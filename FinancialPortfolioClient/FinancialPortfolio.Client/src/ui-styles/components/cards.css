@@ -1,0 +1,22 @@
+.card,
+.fp-card {
+  border: 1px solid var(--fp-border-light);
+
+  border-radius: var(--fp-radius);
+
+  background: var(--fp-surface);
+
+  box-shadow: var(--fp-shadow);
+
+  overflow: hidden;
+}
+
+.card-header {
+  border-bottom: 1px solid var(--fp-border-light);
+
+  background: transparent;
+}
+
+.card-body {
+  background: transparent;
+}

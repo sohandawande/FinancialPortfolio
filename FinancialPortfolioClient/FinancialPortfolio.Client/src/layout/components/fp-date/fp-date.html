@@ -1,0 +1,101 @@
+<div class="fp-date" [class.is-open]="open()" [class.is-disabled]="disabled()">
+  <button
+    type="button"
+    class="fp-date-trigger"
+    [disabled]="disabled()"
+    (click)="toggle()"
+  >
+    <span class="fp-date-ico"><i class="bi bi-calendar3"></i></span>
+    <input
+      class="fp-date-input"
+      type="text"
+      inputmode="numeric"
+      maxlength="10"
+      [value]="typed()"
+      [placeholder]="placeholder()"
+      [disabled]="disabled()"
+      (click)="$event.stopPropagation()"
+      (input)="onTyped($event)"
+      (blur)="onBlur()"
+      (focus)="open() ? null : toggle()"
+      (keydown)="onKeydown($event)"
+    />
+    <i class="bi bi-chevron-down fp-date-caret"></i>
+  </button>
+
+  @if (open()) {
+    <div class="fp-cal" [style.top.px]="panel().top" [style.left.px]="panel().left" (click)="$event.stopPropagation()">
+      <div class="fp-cal-head">
+        <button type="button" class="fp-cal-nav" (click)="prevMonth()" aria-label="Previous">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        <div class="fp-cal-jump">
+          @if (viewMode() === 'years') {
+            <button type="button" class="fp-cal-title" (click)="viewMode.set('days')">{{ decadeLabel() }}</button>
+          } @else {
+            <button type="button" class="fp-cal-title" (click)="showMonths()">{{ monthLabel() }}</button>
+            <button type="button" class="fp-cal-title" (click)="showYears()">{{ yearLabel() }}</button>
+          }
+        </div>
+        <button type="button" class="fp-cal-nav" (click)="nextMonth()" aria-label="Next">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+
+      @if (viewMode() === 'months') {
+        <div class="fp-cal-pick">
+          @for (m of monthChoices(); track m.index) {
+            <button
+              type="button"
+              class="fp-cal-chip"
+              [class.is-on]="m.index === viewMonth()"
+              [disabled]="m.disabled"
+              (click)="pickMonth(m.index, m.disabled)"
+            >
+              {{ m.label }}
+            </button>
+          }
+        </div>
+      } @else if (viewMode() === 'years') {
+        <div class="fp-cal-pick">
+          @for (y of yearChoices(); track y.year) {
+            <button
+              type="button"
+              class="fp-cal-chip"
+              [class.is-on]="y.year === viewYear()"
+              [disabled]="y.disabled"
+              (click)="pickYear(y.year, y.disabled)"
+            >
+              {{ y.year }}
+            </button>
+          }
+        </div>
+      } @else {
+        <div class="fp-cal-week">
+          @for (d of weekdays; track d) {
+            <span>{{ d }}</span>
+          }
+        </div>
+        <div class="fp-cal-grid">
+          @for (day of days(); track day.iso) {
+            <button
+              type="button"
+              class="fp-cal-day"
+              [class.is-out]="day.outside"
+              [class.is-today]="day.today"
+              [class.is-on]="day.selected"
+              [disabled]="day.disabled"
+              (click)="pick(day)"
+            >
+              {{ day.day }}
+            </button>
+          }
+        </div>
+      }
+
+      <div class="fp-cal-foot">
+        <button type="button" class="fp-cal-link" (click)="goToday()">Today</button>
+      </div>
+    </div>
+  }
+</div>

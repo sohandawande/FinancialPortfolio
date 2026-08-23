@@ -1,0 +1,43 @@
+/* ============================================================
+   COMMON UTILITIES
+   ============================================================ */
+
+.fp-surface {
+  background: var(--fp-surface);
+}
+
+.fp-shadow {
+  box-shadow: var(--fp-shadow);
+}
+
+.fp-rounded {
+  border-radius: var(--fp-radius);
+}
+
+.fp-border {
+  border: 1px solid var(--fp-border);
+}
+
+.change-positive {
+  color: var(--fp-success) !important;
+}
+
+.change-negative {
+  color: var(--fp-danger) !important;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.fw-750 {
+  font-weight: 750;
+}
+
+.text-truncate {
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}

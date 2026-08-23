@@ -1,0 +1,36 @@
+.btn-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: var(--fp-radius-sm);
+  border: 1px solid var(--fp-border);
+  background: var(--fp-card);
+  color: var(--fp-text);
+  padding: 0.35rem 0.65rem;
+  font-weight: 600;
+}
+
+.btn-theme-toggle:hover {
+  border-color: var(--fp-vue);
+  color: var(--fp-vue);
+  background: var(--fp-vue-soft);
+}
+
+.theme-menu {
+  min-width: 10rem;
+  border: 1px solid var(--fp-border);
+  border-radius: var(--fp-radius);
+  background: var(--fp-card);
+  z-index: 1050;
+}
+
+.theme-menu .dropdown-item {
+  color: var(--fp-text);
+  font-size: 0.9rem;
+}
+
+.theme-menu .dropdown-item:hover,
+.theme-menu .dropdown-item.active {
+  background: var(--fp-vue-soft);
+  color: var(--fp-vue-dark);
+}

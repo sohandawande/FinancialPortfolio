@@ -1,0 +1,112 @@
+# ============================================================
+# Financial Portfolio - Docker Compose (local development)
+# ============================================================
+# Layout:
+#   FinancialPortfolio/
+#   ├── FinancialPortfolioServer/   (Dockerfile + entrypoint.sh)
+#   ├── FinancialPortfolioClient/FinancialPortfolio.Client/
+#   ├── compose.yaml
+#   └── .env
+#
+#   docker compose up --build
+#   docker compose down -v
+# ============================================================
+
+name: financial-portfolio
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: fp-sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD:-Sohan@Sql2026!}"
+      MSSQL_PID: "Developer"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    networks:
+      - fp-network
+    healthcheck:
+      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$${MSSQL_SA_PASSWORD}" -C -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 40s
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./FinancialPortfolioServer
+      dockerfile: Dockerfile
+    container_name: fp-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+
+      ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=FinancialPortfolioDb;User Id=sa;Password=${MSSQL_SA_PASSWORD:-Sohan@Sql2026!};TrustServerCertificate=True;MultipleActiveResultSets=true"
+
+      # Email
+      Email__ActiveProvider: Mailtrap
+      Email__Mailtrap__UserName: "${MAILTRAP_USER:-}"
+      Email__Mailtrap__Password: "${MAILTRAP_PASS:-}"
+      Email__ResetPasswordUrl: "http://localhost:4300/reset-password"
+      Email__LoginUrl: "http://localhost:4300/login"
+
+      # JWT (JwtSettings.SecretKey)
+      Jwt__SecretKey: "${JWT_SECRET_KEY}"
+      Jwt__Issuer: "FinancialPortfolio.Api"
+      Jwt__Audience: "FinancialPortfolio.Client"
+      Jwt__AccessTokenExpirationMinutes: "60"
+      Jwt__RefreshTokenExpirationDays: "7"
+
+      # Logo.dev
+      Logo__PublishableToken: "${LOGO_PUBLISHABLE_TOKEN:-}"
+      Logo__ExchangeSuffix: ".NS"
+      Logo__StorageFolder: "wwwroot/logos"
+      Logo__PublicPathPrefix: "/logos"
+
+      # Google Sheet
+      GoogleSheet__ApiKey: "${GOOGLE_SHEET_API_KEY:-}"
+      GoogleSheet__SpreadsheetId: "${GOOGLE_SHEET_SPREADSHEET_ID:-}"
+      GoogleSheet__SheetName: "${GOOGLE_SHEET_SHEET_NAME:-Stocks}"
+
+      # Seed (must match AdminUserSeeder fields)
+      Seed__Enabled: "${Seed__Enabled:-true}"
+      Seed__AdminEmail: "${Seed__AdminEmail:-admin@financialportfolio.local}"
+      Seed__AdminPassword: "${Seed__AdminPassword:-Admin@12345!}"
+      Seed__AdminUserName: "${Seed__AdminUserName:-System_Admin}"
+      Seed__AdminFirstName: "${Seed__AdminFirstName:-System}"
+      Seed__AdminLastName: "${Seed__AdminLastName:-Admin}"
+      Seed__AdminUserCode: "${Seed__AdminUserCode:-FP0001}"
+      Seed__AdminMobileNumber: "${Seed__AdminMobileNumber:-0000000000}"
+    ports:
+      - "5000:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    networks:
+      - fp-network
+    restart: unless-stopped
+
+  client:
+    build:
+      context: ./FinancialPortfolioClient/FinancialPortfolio.Client
+      dockerfile: Dockerfile
+    container_name: fp-client
+    ports:
+      - "4300:80"
+    depends_on:
+      - api
+    networks:
+      - fp-network
+    restart: unless-stopped
+
+networks:
+  fp-network:
+    driver: bridge
+
+volumes:
+  sqlserver_data:
+    driver: local

@@ -1,0 +1,454 @@
+<div class="page-container dividends-page">
+  <app-page-header
+    title="Dividends"
+    subtitle="Every cash credit — add, edit or delete, grouped by stock, payout or year"
+    [actions]="headerActions()"
+    (actionClick)="onHeaderAction($event)"
+  />
+
+  @if (loading()) {
+    <div class="div-skeleton">
+      <div class="spinner-border text-success" role="status"></div>
+      <p>Loading your dividend book…</p>
+    </div>
+  } @else if (overview(); as o) {
+    <section class="div-hero">
+      <div class="div-hero-glow"></div>
+
+      <div class="div-hero-lead">
+        <div class="div-hero-kicker">
+          <span class="div-coin"><i class="bi bi-cash-coin"></i></span>
+          Dividend earned
+        </div>
+        <div class="div-hero-amount">{{ o.totalAmount | currency: 'INR' : 'symbol' : '1.2-2' }}</div>
+      </div>
+
+      <div class="div-hero-stats">
+        @if (focusStock(); as focus) {
+          <button type="button" class="div-chip" (click)="clearFocus()">
+            <app-stock-logo [symbol]="focus.symbol" [logoUrl]="focus.logoUrl" [size]="18" rounded="circle" />
+            {{ focus.symbol }}
+            <i class="bi bi-x-lg"></i>
+          </button>
+        }
+        <div class="div-stat is-cos">
+          <span class="div-stat-icon"><i class="bi bi-building"></i></span>
+          <span class="div-stat-value">{{ o.companyCount }}</span>
+          <span class="div-stat-label">{{ o.companyCount === 1 ? 'company' : 'companies' }}</span>
+        </div>
+        <div class="div-stat is-pay">
+          <span class="div-stat-icon"><i class="bi bi-receipt"></i></span>
+          <span class="div-stat-value">{{ o.payoutCount }}</span>
+          <span class="div-stat-label">{{ o.payoutCount === 1 ? 'payout' : 'payouts' }}</span>
+        </div>
+        <div class="div-stat is-last">
+          <span class="div-stat-icon"><i class="bi bi-calendar-event"></i></span>
+          <span class="div-stat-value">
+            @if (latestPayout(); as last) {
+              {{ last.dividendDate | date: 'dd MMM yy' }}
+            } @else {
+              —
+            }
+          </span>
+          <span class="div-stat-label">last credit</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="div-toolbar">
+      <div class="div-tabs" role="tablist">
+        <button type="button" class="div-tab" [class.is-active]="view() === 'stocks'" (click)="setView('stocks')">
+          <i class="bi bi-building"></i>
+          By Stocks
+        </button>
+        <button type="button" class="div-tab" [class.is-active]="view() === 'payouts'" (click)="setView('payouts')">
+          <i class="bi bi-receipt"></i>
+          By Payouts
+        </button>
+        <button type="button" class="div-tab" [class.is-active]="view() === 'year'" (click)="setView('year')">
+          <i class="bi bi-calendar3"></i>
+          By Year
+        </button>
+      </div>
+
+      <label class="div-search">
+        <i class="bi bi-search"></i>
+        <input
+          type="search"
+          placeholder="Search company or symbol…"
+          [ngModel]="searchTerm()"
+          (ngModelChange)="searchTerm.set($event)"
+        />
+      </label>
+    </div>
+
+    @if (view() === 'stocks') {
+      @if (filteredStocks().length === 0) {
+        <div class="div-empty">
+          <span class="div-empty-icon"><i class="bi bi-cash-coin"></i></span>
+          <h3>No dividends yet</h3>
+          <p>Record cash credits when a company pays them. They roll into holdings P&amp;L automatically.</p>
+          <button type="button" class="btn btn-primary" (click)="openAddModal()">
+            <i class="bi bi-plus-lg me-1"></i> Add first dividend
+          </button>
+        </div>
+      } @else {
+        <div class="div-list">
+          @for (stock of filteredStocks(); track stock.stockId) {
+            <article class="div-card" [class.is-open]="isStockExpanded(stock.stockId)">
+              <button type="button" class="div-card-head" (click)="toggleStock(stock.stockId)">
+                <div class="div-identity">
+                  <span class="div-logo-ring">
+                    <app-stock-logo [symbol]="stock.symbol" [logoUrl]="stock.logoUrl" [size]="44" rounded="circle" />
+                  </span>
+                  <div class="min-w-0 text-start">
+                    <div class="div-name">{{ stock.companyName }}</div>
+                    <div class="div-meta">
+                      <span class="div-symbol">{{ stock.symbol }}</span>
+                      @if (stock.payoutCount > 1) {
+                        <span class="div-count-badge">{{ stock.payoutCount }}</span>
+                        <span>Multiple dividends</span>
+                      } @else {
+                        <span><i class="bi bi-briefcase"></i> {{ stock.payouts[0]?.quantity }} shares</span>
+                      }
+                    </div>
+                  </div>
+                </div>
+                <div class="div-head-right">
+                  <div class="div-money">{{ stock.totalAmount | currency: 'INR' : 'symbol' : '1.2-2' }}</div>
+                  <i class="bi div-chevron" [class.bi-chevron-down]="!isStockExpanded(stock.stockId)" [class.bi-chevron-up]="isStockExpanded(stock.stockId)"></i>
+                </div>
+              </button>
+
+              @if (isStockExpanded(stock.stockId)) {
+                <div class="div-card-body">
+                  @for (payout of stock.payouts; track payout.id) {
+                    <div class="div-payout">
+                      <div class="div-identity">
+                        <span class="div-rupee"><i class="bi bi-currency-rupee"></i></span>
+                        <div class="min-w-0">
+                          <div class="div-name">{{ payout.companyName }}</div>
+                          <div class="div-meta">
+                            <span><i class="bi bi-briefcase"></i> {{ payout.quantity }} shares</span>
+                            <span>₹{{ payout.perShareAmount }} / share</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="div-payout-side">
+                        <div class="div-money">{{ payout.amount | currency: 'INR' : 'symbol' : '1.2-2' }}</div>
+                        <div class="div-date">on {{ payout.dividendDate | date: 'dd MMM yy' }}</div>
+                        <div class="div-actions">
+                          <button type="button" class="div-icon-btn" title="Edit" (click)="openEditModal(payout, $event)">
+                            <i class="bi bi-pencil"></i>
+                          </button>
+                          <button type="button" class="div-icon-btn is-danger" title="Delete" (click)="deleteDividend(payout.id, $event)">
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                  <div class="div-card-footer">
+                    <button type="button" class="btn btn-sm btn-success" (click)="openAddModal(stock.stockId, $event)">
+                      <i class="bi bi-plus-lg me-1"></i> Add for {{ stock.symbol }}
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="openHolding(stock.stockId, $event)">
+                      View holding
+                    </button>
+                  </div>
+                </div>
+              }
+            </article>
+          }
+        </div>
+      }
+    }
+
+    @if (view() === 'payouts') {
+      @if (filteredPayouts().length === 0) {
+        <div class="div-empty"><p>No payouts in this view.</p></div>
+      } @else {
+        <div class="div-list">
+          @for (payout of filteredPayouts(); track payout.id) {
+            <article class="div-card">
+              <div class="div-payout is-flat">
+                <div class="div-identity">
+                  <span class="div-logo-ring sm">
+                    <app-stock-logo [symbol]="payout.symbol" [logoUrl]="payout.logoUrl" [size]="40" rounded="circle" />
+                  </span>
+                  <div class="min-w-0">
+                    <div class="div-name">{{ payout.companyName }}</div>
+                    <div class="div-meta">
+                      <span class="div-symbol">{{ payout.symbol }}</span>
+                      <span><i class="bi bi-briefcase"></i> {{ payout.quantity }} shares</span>
+                      <span>₹{{ payout.perShareAmount }} / share</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="div-payout-side">
+                  <div class="div-money">{{ payout.amount | currency: 'INR' : 'symbol' : '1.2-2' }}</div>
+                  <div class="div-date">on {{ payout.dividendDate | date: 'dd MMM yy' }}</div>
+                  <div class="div-actions">
+                    <button type="button" class="div-icon-btn" title="Edit" (click)="openEditModal(payout)">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button type="button" class="div-icon-btn is-danger" title="Delete" (click)="deleteDividend(payout.id)">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </article>
+          }
+        </div>
+      }
+    }
+
+    @if (view() === 'year') {
+      @if (filteredYears().length === 0) {
+        <div class="div-empty"><p>No yearly totals yet.</p></div>
+      } @else {
+        <div class="div-list">
+          @for (year of filteredYears(); track year.year) {
+            <article class="div-card" [class.is-open]="isYearExpanded(year.year)">
+              <button type="button" class="div-card-head" (click)="toggleYear(year.year)">
+                <div class="div-identity">
+                  <span class="div-year-badge">{{ year.year }}</span>
+                  <div class="text-start">
+                    <div class="div-name">Calendar year</div>
+                    <div class="div-meta">
+                      {{ year.companyCount }} {{ year.companyCount === 1 ? 'company' : 'companies' }}
+                      · {{ year.payoutCount }} {{ year.payoutCount === 1 ? 'payout' : 'payouts' }}
+                    </div>
+                  </div>
+                </div>
+                <div class="div-head-right">
+                  <div class="div-money">{{ year.amount | currency: 'INR' : 'symbol' : '1.2-2' }}</div>
+                  <i class="bi div-chevron" [class.bi-chevron-down]="!isYearExpanded(year.year)" [class.bi-chevron-up]="isYearExpanded(year.year)"></i>
+                </div>
+              </button>
+
+              @if (isYearExpanded(year.year)) {
+                <div class="div-card-body">
+                  @for (payout of year.payouts; track payout.id) {
+                    <div class="div-payout">
+                      <div class="div-identity">
+                        <span class="div-logo-ring sm">
+                          <app-stock-logo [symbol]="payout.symbol" [logoUrl]="payout.logoUrl" [size]="36" rounded="circle" />
+                        </span>
+                        <div class="min-w-0">
+                          <div class="div-name">{{ payout.companyName }}</div>
+                          <div class="div-meta">
+                            <span><i class="bi bi-briefcase"></i> {{ payout.quantity }} shares</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="div-payout-side">
+                        <div class="div-money">{{ payout.amount | currency: 'INR' : 'symbol' : '1.2-2' }}</div>
+                        <div class="div-date">on {{ payout.dividendDate | date: 'dd MMM yy' }}</div>
+                        <div class="div-actions">
+                          <button type="button" class="div-icon-btn" title="Edit" (click)="openEditModal(payout, $event)">
+                            <i class="bi bi-pencil"></i>
+                          </button>
+                          <button type="button" class="div-icon-btn is-danger" title="Delete" (click)="deleteDividend(payout.id, $event)">
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </article>
+          }
+        </div>
+      }
+    }
+  }
+</div>
+
+@if (showDividendModal()) {
+  <app-fp-modal
+    [open]="true"
+    [title]="isEditing() ? 'Edit dividend' : 'Add dividend'"
+    size="md"
+    [subtitle]="isEditing() ? 'Update quantity, rate or credit date.' : 'Cash credited to a stock you already bought.'"
+    icon="bi-cash-coin"
+    [busy]="savingDividend()"
+    [confirmText]="isEditing() ? 'Save changes' : 'Save dividend'"
+    (closed)="closeDividendModal()"
+    (confirmed)="submitDividend()"
+  >
+    <div class="div-form">
+      @if (formStock(); as stock) {
+        <div class="div-form-stock">
+          <app-stock-logo [symbol]="stock.symbol" [logoUrl]="stock.logoUrl" [size]="40" rounded="circle" />
+          <div>
+            <div class="fw-semibold">{{ stock.companyName }}</div>
+            <div class="text-muted small">{{ stock.symbol }} · {{ stock.currentQuantity }} shares held</div>
+          </div>
+        </div>
+      }
+
+      <label class="div-field">
+        <span>Stock</span>
+        <select class="form-select" [(ngModel)]="dividendForm.stockId" (ngModelChange)="onStockFormChange()" [class.is-invalid]="!!dividendFieldError('stock')" (blur)="touchDividend('stock')">
+          <option [ngValue]="0" disabled>Select a stock</option>
+          @for (p of positions(); track p.stockId) {
+            <option [ngValue]="p.stockId">{{ p.symbol }} — {{ p.companyName }}</option>
+          }
+        </select>
+        @if (dividendFieldError('stock'); as msg) {
+          <div class="invalid-feedback d-block small">{{ msg }}</div>
+        }
+      </label>
+
+      <div class="div-form-grid">
+        <label class="div-field">
+          <span>Quantity</span>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-hash"></i></span>
+            <input type="number" min="1" class="form-control" [(ngModel)]="dividendForm.quantity" (ngModelChange)="onDividendCalc()" [class.is-invalid]="!!dividendFieldError('quantity')" (blur)="touchDividend('quantity')" />
+          </div>
+          @if (dividendFieldError('quantity'); as msg) {
+            <div class="invalid-feedback d-block small">{{ msg }}</div>
+          }
+        </label>
+        <label class="div-field">
+          <span>Per share</span>
+          <div class="input-group">
+            <span class="input-group-text">₹</span>
+            <input type="number" min="0" step="0.01" class="form-control" [ngModel]="dividendForm.perShareAmount" (focus)="onPriceFocus($event)" (input)="onPerShareInput($event)" (blur)="onPerShareBlur($event)" [class.is-invalid]="!!dividendFieldError('perShare')" />
+          </div>
+          @if (dividendFieldError('perShare'); as msg) {
+            <div class="invalid-feedback d-block small">{{ msg }}</div>
+          }
+        </label>
+      </div>
+
+      <label class="div-field">
+        <span>Total amount</span>
+        <div class="input-group div-amount">
+          <span class="input-group-text">₹</span>
+          <input
+            type="text"
+            class="form-control"
+            [value]="(dividendForm.amount | number:'1.2-2') || '0.00'"
+            readonly
+            tabindex="-1"
+          />
+        </div>
+      </label>
+
+      <label class="div-field">
+        <span>Credit date</span>
+        <div (focusout)="touchDividend('date')">
+          <app-fp-date name="dividendDate" [(ngModel)]="dividendForm.dividendDate" />
+        </div>
+        @if (dividendFieldError('date'); as msg) {
+          <div class="invalid-feedback d-block small">{{ msg }}</div>
+        }
+      </label>
+
+      <div class="div-form-grid">
+        <label class="div-field">
+          <span>Ex date</span>
+          <app-fp-date name="exDate" [(ngModel)]="dividendForm.exDate" />
+        </label>
+        <label class="div-field">
+          <span>Record date</span>
+          <app-fp-date name="recordDate" [(ngModel)]="dividendForm.recordDate" />
+        </label>
+      </div>
+
+      <label class="div-field">
+        <span>Notes</span>
+        <input type="text" class="form-control" maxlength="1000" placeholder="Optional remark" [(ngModel)]="dividendForm.notes" />
+      </label>
+    </div>
+  </app-fp-modal>
+}
+
+@if (showImportModal()) {
+  <app-fp-modal
+    [open]="true"
+    title="Import dividends"
+    subtitle="CSV credits matched by symbol. Stock must already have a buy."
+    icon="bi-upload"
+    size="lg"
+    [busy]="importSaving()"
+    [confirmText]="'Import ' + importPreview().length + ' dividend' + (importPreview().length === 1 ? '' : 's')"
+    [confirmDisabled]="importPreview().length === 0"
+    (closed)="closeImportModal()"
+    (confirmed)="submitImport()"
+  >
+    <div class="import-panel">
+      <div class="import-hint is-div">
+        <i class="bi bi-info-circle"></i>
+        <div>
+          <strong>Required:</strong> Symbol, Quantity, Dividend Date, Amount or Per Share<br />
+          <strong>Optional:</strong> Ex Date, Record Date, Notes
+        </div>
+      </div>
+
+      <div>
+        <label class="form-label mb-1">Select CSV file</label>
+        <div class="import-file-row">
+          <label class="import-pick">
+            <i class="bi bi-file-earmark-spreadsheet"></i>
+            <span>{{ importFileName() || 'Choose file' }}</span>
+            <input type="file" accept=".csv" (change)="onImportFileSelected($event)" [disabled]="importSaving()" />
+          </label>
+          <button type="button" class="import-sample" (click)="downloadImportSample()">
+            <i class="bi bi-download"></i> Sample
+          </button>
+        </div>
+      </div>
+    </div>
+
+    @if (importErrors().length > 0) {
+      <div class="alert alert-warning small">
+        <strong>{{ importErrors().length }} issue(s):</strong>
+        <ul class="mb-0 mt-1">
+          @for (err of importErrors(); track err) {
+            <li>{{ err }}</li>
+          }
+        </ul>
+      </div>
+    }
+
+    @if (importPreview().length > 0) {
+      <div class="table-responsive import-preview">
+        <table class="table table-sm table-bordered mb-0">
+          <thead class="table-light sticky-top">
+            <tr>
+              <th>#</th>
+              <th>Symbol</th>
+              <th class="text-end">Qty</th>
+              <th class="text-end">Amount</th>
+              <th>Date</th>
+              <th>Ex date</th>
+              <th>Record date</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of importPreview(); track $index) {
+              <tr>
+                <td>{{ $index + 1 }}</td>
+                <td>{{ row.symbol }}</td>
+                <td class="text-end">{{ row.quantity }}</td>
+                <td class="text-end">{{ row.amount | number:'1.2-2' }}</td>
+                <td>{{ row.date }}</td>
+                <td>{{ row.exDate || '—' }}</td>
+                <td>{{ row.recordDate || '—' }}</td>
+                <td>{{ row.notes || '—' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="form-text mt-2">{{ importPreview().length }} valid row(s) ready to import</div>
+    }
+  </app-fp-modal>
+}

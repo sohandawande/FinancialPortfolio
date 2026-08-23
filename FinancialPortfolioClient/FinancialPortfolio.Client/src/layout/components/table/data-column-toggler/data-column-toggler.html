@@ -1,0 +1,22 @@
+<div class="data-column-toggler">
+  <button type="button" class="btn btn-outline-secondary btn-sm" (click)="toggleMenu()">
+    <i class="bi bi-layout-three-columns me-1"></i>
+    Columns
+  </button>
+
+  @if (open()) {
+    <div class="column-menu card shadow-sm">
+      @for (col of items(); track col.key) {
+        <label class="column-item">
+          <input
+            type="checkbox"
+            class="form-check-input me-2"
+            [checked]="!col.hidden"
+            (change)="toggleColumn(col)"
+          />
+          {{ col.header }}
+        </label>
+      }
+    </div>
+  }
+</div>

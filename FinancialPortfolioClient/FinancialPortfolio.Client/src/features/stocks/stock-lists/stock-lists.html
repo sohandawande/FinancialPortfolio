@@ -1,0 +1,20 @@
+<div class="page-container">
+  <app-page-header
+    title="Stocks"
+    subtitle="Live market snapshot from your synced Google Sheet data."
+    [actions]="headerActions()"
+    (actionClick)="onHeaderAction($event)">
+  </app-page-header>
+
+  <app-data-grid
+    [columns]="columns()"
+    [data]="stocks()"
+    [loading]="loading()"
+    [totalRecords]="totalRecords()"
+    [query]="query()"
+    emptyMessage="No stocks found"
+    (queryChange)="onQueryChange($event)"
+    (columnsChange)="onColumnsChange($event)"
+  >
+  </app-data-grid>
+</div>

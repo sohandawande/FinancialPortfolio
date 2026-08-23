@@ -1,0 +1,227 @@
+/* =============================================================================
+   Shared page chrome — every feature page uses these primitives
+   ============================================================================= */
+
+.page-container,
+.users-page,
+.holding-detail-page,
+.user-detail-page,
+.dividends-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.page-hero,
+app-page-header .page-hero,
+.dash-hero,
+.div-hero,
+.ud-hero,
+.hd-hero,
+.sd-hero {
+  border-radius: var(--fp-radius) !important;
+  background: linear-gradient(
+    135deg,
+    var(--fp-vue-soft) 0%,
+    var(--fp-navy-soft) 52%,
+    var(--fp-card) 100%
+  ) !important;
+  border: 1px solid var(--fp-border-soft);
+  box-shadow: var(--fp-shadow);
+}
+
+.page-hero h1,
+.page-hero .page-title,
+.dash-title {
+  font-size: var(--fp-fs-page) !important;
+  font-weight: 700 !important;
+  color: var(--fp-navy) !important;
+  margin: 0;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.page-hero .page-subtitle,
+.page-hero p,
+.dash-sub {
+  font-size: var(--fp-fs-md) !important;
+  color: var(--fp-text-muted) !important;
+  margin: 0.25rem 0 0;
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+.page-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.fp-card,
+.page-card {
+  background: var(--fp-card);
+  border: 1px solid var(--fp-border-soft);
+  border-radius: var(--fp-radius);
+  box-shadow: var(--fp-shadow);
+}
+
+.fp-kicker,
+.dash-eyebrow,
+.div-hero-kicker,
+.dividend-year-kicker {
+  font-size: var(--fp-fs-xs) !important;
+  font-weight: 600 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--fp-vue) !important;
+}
+
+/* Detail identity (user / holding / stock) */
+.fp-avatar,
+.ud-avatar,
+.hd-logo,
+.sd-logo {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--fp-radius);
+  flex-shrink: 0;
+}
+
+.fp-field-label,
+.ud-label,
+.hd-label,
+.sd-metric-label,
+.div-field > span,
+.div-stat-label,
+.dividend-metric-label {
+  display: block;
+  font-size: var(--fp-fs-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--fp-text-muted);
+}
+
+.fp-field-value,
+.ud-value,
+.hd-value,
+.sd-metric-value {
+  font-size: var(--fp-fs-md);
+  font-weight: 600;
+  color: var(--fp-text);
+}
+
+.fp-tabs,
+.div-tabs,
+.fp-filter-pills {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.15rem;
+  height: var(--fp-ctrl);
+  padding: 0.2rem;
+  border-radius: 999px;
+  background: var(--fp-navy-soft);
+}
+
+.fp-tab,
+.div-tab,
+.fp-filter-pill {
+  height: 28px;
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 0;
+  background: transparent;
+  border-radius: 999px;
+  padding: 0 0.7rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--fp-text-muted);
+}
+
+.fp-tab i,
+.div-tab i,
+.fp-filter-pill i {
+  font-size: 0.78rem;
+  line-height: 1;
+}
+
+.fp-tab:hover:not(.is-active):not(.active),
+.div-tab:hover:not(.is-active),
+.fp-filter-pill:hover:not(.active) {
+  color: var(--fp-navy);
+  background: rgba(255, 255, 255, 0.65);
+}
+
+.fp-tab.is-active,
+.fp-tab.active,
+.div-tab.is-active,
+.fp-filter-pill.active {
+  background: var(--fp-vue);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(66, 184, 131, 0.25);
+}
+
+.fp-tab-count {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: var(--fp-card);
+  color: var(--fp-navy);
+}
+
+.fp-tab.is-active .fp-tab-count,
+.fp-tab.active .fp-tab-count {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+
+@media (max-width: 991.98px) {
+  .page-hero h1,
+  .page-hero .page-title,
+  .dash-title {
+    font-size: 1.4rem !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .page-hero,
+  .dash-hero {
+    padding: 0.95rem 1rem !important;
+  }
+
+  .page-hero h1,
+  .page-hero .page-title,
+  .dash-title {
+    font-size: 1.25rem !important;
+  }
+
+  .page-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .page-toolbar .btn {
+    width: 100%;
+  }
+
+  .fp-avatar,
+  .ud-avatar,
+  .hd-logo,
+  .sd-logo {
+    width: 56px;
+    height: 56px;
+  }
+}

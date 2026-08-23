@@ -1,0 +1,139 @@
+<div class="page-container">
+  <app-page-header
+    title="System Log Detail"
+    subtitle="Full log entry and exception details"
+    [actions]="headerActions()"
+    (actionClick)="onHeaderAction($event)"
+  >
+  </app-page-header>
+
+@if (loading()) {
+  <div class="card border-0 shadow-sm">
+    <div class="card-body text-center py-5">
+      <div class="spinner-border text-primary" role="status"></div>
+      <p class="text-muted mt-2 mb-0">Loading log…</p>
+    </div>
+  </div>
+} @else if (notFound() || !log()) {
+  <div class="card border-0 shadow-sm">
+    <div class="card-body text-center py-5">
+      <i class="bi bi-exclamation-triangle fs-2 text-warning d-block mb-2"></i>
+      <p class="mb-3">Log not found or could not be loaded.</p>
+      <button type="button" class="btn btn-primary btn-sm" (click)="back()">Back to list</button>
+    </div>
+  </div>
+} @else {
+  @if (log(); as item) {
+    <div class="row g-3">
+      <!-- Summary -->
+      <div class="col-12 col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-header bg-white fw-semibold">Summary</div>
+          <div class="card-body">
+            <dl class="row mb-0 small">
+              <dt class="col-5 text-muted">ID</dt>
+              <dd class="col-7">{{ item.id }}</dd>
+
+              <dt class="col-5 text-muted">Level</dt>
+              <dd class="col-7">
+                <span class="badge" [class]="levelBadgeClass()">{{ item.logLevel }}</span>
+              </dd>
+
+              <dt class="col-5 text-muted">Source</dt>
+              <dd class="col-7">{{ item.applicationLevel }}</dd>
+
+              <dt class="col-5 text-muted">Category</dt>
+              <dd class="col-7">{{ item.category }}</dd>
+
+              <dt class="col-5 text-muted">Method</dt>
+              <dd class="col-7">{{ item.method || '—' }}</dd>
+
+              <dt class="col-5 text-muted">Date</dt>
+              <dd class="col-7">
+                {{ item.createdDate ? (item.createdDate | date: 'medium') : '—' }}
+              </dd>
+
+              <dt class="col-5 text-muted">Path</dt>
+              <dd class="col-7 text-break">{{ item.requestPath || '—' }}</dd>
+
+              <dt class="col-5 text-muted">IP</dt>
+              <dd class="col-7">{{ item.ipAddress || '—' }}</dd>
+
+              <dt class="col-5 text-muted">Machine</dt>
+              <dd class="col-7">{{ item.machineName || '—' }}</dd>
+
+              <dt class="col-5 text-muted">User Id</dt>
+              <dd class="col-7">{{ item.userId ?? '—' }}</dd>
+
+              <dt class="col-5 text-muted">Identity</dt>
+              <dd class="col-7 text-break small">{{ item.identityUserId || '—' }}</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+
+      <!-- Message + exception -->
+      <div class="col-12 col-lg-8">
+        <div class="card border-0 shadow-sm mb-3">
+          <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <span class="fw-semibold">Message</span>
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-secondary"
+              title="Copy"
+              (click)="copy(item.message)"
+            >
+              <i class="bi bi-clipboard"></i>
+            </button>
+          </div>
+          <div class="card-body">
+            <pre class="log-pre mb-0">{{ item.message }}</pre>
+          </div>
+        </div>
+
+        @if (item.detail?.exception) {
+          <div class="card border-0 shadow-sm mb-3 border-start border-danger border-3">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+              <span class="fw-semibold text-danger">Exception</span>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary"
+                (click)="copy(item.detail?.exception)"
+              >
+                <i class="bi bi-clipboard"></i>
+              </button>
+            </div>
+            <div class="card-body">
+              <pre class="log-pre text-danger mb-0">{{ item.detail?.exception }}</pre>
+            </div>
+          </div>
+        }
+
+        @if (item.detail?.stackTrace) {
+          <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+              <span class="fw-semibold">Stack Trace</span>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary"
+                (click)="copy(item.detail?.stackTrace)"
+              >
+                <i class="bi bi-clipboard"></i>
+              </button>
+            </div>
+            <div class="card-body">
+              <pre class="log-pre stack-trace mb-0">{{ item.detail?.stackTrace }}</pre>
+            </div>
+          </div>
+        }
+
+        @if (!item.detail?.exception && !item.detail?.stackTrace) {
+          <div class="alert alert-light border text-muted mb-0">
+            No exception or stack trace for this log.
+          </div>
+        }
+      </div>
+    </div>
+  }
+}
+</div>

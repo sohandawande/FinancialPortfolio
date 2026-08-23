@@ -1,0 +1,74 @@
+.ud-hero {
+  border-radius: var(--fp-radius);
+}
+
+.ud-avatar {
+  background: linear-gradient(135deg, var(--fp-vue) 0%, var(--fp-vue-hover) 100%);
+  color: #fff;
+  font-size: 1.35rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(66, 184, 131, 0.35);
+  letter-spacing: 0.02em;
+}
+
+.ud-avatar.inactive {
+  background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+  box-shadow: 0 4px 14px rgba(100, 116, 139, 0.25);
+}
+
+.ud-section-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--fp-radius-sm);
+  background: var(--fp-vue-soft);
+  color: var(--fp-vue);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.ud-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 1.25rem;
+}
+
+.ud-field-full {
+  grid-column: 1 / -1;
+}
+
+.user-detail-page .card {
+  border-radius: var(--fp-radius);
+  border: 1px solid var(--fp-border-soft);
+  box-shadow: var(--fp-shadow);
+}
+
+.user-detail-page .card-header {
+  border-radius: var(--fp-radius) var(--fp-radius) 0 0 !important;
+}
+
+.stock-active-yes {
+  background: var(--fp-vue-soft) !important;
+  color: var(--fp-vue-dark) !important;
+  border: 1px solid var(--fp-vue-muted);
+}
+
+.stock-active-no {
+  background: var(--fp-danger-soft) !important;
+  color: #b91c1c !important;
+  border: 1px solid #fecaca;
+}
+
+@media (max-width: 575.98px) {
+  .ud-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.user-detail-page .modal {
+  z-index: 1055;
+}

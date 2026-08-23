@@ -1,0 +1,28 @@
+.badge {
+  padding: 0.35rem 0.65rem;
+
+  border-radius: 999px;
+
+  font-size: 0.62rem;
+  font-weight: 750;
+}
+
+.badge-primary {
+  color: var(--fp-primary-dark);
+  background: var(--fp-primary-soft);
+}
+
+.badge-success {
+  color: #16835f;
+  background: var(--fp-success-soft);
+}
+
+.badge-danger {
+  color: #b83b4a;
+  background: var(--fp-danger-soft);
+}
+
+.badge-warning {
+  color: #a66b0a;
+  background: var(--fp-warning-soft);
+}

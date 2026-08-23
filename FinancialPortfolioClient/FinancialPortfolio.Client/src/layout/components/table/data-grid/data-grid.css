@@ -1,0 +1,43 @@
+.data-grid-wrap.card {
+  overflow: visible;
+}
+
+.data-grid {
+  width: 100%;
+}
+
+.data-grid-title {
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--fp-navy);
+  font-size: var(--fp-fs-lg);
+}
+
+.dg-tools:not(:empty) {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.dg-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.dg-btn.active {
+  background: var(--fp-vue-soft);
+  border-color: var(--fp-vue-muted);
+  color: var(--fp-vue-dark);
+}
+
+.dg-filter-panel {
+  width: 100%;
+  background: var(--fp-navy-soft);
+  border: 1px solid var(--fp-border-soft);
+  border-radius: var(--fp-radius-sm);
+  padding: 0.85rem 1rem;
+  margin-bottom: 0.75rem;
+}

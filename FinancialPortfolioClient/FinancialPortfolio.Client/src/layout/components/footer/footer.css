@@ -1,0 +1,11 @@
+footer {
+  height: 48px;
+  flex-shrink: 0;
+  border-top: 1px solid var(--fp-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--fp-card);
+  color: var(--fp-text-muted);
+  font-size: var(--fp-fs-xs);
+}

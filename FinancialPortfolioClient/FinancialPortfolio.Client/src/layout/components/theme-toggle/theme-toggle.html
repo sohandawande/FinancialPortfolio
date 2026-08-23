@@ -1,0 +1,44 @@
+<div class="dropdown">
+  <button
+    class="btn btn-theme-toggle"
+    type="button"
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+    [title]="'Theme: ' + label()">
+    <i class="bi" [class]="icon()"></i>
+    <span class="d-none d-md-inline ms-1 small">{{ label() }}</span>
+  </button>
+
+  <ul class="dropdown-menu dropdown-menu-end shadow theme-menu">
+    <li>
+      <button
+        type="button"
+        class="dropdown-item d-flex align-items-center gap-2"
+        [class.active]="theme.mode() === 'light'"
+        (click)="setMode('light')">
+        <i class="bi bi-sun-fill"></i>
+        Light
+      </button>
+    </li>
+    <li>
+      <button
+        type="button"
+        class="dropdown-item d-flex align-items-center gap-2"
+        [class.active]="theme.mode() === 'dark'"
+        (click)="setMode('dark')">
+        <i class="bi bi-moon-stars-fill"></i>
+        Dark
+      </button>
+    </li>
+    <li>
+      <button
+        type="button"
+        class="dropdown-item d-flex align-items-center gap-2"
+        [class.active]="theme.mode() === 'system'"
+        (click)="setMode('system')">
+        <i class="bi bi-circle-half"></i>
+        Auto (system)
+      </button>
+    </li>
+  </ul>
+</div>

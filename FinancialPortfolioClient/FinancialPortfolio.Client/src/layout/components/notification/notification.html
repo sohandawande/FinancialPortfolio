@@ -1,0 +1,47 @@
+<div class="dropdown">
+  <button
+    class="btn btn-link position-relative text-dark"
+    type="button"
+    data-bs-toggle="dropdown"
+    aria-expanded="false">
+    <i class="bi bi-bell fs-5"></i>
+    @if (notification.unreadCount() > 0) {
+      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+        {{ notification.unreadCount() }}
+      </span>
+    }
+  </button>
+
+  <ul class="dropdown-menu dropdown-menu-end shadow notification-menu">
+    <li class="dropdown-header d-flex justify-content-between align-items-center">
+      <span>Notifications</span>
+      @if (notification.unreadCount() > 0) {
+        <button type="button" class="btn btn-link btn-sm p-0" (click)="notification.markAllRead()">
+          Mark all read
+        </button>
+      }
+    </li>
+    <li><hr class="dropdown-divider" /></li>
+
+    @if (notification.items().length === 0) {
+      <li class="px-3 py-2 text-muted small">No notifications</li>
+    } @else {
+      @for (n of notification.items(); track n.id) {
+        <li>
+          <button
+            type="button"
+            class="dropdown-item d-flex gap-2"
+            [class.fw-semibold]="!n.read"
+            (click)="notification.markRead(n.id)">
+            <i class="bi mt-1" [ngClass]="n.icon || 'bi-bell'"></i>
+            <div>
+              <div>{{ n.title }}</div>
+              <div class="small text-muted">{{ n.message }}</div>
+              <div class="small text-muted">{{ n.time }}</div>
+            </div>
+          </button>
+        </li>
+      }
+    }
+  </ul>
+</div>

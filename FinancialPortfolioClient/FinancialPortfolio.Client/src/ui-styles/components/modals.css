@@ -1,0 +1,12 @@
+.modal-content {
+  border: 0;
+
+  border-radius: var(--fp-radius-lg);
+
+  box-shadow: var(--fp-shadow-lg);
+}
+
+.modal-header,
+.modal-footer {
+  border-color: var(--fp-border-light);
+}

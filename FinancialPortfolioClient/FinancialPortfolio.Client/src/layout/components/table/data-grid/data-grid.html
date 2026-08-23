@@ -1,0 +1,88 @@
+<div
+  class="data-grid-wrap"
+  [class.card]="!embedded()"
+  [class.border-0]="!embedded()"
+  [class.shadow-sm]="!embedded()"
+>
+  <div [class.card-body]="!embedded()" [class.p-3]="!embedded()">
+    <div class="data-grid">
+      @if (title()) {
+        <h4 class="data-grid-title">{{ title() }}</h4>
+      }
+
+      <div class="dg-toolbar">
+        <div class="dg-tools">
+          <ng-content select="[gridTools]"></ng-content>
+        </div>
+
+        <div class="dg-search">
+          @if (showSearch()) {
+            <app-data-search-box
+              [value]="query().globalSearch || ''"
+              (searchChange)="onSearch($event)"
+            />
+          }
+        </div>
+
+        <div class="dg-actions">
+          @if (showFilters()) {
+            <button
+              type="button"
+              class="btn btn-outline-secondary btn-sm dg-btn"
+              [class.active]="filtersOpen()"
+              (click)="toggleFilters()">
+              <i class="bi bi-funnel"></i>
+              Filters
+              @if (activeFilterCount() > 0) {
+                <span class="badge text-bg-primary ms-1">{{ activeFilterCount() }}</span>
+              }
+            </button>
+          }
+
+          @if (showColumnToggler()) {
+            <app-data-column-toggler
+              [columns]="columns()"
+              (columnsChange)="onColumnsChange($event)"
+            />
+          }
+        </div>
+      </div>
+
+      @if (showFilters() && filtersOpen()) {
+        <div class="dg-filter-panel mb-3">
+          <app-data-filters
+            [columns]="columns()"
+            [embedded]="true"
+            (filterChange)="onFilter($event)"
+            (closed)="onFiltersClosed()"
+          />
+        </div>
+      }
+
+      <app-data-table
+        [columns]="columns()"
+        [data]="resolved().page"
+        [loading]="loading()"
+        [emptyMessage]="emptyMessage()"
+        [sorts]="query().sorts || []"
+        [pageNumber]="query().pageNumber"
+        [pageSize]="query().pageSize"
+        [showSerial]="showSerial()"
+        (sortChange)="onSort($event)"
+        (rowClick)="rowClick.emit($event)"
+      />
+
+      @if (showPagination()) {
+        <div class="mt-3">
+          <app-data-pagination
+            [pageNumber]="query().pageNumber"
+            [pageSize]="query().pageSize"
+            [totalRecords]="resolved().total"
+            (pageChange)="onPage($event)"
+            (pageSizeChange)="onPageSize($event)"
+          />
+        </div>
+      }
+    </div>
+  </div>
+</div>

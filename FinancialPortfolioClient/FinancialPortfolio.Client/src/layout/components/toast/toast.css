@@ -1,0 +1,22 @@
+.toast-host {
+  z-index: 1100;
+  max-width: 380px;
+  pointer-events: none;
+}
+
+.toast-host .toast {
+  min-width: 280px;
+  pointer-events: auto;
+  border: 0;
+  border-radius: 0.75rem;
+  box-shadow: 0 12px 32px rgba(53, 73, 94, 0.14);
+}
+
+.toast-host .toast-header {
+  border-bottom-color: #eef2f7;
+  background: #fff;
+}
+
+.toast-host .btn-close:focus {
+  box-shadow: 0 0 0 0.15rem rgba(66, 184, 131, 0.25);
+}

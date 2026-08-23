@@ -1,0 +1,62 @@
+/* Forms — Vue tokens only (no second palette) */
+
+.form-control,
+.form-select {
+  min-height: 42px;
+  border: 1px solid var(--fp-border);
+  border-radius: var(--fp-radius-sm);
+  color: var(--fp-text);
+  background: var(--fp-card);
+  font-size: var(--fp-fs-md);
+  transition: border-color var(--fp-transition), box-shadow var(--fp-transition);
+}
+
+.form-control-sm,
+.form-select-sm {
+  min-height: var(--fp-ctrl, 36px);
+  height: var(--fp-ctrl, 36px);
+  font-size: var(--fp-fs-sm);
+}
+
+.form-control:hover,
+.form-select:hover {
+  border-color: #cbd5e1;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--fp-vue);
+  box-shadow: 0 0 0 0.2rem rgba(66, 184, 131, 0.2);
+}
+
+.form-label {
+  margin-bottom: 0.35rem;
+  color: var(--fp-navy);
+  font-size: var(--fp-fs-sm);
+  font-weight: 600;
+}
+
+.input-group-text {
+  border-color: var(--fp-border);
+  color: var(--fp-text-muted);
+  background: var(--fp-navy-soft);
+}
+
+.form-control::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+.fp-form-modal .form-label,
+.fp-form .form-label {
+  font-size: var(--fp-fs-sm);
+  font-weight: 600;
+}
+
+.fp-form-card {
+  border-radius: var(--fp-radius);
+}
+
+.fp-field {
+  margin-bottom: 1rem;
+}

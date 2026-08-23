@@ -1,0 +1,53 @@
+.serial-col {
+  width: 60px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: #94a3b8;
+  font-size: 0.8rem;
+}
+
+.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.sortable:hover {
+  color: #42b883 !important;
+}
+
+.table tbody tr {
+  transition: background 0.12s ease;
+}
+
+.table-hover > tbody > tr:hover > * {
+  --bs-table-bg-state: #e8f8f1;
+}
+
+.dt-action-btn {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--fp-radius-sm, 0.5rem);
+}
+
+.table td,
+.table th {
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.dt-num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+}
+
+.text-center .badge {
+  display: inline-flex;
+  justify-content: center;
+  min-width: 4.5rem;
+}

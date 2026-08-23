@@ -1,0 +1,210 @@
+/* Sober, attractive form language used by auth + portfolio modals */
+
+.fp-form .fp-field,
+.fp-form-modal .fp-field {
+  margin-bottom: 1rem;
+}
+
+.form-control,
+.form-select {
+  min-height: 44px;
+  border: 1px solid var(--fp-border);
+  border-radius: 0.65rem;
+  color: var(--fp-text);
+  background: #fff;
+  font-size: 0.9rem;
+  transition:
+    border-color var(--fp-transition),
+    box-shadow var(--fp-transition),
+    background var(--fp-transition);
+}
+
+textarea.form-control {
+  min-height: 88px;
+  padding-top: 0.7rem;
+}
+
+.form-control:hover,
+.form-select:hover {
+  border-color: #c5d0dc;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--fp-vue);
+  box-shadow: 0 0 0 4px rgba(66, 184, 131, 0.16);
+}
+
+.form-label {
+  margin-bottom: 0.4rem;
+  color: #35495e;
+  font-size: 0.78rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+}
+
+.input-group-text {
+  border-color: var(--fp-border);
+  color: #42b883;
+  background: #f3faf7;
+  min-width: 2.6rem;
+  justify-content: center;
+}
+
+.input-group .form-control,
+.input-group .form-select {
+  border-left: 0;
+}
+
+.input-group:focus-within .input-group-text,
+.input-group:focus-within .form-control,
+.input-group:focus-within .form-select {
+  border-color: var(--fp-vue);
+}
+
+.fp-form-card {
+  border-radius: 1.15rem;
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(135deg, rgba(66, 184, 131, 0.18), rgba(53, 73, 94, 0.08)) border-box;
+}
+
+.fp-modal-backdrop {
+  background: rgba(36, 52, 68, 0.48);
+  backdrop-filter: blur(6px);
+}
+
+.fp-form-modal {
+  border: 0;
+  border-radius: 1.15rem;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(36, 52, 68, 0.22);
+}
+
+.fp-form-modal-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 1.15rem 1.25rem 1rem;
+  background:
+    linear-gradient(135deg, #f3faf7 0%, #eef3f7 100%);
+  border-bottom: 1px solid var(--fp-border);
+}
+
+.fp-form-modal-head.is-sell {
+  background: linear-gradient(135deg, #fff5f5 0%, #eef3f7 100%);
+}
+
+.fp-form-modal-head h5 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #35495e;
+}
+
+.fp-form-modal-head p {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-top: 0.15rem;
+}
+
+.fp-form-modal-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, #42b883, #36a473);
+  color: #fff;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+  box-shadow: 0 8px 16px rgba(66, 184, 131, 0.28);
+}
+
+.fp-form-modal-head.is-sell .fp-form-modal-icon {
+  background: linear-gradient(145deg, #ef4444, #dc2626);
+  box-shadow: 0 8px 16px rgba(239, 68, 68, 0.25);
+}
+
+.fp-form-modal .modal-body {
+  padding: 1.15rem 1.25rem;
+}
+
+.fp-form-modal .modal-footer {
+  border-top: 1px solid var(--fp-border);
+  padding: 0.85rem 1.25rem 1.1rem;
+  background: #f8fafc;
+}
+
+.fp-selected-stock,
+.fp-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.85rem;
+  border: 1px solid #d7eee4;
+  background: #f4fbf7;
+  margin-bottom: 1rem;
+}
+
+.fp-hint {
+  align-items: flex-start;
+  color: #475569;
+  font-size: 0.82rem;
+}
+
+.fp-hint i {
+  color: #42b883;
+  margin-top: 0.15rem;
+}
+
+.fp-stock-results {
+  margin-top: 0.45rem;
+  max-height: 220px;
+  overflow: auto;
+  border: 1px solid var(--fp-border);
+  border-radius: 0.75rem;
+  background: #fff;
+}
+
+.fp-stock-option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.55rem 0.75rem;
+  border: 0;
+  border-bottom: 1px solid var(--fp-border-soft);
+  background: transparent;
+}
+
+.fp-stock-option:last-child {
+  border-bottom: 0;
+}
+
+.fp-stock-option:hover {
+  background: #f3faf7;
+}
+
+.fp-stock-price {
+  font-weight: 650;
+  color: #35495e;
+  font-variant-numeric: tabular-nums;
+}
+
+.fp-preview-table {
+  max-height: 280px;
+  overflow-y: auto;
+  border-radius: 0.65rem;
+  border: 1px solid var(--fp-border);
+}
+
+@media (max-width: 575.98px) {
+  .fp-form-modal-head,
+  .fp-form-modal .modal-body,
+  .fp-form-modal .modal-footer {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}

@@ -1,0 +1,21 @@
+<div class="page-container">
+  <app-page-header
+    title="System Logs"
+    subtitle="View system logs for debugging and monitoring purposes."
+    [actions]="headerActions()"
+    (actionClick)="onHeaderAction($event)"
+  >
+  </app-page-header>
+  
+  <app-data-grid
+    [columns]="columns()"
+    [data]="logs()"
+    [loading]="loading()"
+    [totalRecords]="totalRecords()"
+    [query]="query()"
+    emptyMessage="No system logs found"
+    (queryChange)="onQueryChange($event)"
+    (columnsChange)="onColumnsChange($event)"
+  >
+  </app-data-grid>
+</div>

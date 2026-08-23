@@ -1,0 +1,274 @@
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.kpi-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  min-width: 0;
+  padding: 0.95rem 1rem;
+  background: var(--fp-card);
+  border: 1px solid var(--fp-border-soft);
+  border-radius: var(--fp-radius);
+  box-shadow: var(--fp-shadow);
+}
+
+.kpi-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  font-size: 1.05rem;
+}
+
+.kpi-icon.is-value {
+  background: var(--fp-vue-soft);
+  color: var(--fp-vue-dark);
+}
+
+.kpi-icon.is-invest {
+  background: #e8f3ff;
+  color: #2563eb;
+}
+
+.kpi-icon.is-up {
+  background: var(--fp-vue-soft);
+  color: var(--fp-vue-dark);
+}
+
+.kpi-icon.is-down {
+  background: #fee2e2;
+  color: var(--fp-danger);
+}
+
+.kpi-icon.is-booked {
+  background: #fff4e8;
+  color: #c2410c;
+}
+
+.kpi-body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.22rem;
+}
+
+.kpi-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--fp-text-muted);
+  line-height: 1;
+}
+
+.kpi-amount {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--fp-navy);
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+}
+
+.kpi-amount.is-up {
+  color: var(--fp-vue-dark);
+}
+
+.kpi-amount.is-down {
+  color: var(--fp-danger);
+}
+
+@media (max-width: 1199.98px) {
+  .kpi-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 575.98px) {
+  .kpi-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.holdings-row {
+  cursor: pointer;
+}
+
+.holdings-row:hover {
+  background: var(--fp-vue-soft);
+}
+
+.income-panel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.income-heading,
+.income-stat,
+.income-all,
+.income-panel :is(.fp-select-trigger) {
+  height: var(--fp-ctrl);
+  min-height: var(--fp-ctrl);
+}
+
+.income-heading {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex: 0 0 auto;
+  padding-right: 0.35rem;
+}
+
+.income-heading-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: var(--fp-vue-soft);
+  color: var(--fp-vue-dark);
+  font-size: 0.85rem;
+}
+
+.income-heading-text {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--fp-navy);
+  letter-spacing: -0.02em;
+}
+
+.income-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+  flex: 1 1 0;
+  padding: 0 0.6rem 0 0.3rem;
+  border: 1px solid var(--fp-border-soft);
+  border-radius: var(--fp-radius-sm);
+  background: var(--fp-card);
+}
+
+.income-stat-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  font-size: 0.75rem;
+}
+
+.income-stat.is-year {
+  background: linear-gradient(180deg, rgba(194, 65, 12, 0.08) 0%, var(--fp-card) 70%);
+}
+
+.income-stat.is-year .income-stat-icon {
+  background: #fff4e8;
+  color: #c2410c;
+}
+
+.income-stat.is-share {
+  background: linear-gradient(180deg, rgba(124, 58, 237, 0.08) 0%, var(--fp-card) 70%);
+}
+
+.income-stat.is-share .income-stat-icon {
+  background: #f5f3ff;
+  color: #6d28d9;
+}
+
+.income-stat.is-payouts {
+  background: linear-gradient(180deg, rgba(37, 99, 235, 0.08) 0%, var(--fp-card) 70%);
+}
+
+.income-stat.is-payouts .income-stat-icon {
+  background: #e8f3ff;
+  color: #2563eb;
+}
+
+.income-stat.is-life {
+  background: linear-gradient(180deg, rgba(66, 184, 131, 0.12) 0%, var(--fp-card) 70%);
+}
+
+.income-stat.is-life .income-stat-icon {
+  background: var(--fp-vue-soft);
+  color: var(--fp-vue-dark);
+}
+
+.income-stat-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--fp-text-muted);
+}
+
+.income-stat-value {
+  margin-left: auto;
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.income-stat.is-year .income-stat-value { color: #c2410c; }
+.income-stat.is-share .income-stat-value { color: #6d28d9; }
+.income-stat.is-payouts .income-stat-value { color: #2563eb; }
+.income-stat.is-life .income-stat-value { color: var(--fp-vue-dark); }
+
+.income-stat-chip {
+  height: 20px;
+  padding: 0 0.4rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  background: #fff4e8;
+  color: #c2410c;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.income-year {
+  flex: 0 0 auto;
+}
+
+:host ::ng-deep .income-year .fp-select-trigger {
+  min-width: 0 !important;
+  width: auto;
+  padding-left: 0.5rem;
+  padding-right: 0.45rem;
+}
+
+:host ::ng-deep .income-year .fp-select-label {
+  flex: 0 0 auto;
+}
+
+.income-all {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  padding: 0 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+@media (max-width: 991.98px) {
+  .income-panel {
+    flex-wrap: wrap;
+  }
+
+  .income-stat {
+    flex: 1 1 calc(50% - 0.5rem);
+  }
+}

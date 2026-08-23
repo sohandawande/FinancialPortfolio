@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".dockerignore" />
+    <File Path="Dockerfile" />
+    <File Path="entrypoint.sh" />
+  </Folder>
+  <Project Path="FinancialPortfolio.Api/FinancialPortfolio.Api.csproj" />
+  <Project Path="FinancialPortfolio.Business/FinancialPortfolio.Business.csproj" Id="56e6a6ac-b0e7-45e9-923a-3e5beff888cc" />
+  <Project Path="FinancialPortfolio.Data/FinancialPortfolio.Data.csproj" />
+  <Project Path="FinancialPortfolio.Models/FinancialPortfolio.Models.csproj" Id="a9bd3252-9322-4d18-9160-597aa7b2b01b" />
+  <Project Path="FinancialPortfolio.QueryEngine/FinancialPortfolio.QueryEngine.csproj" />
+</Solution>

@@ -1,0 +1,36 @@
+.page-link {
+  min-width: 34px;
+  min-height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: 0 2px;
+
+  border: 1px solid var(--fp-border);
+
+  border-radius: var(--fp-radius-xs) !important;
+
+  color: var(--fp-text-secondary);
+
+  background: #fff;
+
+  font-size: 0.72rem;
+}
+
+.page-item.active .page-link {
+  border-color: var(--fp-primary);
+
+  background: var(--fp-primary);
+
+  color: #fff;
+}
+
+.page-link:hover {
+  color: var(--fp-primary);
+
+  background: var(--fp-primary-soft);
+
+  border-color: #d4daf6;
+}

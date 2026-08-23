@@ -1,0 +1,197 @@
+<div class="auth-page">
+  <div class="auth-card auth-card-wide card">
+    <div class="card-body">
+      <div class="text-center mb-3">
+        <div class="auth-logo">
+          <i class="bi bi-person-plus"></i>
+        </div>
+        <h1 class="auth-title">Create account</h1>
+        <p class="auth-subtitle">
+          Register with your details. Your user code will be assigned after approval.
+        </p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="row g-2">
+          <!-- First name -->
+          <div class="col-12 col-md-6">
+            <label class="form-label">First name</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-person"></i></span>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="firstName"
+                placeholder="First name"
+                autocomplete="given-name"
+                [class.is-invalid]="!!error('firstName', 'First name')"
+              />
+            </div>
+            @if (error('firstName', 'First name'); as msg) {
+              <div class="invalid-feedback d-block small">{{ msg }}</div>
+            }
+          </div>
+
+          <!-- Last name -->
+          <div class="col-12 col-md-6">
+            <label class="form-label">Last name</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-person"></i></span>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="lastName"
+                placeholder="Last name"
+                autocomplete="family-name"
+                [class.is-invalid]="!!error('lastName', 'Last name')"
+              />
+            </div>
+            @if (error('lastName', 'Last name'); as msg) {
+              <div class="invalid-feedback d-block small">{{ msg }}</div>
+            }
+          </div>
+
+          <!-- Email -->
+          <div class="col-12">
+            <label class="form-label">Email</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+              <input
+                type="email"
+                class="form-control"
+                formControlName="email"
+                placeholder="you@example.com"
+                autocomplete="email"
+                [class.is-invalid]="!!error('email', 'Email')"
+                [class.is-valid]="
+                  form.controls.email.valid &&
+                  (form.controls.email.dirty || form.controls.email.touched)
+                "
+              />
+              @if (form.controls.email.pending) {
+                <span class="input-group-text">
+                  <span class="spinner-border spinner-border-sm"></span>
+                </span>
+              }
+            </div>
+            @if (error('email', 'Email'); as msg) {
+              <div class="invalid-feedback d-block small">{{ msg }}</div>
+            }
+          </div>
+
+          <!-- Username (Identity) — UserCode is generated on server -->
+          <div class="col-12">
+            <label class="form-label">Username</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-at"></i></span>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="userName"
+                placeholder="e.g. sohan.dawande"
+                autocomplete="username"
+                [class.is-invalid]="!!error('userName', 'Username')"
+                [class.is-valid]="
+                  form.controls.userName.valid &&
+                  (form.controls.userName.dirty || form.controls.userName.touched)
+                "
+              />
+              @if (form.controls.userName.pending) {
+                <span class="input-group-text">
+                  <span class="spinner-border spinner-border-sm"></span>
+                </span>
+              }
+            </div>
+            @if (error('userName', 'Username'); as msg) {
+              <div class="invalid-feedback d-block small">{{ msg }}</div>
+            }
+          </div>
+
+          <!-- Mobile -->
+          <div class="col-12">
+            <label class="form-label">Mobile</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-phone"></i></span>
+              <input
+                type="tel"
+                class="form-control"
+                formControlName="mobileNumber"
+                placeholder="10-digit mobile"
+                autocomplete="tel"
+                maxlength="10"
+                [class.is-invalid]="!!error('mobileNumber', 'Mobile')"
+              />
+            </div>
+            @if (error('mobileNumber', 'Mobile'); as msg) {
+              <div class="invalid-feedback d-block small">{{ msg }}</div>
+            }
+          </div>
+
+          <!-- Password -->
+          <div class="col-12">
+            <label class="form-label">Password</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-lock"></i></span>
+              <input
+                type="password"
+                class="form-control"
+                formControlName="password"
+                placeholder="Create a strong password"
+                autocomplete="new-password"
+                [class.is-invalid]="!!error('password', 'Password')"
+              />
+            </div>
+            @if (error('password', 'Password'); as msg) {
+              <div class="invalid-feedback d-block small">{{ msg }}</div>
+            }
+            <div class="mt-1">
+              <app-password-strength [password]="passwordValue" />
+            </div>
+          </div>
+
+          <!-- Confirm password -->
+          <div class="col-12">
+            <label class="form-label">Confirm password</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-shield-check"></i></span>
+              <input
+                type="password"
+                class="form-control"
+                formControlName="confirmPassword"
+                placeholder="Re-enter password"
+                autocomplete="new-password"
+                [class.is-invalid]="!!error('confirmPassword', 'Confirm password')"
+              />
+            </div>
+            @if (error('confirmPassword', 'Confirm password'); as msg) {
+              <div class="invalid-feedback d-block small">{{ msg }}</div>
+            }
+          </div>
+        </div>
+
+        @if (serverError()) {
+          <div class="alert alert-danger py-2 small mt-2 mb-0">{{ serverError() }}</div>
+        }
+
+        <button
+          type="submit"
+          class="btn btn-primary w-100 mt-3"
+          [disabled]="loading() || form.pending || form.invalid">
+          @if (loading()) {
+            <span class="spinner-border spinner-border-sm me-1"></span>
+            Creating account…
+          } @else {
+            Create account
+          }
+        </button>
+      </form>
+
+      <div class="auth-divider">or</div>
+
+      <p class="text-center auth-links mb-0">
+        Already have an account?
+        <a routerLink="/login">Sign in</a>
+      </p>
+    </div>
+  </div>
+</div>

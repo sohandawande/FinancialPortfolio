@@ -1,0 +1,17 @@
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(244, 247, 249, 0.72);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.loading-overlay .spinner-border {
+  width: 2.5rem;
+  height: 2.5rem;
+  color: #42b883;
+  border-width: 0.25em;
+}

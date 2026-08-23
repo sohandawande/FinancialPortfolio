@@ -1,0 +1,17 @@
+<div
+  class="alert d-flex align-items-start gap-2"
+  [class]="'alert-' + type()"
+  [class.alert-dismissible]="dismissible()"
+  role="alert">
+  @if (icon()) {
+    <i class="bi mt-1" [ngClass]="icon()"></i>
+  }
+
+  <div class="flex-grow-1">
+    <ng-content />
+  </div>
+
+  @if (dismissible()) {
+    <button type="button" class="btn-close" aria-label="Close" (click)="closed.emit()"></button>
+  }
+</div>

@@ -1,0 +1,44 @@
+.table {
+  --bs-table-bg: transparent;
+
+  margin-bottom: 0;
+}
+
+.table thead th {
+  padding: 0.8rem 1rem;
+
+  color: var(--fp-text-muted);
+
+  background: var(--fp-surface-soft) !important;
+
+  border-bottom: 1px solid var(--fp-border);
+
+  font-size: 0.66rem;
+  font-weight: 800;
+
+  letter-spacing: 0.08em;
+
+  text-transform: uppercase;
+
+  white-space: nowrap;
+}
+
+.table tbody td {
+  padding: 0.85rem 1rem;
+
+  color: var(--fp-text-secondary);
+
+  border-color: var(--fp-border-light);
+
+  font-size: 0.78rem;
+
+  vertical-align: middle;
+}
+
+.table-hover tbody tr {
+  transition: background var(--fp-transition);
+}
+
+.table-hover tbody tr:hover {
+  background: #f8f9fe;
+}

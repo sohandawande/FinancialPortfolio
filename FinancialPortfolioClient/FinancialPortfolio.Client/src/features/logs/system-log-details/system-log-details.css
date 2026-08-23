@@ -1,0 +1,18 @@
+.log-pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  max-height: none;
+}
+
+.stack-trace {
+  max-height: 420px;
+  overflow: auto;
+  background: var(--fp-navy-soft);
+  padding: 0.75rem;
+  border-radius: var(--fp-radius-sm);
+  font-size: var(--fp-fs-sm);
+}

@@ -1,0 +1,20 @@
+@if (session.visible()) {
+  <div class="session-overlay" role="dialog" aria-modal="true" aria-labelledby="session-title">
+    <div class="session-dialog card border-0 shadow-lg">
+      <div class="card-body text-center p-4">
+        <div class="session-icon mb-3">
+          <i class="bi bi-hourglass-split"></i>
+        </div>
+        <h2 id="session-title" class="h5 mb-2">Session expired</h2>
+        <p class="text-muted small mb-3">
+          Your sign-in has expired. You will be redirected to login in
+          <strong>{{ session.secondsLeft() }}</strong> seconds.
+        </p>
+        <button type="button" class="btn btn-primary w-100" (click)="logoutNow()">
+          <i class="bi bi-box-arrow-in-right me-1"></i>
+          Sign in now
+        </button>
+      </div>
+    </div>
+  </div>
+}

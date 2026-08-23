@@ -1,0 +1,20 @@
+<span
+  class="stock-logo-wrap"
+  [class]="radiusClass()"
+  [style.width.px]="size()"
+  [style.height.px]="size()"
+  [style.font-size.px]="fontSize()"
+  [attr.title]="symbol()"
+>
+  <span class="stock-logo-fallback">{{ initials() }}</span>
+  @if (src(); as url) {
+    <img
+      class="stock-logo-img"
+      [src]="url"
+      [alt]="symbol()"
+      loading="lazy"
+      referrerpolicy="no-referrer"
+      (error)="onError()"
+    />
+  }
+</span>

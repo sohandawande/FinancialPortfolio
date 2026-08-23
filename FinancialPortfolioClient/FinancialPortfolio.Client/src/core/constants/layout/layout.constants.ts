@@ -1,0 +1,9 @@
+export const LAYOUT = {
+  NAVBAR_HEIGHT: 60,
+
+  FOOTER_HEIGHT: 45,
+
+  SIDEBAR_WIDTH: 260,
+
+  SIDEBAR_COLLAPSED_WIDTH: 70,
+} as const;

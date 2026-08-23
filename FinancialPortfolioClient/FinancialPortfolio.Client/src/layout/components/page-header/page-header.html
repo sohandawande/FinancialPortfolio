@@ -1,0 +1,30 @@
+<div class="page-hero mb-3">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 w-100">
+    <div class="min-w-0">
+      <h1 class="page-title text-truncate">{{ title() }}</h1>
+      @if (subtitle()) {
+        <p class="page-subtitle mb-0">{{ subtitle() }}</p>
+      }
+    </div>
+
+    @if (visibleActions().length) {
+      <div class="d-flex flex-wrap gap-2">
+        @for (action of visibleActions(); track action.id) {
+          <button
+            type="button"
+            [class]="btnClass(action)"
+            [disabled]="!!action.disabled || !!action.loading"
+            [title]="action.title || action.label"
+            (click)="onClick(action)">
+            @if (action.loading) {
+              <span class="spinner-border spinner-border-sm me-1"></span>
+            } @else if (action.icon) {
+              <i class="bi me-1" [class]="action.icon"></i>
+            }
+            {{ action.label }}
+          </button>
+        }
+      </div>
+    }
+  </div>
+</div>

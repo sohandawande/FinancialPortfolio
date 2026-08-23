@@ -1,0 +1,31 @@
+.users-page {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.users-grid-wrap {
+  border-radius: var(--fp-radius);
+  border: 1px solid var(--fp-border-soft);
+  background: var(--fp-card);
+  box-shadow: var(--fp-shadow);
+  overflow: hidden;
+}
+
+.modal {
+  z-index: 1055;
+}
+
+.modal-backdrop {
+  z-index: 1050;
+}
+
+.btn-outline-teal {
+  --bs-btn-color: var(--fp-vue);
+  --bs-btn-border-color: var(--fp-vue);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--fp-vue);
+  --bs-btn-hover-border-color: var(--fp-vue);
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: var(--fp-vue-dark);
+  --bs-btn-active-border-color: var(--fp-vue-dark);
+}

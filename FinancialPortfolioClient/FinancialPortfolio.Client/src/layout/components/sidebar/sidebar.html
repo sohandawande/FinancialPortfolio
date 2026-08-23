@@ -1,0 +1,32 @@
+<div class="sidebar">
+  <div class="sidebar-header">
+    <i class="bi bi-pie-chart-fill sidebar-logo-icon"></i>
+    @if (!collapsed) {
+      <span class="sidebar-logo-text">Financial Portfolio</span>
+    }
+  </div>
+
+  <ul class="nav flex-column sidebar-menu">
+    @for (menu of menus; track menu.id) {
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          [routerLink]="menu.route"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: menu.route === '/dashboard' }"
+          (click)="navigate()">
+          <i [class]="'bi ' + menu.icon"></i>
+          @if (!collapsed) {
+            <span>{{ menu.title }}</span>
+          }
+        </a>
+      </li>
+    }
+  </ul>
+
+  <div class="sidebar-footer">
+    @if (!collapsed) {
+      <small>Version 1.0.0</small>
+    }
+  </div>
+</div>

@@ -1,0 +1,52 @@
+<div class="page-container users-page">
+  <app-page-header
+    title="Pending users"
+    subtitle="Approve new registrations and assign roles."
+    [actions]="headerActions()"
+    (actionClick)="onHeaderAction($event)"
+  />
+
+  <app-data-grid
+    [columns]="columns()"
+    [data]="pageRows()"
+    [loading]="loading()"
+    [totalRecords]="totalRecords()"
+    [query]="query()"
+    emptyMessage="No pending users"
+    (queryChange)="onQueryChange($event)"
+    (columnsChange)="onColumnsChange($event)"
+  />
+
+    @if (showApprove() && selectedUser(); as user) {
+    <app-fp-modal
+      [open]="true"
+      title="Approve user"
+      size="sm"
+      [subtitle]="user.email + ' · ' + user.userCode"
+      icon="bi-person-check"
+      variant="success"
+      [busy]="saving()"
+      confirmText="Approve"
+      confirmColor="success"
+      [confirmDisabled]="selectedRoles().length === 0"
+      (closed)="closeApprove()"
+      (confirmed)="submitApprove()"
+    >
+      <p class="mb-3 fw-semibold">{{ user.fullName }}</p>
+      <div class="d-flex flex-column gap-2">
+        @for (role of assignableRoles; track role) {
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              [id]="'p-role-' + role"
+              [checked]="isRoleSelected(role)"
+              (change)="toggleRole(role, $any($event.target).checked)"
+            />
+            <label class="form-check-label" [for]="'p-role-' + role">{{ role }}</label>
+          </div>
+        }
+      </div>
+    </app-fp-modal>
+  }
+</div>

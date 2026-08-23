@@ -1,0 +1,29 @@
+.data-column-toggler {
+  position: relative;
+  display: inline-flex;
+}
+
+.column-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  min-width: 200px;
+  max-height: 280px;
+  overflow-y: auto;
+  z-index: 1050;
+  padding: 8px 0;
+  border-radius: var(--fp-radius-sm);
+}
+
+.column-item {
+  display: flex;
+  align-items: center;
+  padding: 6px 14px;
+  margin: 0;
+  cursor: pointer;
+  font-size: var(--fp-fs-sm);
+}
+
+.column-item:hover {
+  background: var(--fp-vue-soft);
+}

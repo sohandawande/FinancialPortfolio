@@ -1,0 +1,279 @@
+<div class="user-detail-page">
+  <app-page-header
+    [title]="user()?.fullName || 'User detail'"
+    [subtitle]="user() ? (user()!.email + ' · ' + user()!.userCode) : 'View full profile and manage account status'"
+    [actions]="headerActions()"
+    (actionClick)="onHeaderAction($event)"
+  />
+
+  @if (loading()) {
+    <div class="card border-0 shadow-sm">
+      <div class="card-body text-center py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="text-muted mt-2 mb-0">Loading user…</p>
+      </div>
+    </div>
+  } @else if (notFound() || !user()) {
+    <div class="card border-0 shadow-sm">
+      <div class="card-body text-center py-5">
+        <i class="bi bi-person-x fs-1 text-warning d-block mb-2"></i>
+        <p class="mb-3 fw-semibold">User not found</p>
+        <p class="text-muted small mb-3">The user may have been removed or the link is invalid.</p>
+        <button type="button" class="btn btn-primary btn-sm" (click)="back()">
+          <i class="bi bi-arrow-left me-1"></i> Back to manage
+        </button>
+      </div>
+    </div>
+  } @else {
+    @if (user(); as u) {
+      <!-- Hero -->
+      <div class="ud-hero card border-0 shadow-sm mb-3">
+        <div class="card-body p-4">
+          <div class="d-flex flex-wrap gap-3 align-items-start">
+            <div class="ud-avatar" [class.inactive]="!u.isActive">
+              {{ initials() }}
+            </div>
+
+            <div class="flex-grow-1 min-w-0">
+              <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+                <h3 class="mb-0 fw-bold text-truncate">{{ u.fullName }}</h3>
+                @if (isSelf()) {
+                  <span class="badge text-bg-primary">You</span>
+                }
+                @if (u.isActive) {
+                  <span class="badge rounded-pill stock-active-yes">Active</span>
+                } @else {
+                  <span class="badge rounded-pill stock-active-no">Inactive</span>
+                }
+                @if (u.emailConfirmed) {
+                  <span class="badge rounded-pill text-bg-success-subtle text-success border border-success-subtle">
+                    <i class="bi bi-envelope-check me-1"></i>Email verified
+                  </span>
+                } @else {
+                  <span class="badge rounded-pill text-bg-warning-subtle text-warning border border-warning-subtle">
+                    <i class="bi bi-envelope-exclamation me-1"></i>Email not verified
+                  </span>
+                }
+              </div>
+
+              <div class="text-muted small mb-2">
+                <i class="bi bi-person-badge me-1"></i>{{ u.userCode }}
+                <span class="mx-2">·</span>
+                <i class="bi bi-at me-1"></i>{{ u.userName }}
+              </div>
+
+              <div class="d-flex flex-wrap gap-1">
+                @for (role of u.roles; track role) {
+                  <span class="badge text-bg-secondary">{{ role }}</span>
+                } @empty {
+                  <span class="badge text-bg-light border text-muted">No roles</span>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3">
+        <!-- Profile -->
+        <div class="col-12 col-lg-6">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 pb-0">
+              <div class="d-flex align-items-center gap-2">
+                <span class="ud-section-icon"><i class="bi bi-person-vcard"></i></span>
+                <span class="fw-semibold">Profile</span>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="ud-form-grid">
+                <div class="ud-field">
+                  <label class="ud-label">First name</label>
+                  <div class="ud-value">{{ u.firstName || '—' }}</div>
+                </div>
+                <div class="ud-field">
+                  <label class="ud-label">Last name</label>
+                  <div class="ud-value">{{ u.lastName || '—' }}</div>
+                </div>
+                <div class="ud-field">
+                  <label class="ud-label">Full name</label>
+                  <div class="ud-value">{{ u.fullName || '—' }}</div>
+                </div>
+                <div class="ud-field">
+                  <label class="ud-label">User code</label>
+                  <div class="ud-value font-monospace">{{ u.userCode || '—' }}</div>
+                </div>
+                <div class="ud-field">
+                  <label class="ud-label">Username</label>
+                  <div class="ud-value">{{ u.userName || '—' }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact -->
+        <div class="col-12 col-lg-6">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 pb-0">
+              <div class="d-flex align-items-center gap-2">
+                <span class="ud-section-icon"><i class="bi bi-telephone"></i></span>
+                <span class="fw-semibold">Contact</span>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="ud-form-grid">
+                <div class="ud-field ud-field-full">
+                  <label class="ud-label">Email</label>
+                  <div class="ud-value d-flex align-items-center gap-2 flex-wrap">
+                    <a [href]="'mailto:' + u.email" class="text-decoration-none">{{ u.email }}</a>
+                    @if (u.emailConfirmed) {
+                      <span class="badge text-bg-success-subtle text-success border border-success-subtle">Verified</span>
+                    } @else {
+                      <span class="badge text-bg-warning-subtle text-warning border border-warning-subtle">Not verified</span>
+                    }
+                  </div>
+                </div>
+                <div class="ud-field ud-field-full">
+                  <label class="ud-label">Mobile number</label>
+                  <div class="ud-value">
+                    @if (u.mobileNumber) {
+                      <a [href]="'tel:' + u.mobileNumber" class="text-decoration-none">{{ u.mobileNumber }}</a>
+                    } @else {
+                      —
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Account status -->
+        <div class="col-12 col-lg-6">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 pb-0">
+              <div class="d-flex align-items-center gap-2">
+                <span class="ud-section-icon"><i class="bi bi-shield-check"></i></span>
+                <span class="fw-semibold">Account status</span>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="ud-form-grid">
+                <div class="ud-field">
+                  <label class="ud-label">Status</label>
+                  <div class="ud-value">
+                    @if (u.isActive) {
+                      <span class="badge rounded-pill stock-active-yes">Active</span>
+                    } @else {
+                      <span class="badge rounded-pill stock-active-no">Inactive</span>
+                    }
+                  </div>
+                </div>
+                <div class="ud-field">
+                  <label class="ud-label">Identity ID</label>
+                  <div class="ud-value font-monospace small text-break">{{ u.identityUserId }}</div>
+                </div>
+                <div class="ud-field">
+                  <label class="ud-label">Internal ID</label>
+                  <div class="ud-value font-monospace">{{ u.userId }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Roles -->
+        <div class="col-12 col-lg-6">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 pb-0">
+              <div class="d-flex align-items-center justify-content-between gap-2">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="ud-section-icon"><i class="bi bi-people"></i></span>
+                  <span class="fw-semibold">Roles</span>
+                </div>
+                @if (!isSelf()) {
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-primary"
+                    (click)="openRoles()"
+                    [disabled]="busy() || savingRoles()">
+                    <i class="bi bi-pencil me-1"></i> Edit
+                  </button>
+                }
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="d-flex flex-wrap gap-2">
+                @for (role of u.roles; track role) {
+                  <span class="badge text-bg-secondary fs-6 px-3 py-2">{{ role }}</span>
+                } @empty {
+                  <span class="text-muted small">No roles assigned</span>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Audit -->
+        <div class="col-12">
+          <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 pb-0">
+              <div class="d-flex align-items-center gap-2">
+                <span class="ud-section-icon"><i class="bi bi-clock-history"></i></span>
+                <span class="fw-semibold">Audit</span>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-sm-6 col-md-3">
+                  <label class="ud-label">Created</label>
+                  <div class="ud-value">
+                    {{ u.createdDate ? (u.createdDate | date: 'medium') : '—' }}
+                  </div>
+                </div>
+                <div class="col-sm-6 col-md-3">
+                  <label class="ud-label">Last modified</label>
+                  <div class="ud-value">
+                    {{ u.modifiedDate ? (u.modifiedDate | date: 'medium') : '—' }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  }
+
+  <!-- Roles modal -->
+  @if (showRoles() && user(); as u) {
+    <app-fp-modal
+      [open]="true"
+      title="Change roles"
+      size="sm"
+      [subtitle]="u.email"
+      icon="bi-shield-check"
+      [busy]="savingRoles()"
+      confirmText="Save roles"
+      [confirmDisabled]="selectedRoles().length === 0"
+      (closed)="closeRoles()"
+      (confirmed)="saveRoles()"
+    >
+      <p class="mb-3 fw-semibold">{{ u.fullName }}</p>
+      <div class="d-flex flex-column gap-2">
+        @for (role of assignableRoles; track role) {
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              [id]="'ud-role-' + role"
+              [checked]="isRoleSelected(role)"
+              (change)="toggleRole(role, $any($event.target).checked)"
+            />
+            <label class="form-check-label" [for]="'ud-role-' + role">{{ role }}</label>
+          </div>
+        }
+      </div>
+    </app-fp-modal>
+  }
+</div>

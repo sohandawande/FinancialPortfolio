@@ -1,0 +1,14 @@
+<app-fp-modal
+  [open]="modal.visible()"
+  [title]="modal.options().title || 'Confirm'"
+  size="sm"
+  [icon]="icon()"
+  [variant]="variant()"
+  [confirmText]="modal.options().confirmText || 'Yes'"
+  [cancelText]="modal.options().cancelText || 'Cancel'"
+  [confirmColor]="modal.options().confirmColor || 'primary'"
+  (closed)="modal.cancel()"
+  (confirmed)="modal.confirm()"
+>
+  <p class="mb-0">{{ modal.options().message }}</p>
+</app-fp-modal>

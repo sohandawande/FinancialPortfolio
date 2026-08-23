@@ -1,0 +1,85 @@
+<div class="auth-page">
+  <div class="auth-card card">
+    <div class="card-body">
+      <div class="text-center mb-3">
+        <div class="auth-logo">
+          <i class="bi bi-graph-up-arrow"></i>
+        </div>
+        <h1 class="auth-title">Sign in</h1>
+        <p class="auth-subtitle">Financial Portfolio</p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="login()" novalidate>
+        <div class="mb-2">
+          <label class="form-label">Email, username or user code</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-person"></i></span>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="loginId"
+              placeholder="you@example.com or username"
+              autocomplete="username"
+              [class.is-invalid]="!!error('loginId', 'Email, username or user code')"
+            />
+          </div>
+          @if (error('loginId', 'Email, username or user code'); as msg) {
+            <div class="invalid-feedback d-block small">{{ msg }}</div>
+          }
+        </div>
+
+        <div class="mb-2">
+          <label class="form-label">Password</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+            <input
+              type="password"
+              class="form-control"
+              formControlName="password"
+              placeholder="••••••••"
+              autocomplete="current-password"
+              [class.is-invalid]="!!error('password', 'Password')"
+            />
+          </div>
+          @if (error('password', 'Password'); as msg) {
+            <div class="invalid-feedback d-block small">{{ msg }}</div>
+          }
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-3 auth-links">
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="remember"
+              [checked]="rememberMe()"
+              (change)="rememberMe.set($any($event.target).checked)"
+            />
+            <label class="form-check-label" for="remember">Remember me</label>
+          </div>
+          <a routerLink="/forgot-password">Forgot password?</a>
+        </div>
+
+        @if (errorMessage()) {
+          <div class="alert alert-danger py-2 small mb-3">{{ errorMessage() }}</div>
+        }
+
+        <button type="submit" class="btn btn-primary w-100" [disabled]="loading()">
+          @if (loading()) {
+            <span class="spinner-border spinner-border-sm me-1"></span>
+            Signing in…
+          } @else {
+            Sign in
+          }
+        </button>
+      </form>
+
+      <div class="auth-divider">or</div>
+
+      <p class="text-center auth-links mb-0">
+        Don’t have an account?
+        <a routerLink="/register">Create one</a>
+      </p>
+    </div>
+  </div>
+</div>

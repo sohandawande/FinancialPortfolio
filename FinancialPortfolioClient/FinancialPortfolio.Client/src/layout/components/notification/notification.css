@@ -1,0 +1,29 @@
+.notification-menu {
+  min-width: 320px;
+  max-height: 380px;
+  overflow-y: auto;
+  border: 0;
+  border-radius: 0.75rem;
+  box-shadow: 0 12px 40px rgba(53, 73, 94, 0.14);
+  padding: 0.35rem;
+  z-index: 1050;
+}
+
+.notification-menu .dropdown-item {
+  border-radius: 0.45rem;
+  white-space: normal;
+}
+
+.notification-menu .dropdown-item:hover {
+  background: #e8f8f1;
+}
+
+.notification-menu .btn-link {
+  color: #42b883;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.notification-menu .btn-link:hover {
+  color: #36a473;
+}

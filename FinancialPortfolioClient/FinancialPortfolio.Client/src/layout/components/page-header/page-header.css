@@ -1,0 +1,48 @@
+.page-hero {
+  border-radius: var(--fp-radius);
+  background: linear-gradient(135deg, var(--fp-vue-soft) 0%, var(--fp-navy-soft) 55%, var(--fp-card) 100%);
+  border: 1px solid var(--fp-border-soft);
+  padding: 1.15rem 1.4rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  box-shadow: var(--fp-shadow);
+}
+
+.page-hero .page-title,
+.page-hero h1 {
+  font-size: var(--fp-fs-page, 1.75rem);
+  font-weight: 700;
+  color: var(--fp-navy);
+  margin: 0;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.page-hero .page-subtitle {
+  font-size: var(--fp-fs-md, 0.875rem);
+  color: var(--fp-text-muted);
+  margin: 0.25rem 0 0;
+  font-weight: 400;
+}
+
+.page-hero .btn {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  gap: 0.35rem;
+}
+
+@media (max-width: 575.98px) {
+  .page-hero {
+    padding: 0.95rem 1rem;
+  }
+
+  .page-hero .page-title,
+  .page-hero h1 {
+    font-size: 1.25rem;
+  }
+}

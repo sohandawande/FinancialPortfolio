@@ -1,0 +1,50 @@
+<div class="page-container users-page">
+  <app-page-header
+    title="Manage users"
+    subtitle="Activate, deactivate, or change roles for approved users."
+    [actions]="headerActions()"
+    (actionClick)="onHeaderAction($event)"
+  />
+
+  <app-data-grid
+    [columns]="columns()"
+    [data]="pageRows()"
+    [loading]="loading()"
+    [totalRecords]="totalRecords()"
+    [query]="query()"
+    emptyMessage="No managed users"
+    (queryChange)="onQueryChange($event)"
+    (columnsChange)="onColumnsChange($event)"
+  />
+
+    @if (showRoles() && selectedUser(); as user) {
+    <app-fp-modal
+      [open]="true"
+      title="Change roles"
+      size="sm"
+      [subtitle]="user.email"
+      icon="bi-shield-check"
+      [busy]="saving()"
+      confirmText="Save roles"
+      [confirmDisabled]="selectedRoles().length === 0"
+      (closed)="closeRoles()"
+      (confirmed)="saveRoles()"
+    >
+      <p class="mb-3 fw-semibold">{{ user.fullName }}</p>
+      <div class="d-flex flex-column gap-2">
+        @for (role of assignableRoles; track role) {
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              [id]="'m-role-' + role"
+              [checked]="isRoleSelected(role)"
+              (change)="toggleRole(role, $any($event.target).checked)"
+            />
+            <label class="form-check-label" [for]="'m-role-' + role">{{ role }}</label>
+          </div>
+        }
+      </div>
+    </app-fp-modal>
+  }
+</div>

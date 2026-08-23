@@ -1,0 +1,58 @@
+<div class="dropdown">
+  <button
+    class="btn btn-light d-flex align-items-center gap-2 user-menu-btn"
+    type="button"
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+  >
+    <span class="user-avatar">{{ initials() }}</span>
+    <i class="bi bi-chevron-down small d-none d-md-inline"></i>
+  </button>
+
+  <ul class="dropdown-menu dropdown-menu-end shadow user-dropdown">
+    <li class="px-3 py-2">
+      <div class="fw-semibold text-truncate text-center">{{ displayName() }}</div>
+      <div class="small text-muted text-center mt-1">
+        <i class="bi bi-shield-check me-1"></i>{{ rolesLabel() }}
+      </div>
+    </li>
+
+    <li><hr class="dropdown-divider" /></li>
+
+    <li class="px-3 py-2">
+      @if (userCode()) {
+        <div class="small text-muted">
+            <i class="bi bi-person-vcard me-1"></i>{{ userCode() }}
+        </div>
+      }
+      <div class="small text-muted mt-1">
+        <i class="bi bi-envelope-at me-1"></i>{{ email() }}
+      </div>
+    </li>
+
+    <li><hr class="dropdown-divider" /></li>
+
+    <li>
+      <a class="dropdown-item" routerLink="/change-password">
+        <i class="bi bi-key me-2"></i>
+        Change password
+      </a>
+    </li>
+
+    <li>
+      <a class="dropdown-item" routerLink="/dashboard">
+        <i class="bi bi-speedometer2 me-2"></i>
+        Dashboard
+      </a>
+    </li>
+
+    <li><hr class="dropdown-divider" /></li>
+
+    <li>
+      <button type="button" class="dropdown-item text-danger" (click)="logout()">
+        <i class="bi bi-box-arrow-right me-2"></i>
+        Sign out
+      </button>
+    </li>
+  </ul>
+</div>

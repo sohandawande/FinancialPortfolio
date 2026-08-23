@@ -1,0 +1,45 @@
+.layout {
+  display: flex;
+
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+
+  background: var(--fp-body);
+}
+
+.main-wrapper {
+  display: flex;
+  flex-direction: column;
+
+  flex: 1;
+
+  min-width: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+
+  background: var(--fp-body);
+
+  overflow: hidden;
+}
+
+.content {
+  flex: 1;
+
+  min-width: 0;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.layout-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 1040;
+
+  background: rgba(8, 16, 31, 0.48);
+
+  backdrop-filter: blur(2px);
+}

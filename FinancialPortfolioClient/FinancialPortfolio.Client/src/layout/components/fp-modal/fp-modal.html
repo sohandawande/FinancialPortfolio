@@ -1,0 +1,74 @@
+@if (open()) {
+  <div
+    class="fp-modal-shell"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-labelledby]="'fp-modal-title'"
+  >
+    <button type="button" class="fp-modal-backdrop" tabindex="-1" (click)="onBackdrop()"></button>
+
+    <div
+      class="fp-modal-dialog"
+      [attr.data-size]="size()"
+      [style]="dialogStyle()"
+    >
+      <div class="fp-modal-content" [attr.data-variant]="variant()">
+        <div class="fp-modal-head">
+          <div class="fp-modal-icon">
+            <i class="bi" [class]="icon()"></i>
+          </div>
+          <div class="flex-grow-1 min-w-0">
+            <h5 class="fp-modal-title" id="fp-modal-title">{{ title() }}</h5>
+            @if (subtitle()) {
+              <p class="fp-modal-subtitle">{{ subtitle() }}</p>
+            }
+          </div>
+          @if (closable()) {
+            <button
+              type="button"
+              class="btn-close"
+              aria-label="Close"
+              [disabled]="busy()"
+              (click)="onCloseClick()"
+            ></button>
+          }
+        </div>
+
+        <div class="fp-modal-body">
+          <ng-content />
+        </div>
+
+        @if (showFooter()) {
+          <div class="fp-modal-footer">
+            <ng-content select="[fpModalFooter]" />
+            @if (showCancel()) {
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                [disabled]="busy()"
+                (click)="cancel()"
+              >
+                {{ cancelText() }}
+              </button>
+            }
+            @if (showConfirm()) {
+              <button
+                type="button"
+                [class]="confirmBtnClass()"
+                [disabled]="busy() || confirmDisabled()"
+                (click)="confirm()"
+              >
+                @if (busy()) {
+                  <span class="spinner-border spinner-border-sm me-1"></span>
+                } @else if (confirmIcon()) {
+                  <i class="bi me-1" [class]="confirmIcon()"></i>
+                }
+                {{ confirmText() }}
+              </button>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,27 @@
+.alert {
+  border: 0;
+
+  border-radius: var(--fp-radius-sm);
+
+  font-size: 0.78rem;
+}
+
+.alert-success {
+  color: #147552;
+  background: var(--fp-success-soft);
+}
+
+.alert-danger {
+  color: #b13b49;
+  background: var(--fp-danger-soft);
+}
+
+.alert-warning {
+  color: #9a650d;
+  background: var(--fp-warning-soft);
+}
+
+.alert-info {
+  color: #287c9b;
+  background: var(--fp-info-soft);
+}

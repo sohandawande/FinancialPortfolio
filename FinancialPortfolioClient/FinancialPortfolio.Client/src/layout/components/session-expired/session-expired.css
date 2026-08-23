@@ -1,0 +1,29 @@
+.session-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  backdrop-filter: blur(2px);
+}
+
+.session-dialog {
+  width: 100%;
+  max-width: 380px;
+  border-radius: 1rem;
+}
+
+.session-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto;
+  border-radius: 1rem;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(145deg, #42b883, #36a473);
+  color: #fff;
+  font-size: 1.5rem;
+}

@@ -1,0 +1,85 @@
+<div class="data-filters">
+  @if (!embedded()) {
+    <button
+      type="button"
+      class="btn btn-outline-secondary btn-sm"
+      (click)="toggle()"
+      [class.active]="expanded()">
+      <i class="bi bi-funnel me-1"></i>
+      Filters
+      @if (activeCount() > 0) {
+        <span class="badge text-bg-primary ms-1">{{ activeCount() }}</span>
+      }
+    </button>
+  }
+
+  @if (expanded() || embedded()) {
+    <div class="card border-0 shadow-sm mt-2" [class.mt-0]="embedded()">
+      <div class="card-body">
+        @if (filterableColumns().length === 0) {
+          <div class="text-muted small">No filterable columns</div>
+        } @else {
+          <div class="d-flex flex-column gap-2">
+            @for (row of rows(); track row.id) {
+              <div class="row g-2 align-items-center">
+                <div class="col-12 col-md-4">
+                  <select
+                    class="form-select form-select-sm"
+                    [ngModel]="row.field"
+                    (ngModelChange)="onFieldChange(row.id, $event)">
+                    @for (col of filterableColumns(); track col.key) {
+                      <option [value]="col.key">{{ col.header }}</option>
+                    }
+                  </select>
+                </div>
+
+                <div class="col-12 col-md-3">
+                  <select
+                    class="form-select form-select-sm"
+                    [ngModel]="row.operator"
+                    (ngModelChange)="updateRow(row.id, { operator: +$event })">
+                    @for (op of operators; track op.value) {
+                      <option [ngValue]="op.value">{{ op.label }}</option>
+                    }
+                  </select>
+                </div>
+
+                <div class="col-12 col-md-4">
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    placeholder="Value"
+                    [ngModel]="row.value"
+                    (ngModelChange)="updateRow(row.id, { value: $event })"
+                  />
+                </div>
+
+                <div class="col-12 col-md-1 text-md-end">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-danger"
+                    title="Remove"
+                    (click)="removeRow(row.id)">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+
+          <div class="d-flex flex-wrap justify-content-end gap-2 mt-3 pt-2 border-top">
+            <button type="button" class="btn btn-outline-secondary btn-sm" (click)="addRow()">
+              <i class="bi bi-plus-lg me-1"></i> Add
+            </button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" (click)="clear()">
+              Clear
+            </button>
+            <button type="button" class="btn btn-primary btn-sm" (click)="apply()">
+              <i class="bi bi-check2 me-1"></i> Apply
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

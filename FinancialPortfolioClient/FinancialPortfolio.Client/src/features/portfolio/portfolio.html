@@ -1,0 +1,721 @@
+<div class="page-container">
+  <app-page-header
+    [title]="portfolio()?.name || 'Portfolio'"
+    [subtitle]="hasPortfolio() ? (portfolio()?.description || 'Track holdings, ledger and performance') : 'Create a portfolio to start buying and tracking stocks'"
+    [actions]="headerActions()"
+    (actionClick)="onHeaderAction($event)"
+  />
+
+  @if (!hasPortfolio() && !loading()) {
+    <div class="card border-0 shadow-sm create-portfolio-card fp-form-card">
+      <div class="card-body p-4 p-md-5">
+        <div class="text-center mb-4">
+          <div class="create-icon mx-auto mb-3">
+            <i class="bi bi-briefcase"></i>
+          </div>
+          <h2 class="h4 mb-2">Create your portfolio</h2>
+          <p class="text-muted mb-0 mx-auto" style="max-width: 520px">
+            A quiet place to start. Name it, then buy lots, sell FIFO, and follow the ledger.
+          </p>
+        </div>
+        <form class="fp-form mx-auto" style="max-width: 460px" (submit)="$event.preventDefault(); submitPortfolio()">
+          <div class="fp-field">
+            <label class="form-label">Portfolio name <span class="text-danger">*</span></label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-bookmark"></i></span>
+              <input
+                type="text"
+                class="form-control"
+                maxlength="100"
+                placeholder="My Portfolio"
+                [(ngModel)]="portfolioForm.name"
+                name="inlinePortfolioName"
+                [class.is-invalid]="!!portfolioNameError()"
+                (blur)="portfolioNameTouched.set(true)"
+              />
+            </div>
+            @if (portfolioNameError(); as msg) {
+              <div class="invalid-feedback d-block small">{{ msg }}</div>
+            }
+          </div>
+          <div class="fp-field">
+            <label class="form-label">Description</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-text-left"></i></span>
+              <textarea
+                class="form-control"
+                rows="3"
+                maxlength="500"
+                placeholder="Optional notes about this portfolio"
+                [(ngModel)]="portfolioForm.description"
+                name="inlinePortfolioDescription"
+              ></textarea>
+            </div>
+          </div>
+          <button
+            type="submit"
+            class="btn btn-primary w-100"
+            [disabled]="portfolioSaving()"
+          >
+            @if (portfolioSaving()) {
+              <span class="spinner-border spinner-border-sm me-1"></span>
+            }
+            <i class="bi bi-plus-lg me-1"></i>
+            Create Portfolio
+          </button>
+        </form>
+      </div>
+    </div>
+  }
+
+  @if (hasPortfolio() && summary(); as s) {
+    <div class="kpi-row">
+      <article class="kpi-card">
+        <span class="kpi-icon is-value"><i class="bi bi-wallet2"></i></span>
+        <div class="kpi-body">
+          <span class="kpi-label">Portfolio value</span>
+          <span class="kpi-amount">{{ s.totalCurrentValue | currency:'INR':'symbol':'1.2-2' }}</span>
+        </div>
+      </article>
+
+      <article class="kpi-card">
+        <span class="kpi-icon is-invest"><i class="bi bi-graph-up"></i></span>
+        <div class="kpi-body">
+          <span class="kpi-label">Total investment</span>
+          <span class="kpi-amount">{{ s.totalInvestment | currency:'INR':'symbol':'1.2-2' }}</span>
+        </div>
+      </article>
+
+      <article class="kpi-card">
+        <span
+          class="kpi-icon"
+          [class.is-up]="s.unrealizedGainLoss >= 0"
+          [class.is-down]="s.unrealizedGainLoss < 0"
+        >
+          <i
+            class="bi"
+            [class.bi-arrow-up-right]="s.unrealizedGainLoss >= 0"
+            [class.bi-arrow-down-right]="s.unrealizedGainLoss < 0"
+          ></i>
+        </span>
+        <div class="kpi-body">
+          <span class="kpi-label">Unrealized P&amp;L</span>
+          <div class="kpi-amount-row">
+            <span
+              class="kpi-amount"
+              [class.is-up]="s.unrealizedGainLoss >= 0"
+              [class.is-down]="s.unrealizedGainLoss < 0"
+            >
+              {{ formatPnL(s.unrealizedGainLoss) }}
+            </span>
+            <span
+              class="kpi-chip"
+              [class.is-up]="s.unrealizedGainLossPercent >= 0"
+              [class.is-down]="s.unrealizedGainLossPercent < 0"
+            >
+              {{ formatPnL(s.unrealizedGainLossPercent) }}%
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <article class="kpi-card">
+        <span class="kpi-icon is-booked"><i class="bi bi-cash-stack"></i></span>
+        <div class="kpi-body">
+          <span class="kpi-label">Profit booked</span>
+          <span
+            class="kpi-amount"
+            [class.is-up]="s.realizedProfitBooked >= 0"
+            [class.is-down]="s.realizedProfitBooked < 0"
+          >
+            {{ s.realizedProfitBooked | currency:'INR':'symbol':'1.2-2' }}
+          </span>
+        </div>
+      </article>
+
+      <article class="kpi-card">
+        <span class="kpi-icon is-div"><i class="bi bi-cash-coin"></i></span>
+        <div class="kpi-body">
+          <span class="kpi-label">Lifetime dividends</span>
+          <span class="kpi-amount is-up">
+            {{ s.totalDividendsReceived | currency:'INR':'symbol':'1.2-2' }}
+          </span>
+        </div>
+      </article>
+    </div>
+
+    <div class="stat-strip">
+      <div class="stat-item is-total" title="Distinct symbols across holdings and sold history">
+        <div class="stat-head">
+          <span class="stat-icon"><i class="bi bi-diagram-3"></i></span>
+          <span class="stat-label">All stocks</span>
+        </div>
+        <span class="stat-value">{{ s.totalStocksHoldSell }}</span>
+      </div>
+      <div class="stat-item is-hold" title="Distinct symbols still held">
+        <div class="stat-head">
+          <span class="stat-icon"><i class="bi bi-building"></i></span>
+          <span class="stat-label">Holding</span>
+        </div>
+        <span class="stat-value">{{ s.totalStocksHold }}</span>
+      </div>
+      <div class="stat-item is-sold" title="Distinct symbols that have a sell">
+        <div class="stat-head">
+          <span class="stat-icon"><i class="bi bi-box-arrow-right"></i></span>
+          <span class="stat-label">Exited</span>
+        </div>
+        <span class="stat-value">{{ s.totalStocksSold }}</span>
+      </div>
+      <div class="stat-item is-open" title="Open and partial lots still in the book">
+        <div class="stat-head">
+          <span class="stat-icon"><i class="bi bi-layers"></i></span>
+          <span class="stat-label">Open lots</span>
+        </div>
+        <span class="stat-value">{{ s.totalHoldLots }}</span>
+      </div>
+      <div class="stat-item is-lots" title="Lots that have been sold">
+        <div class="stat-head">
+          <span class="stat-icon"><i class="bi bi-check2-square"></i></span>
+          <span class="stat-label">Sold lots</span>
+        </div>
+        <span class="stat-value">{{ s.totalSoldLots }}</span>
+      </div>
+    </div>
+  }
+
+  @if (hasPortfolio()) {
+    <div class="portfolio-toolbar">
+      <div class="fp-tabs" role="tablist">
+        <button type="button" class="fp-tab" [class.is-active]="activeTab() === 'holdings'" (click)="setTab('holdings')">
+          <i class="bi bi-briefcase"></i>
+          Holdings
+          @if (holdings().length > 0) {
+            <span class="fp-tab-count">{{ holdings().length }}</span>
+          }
+        </button>
+        <button type="button" class="fp-tab" [class.is-active]="activeTab() === 'sold'" (click)="setTab('sold')">
+          <i class="bi bi-box-arrow-right"></i>
+          Sold History
+          @if (soldHistory().length > 0) {
+            <span class="fp-tab-count">{{ soldHistory().length }}</span>
+          }
+        </button>
+        <button type="button" class="fp-tab" [class.is-active]="activeTab() === 'ledger'" (click)="setTab('ledger')">
+          <i class="bi bi-journal-text"></i>
+          Ledger
+          @if (ledger().length > 0) {
+            <span class="fp-tab-count">{{ ledger().length }}</span>
+          }
+        </button>
+      </div>
+
+      <div class="fp-filter-bar">
+        @if (activeTab() === 'holdings') {
+          <app-fp-dropdown-select
+            icon="bi-flag"
+            ariaLabel="Filter by status"
+            [options]="statusOptions"
+            [value]="filterStatus()"
+            (valueChange)="onStatusChange($event)">
+          </app-fp-dropdown-select>
+        }
+
+        <app-fp-dropdown-select
+          icon="bi-building"
+          ariaLabel="Filter by exchange"
+          [options]="exchangeOptions"
+          [value]="filterExchange()"
+          (valueChange)="onExchangeChange($event)">
+        </app-fp-dropdown-select>
+
+        @if (activeTab() === 'sold') {
+          <div class="fp-filter-field">
+            <span class="fp-filter-icon"><i class="bi bi-calendar3"></i></span>
+            <input type="date" class="fp-filter-control" [ngModel]="filterFromDate()" (ngModelChange)="filterFromDate.set($event)" />
+          </div>
+          <div class="fp-filter-field">
+            <span class="fp-filter-icon"><i class="bi bi-calendar-check"></i></span>
+            <input type="date" class="fp-filter-control" [ngModel]="filterToDate()" (ngModelChange)="filterToDate.set($event)" />
+          </div>
+        }
+
+        @if (activeTab() === 'ledger') {
+          <div class="fp-filter-pills" role="group">
+            @for (filter of ledgerFilters; track filter) {
+              <button
+                type="button"
+                class="fp-filter-pill"
+                [class.active]="ledgerFilter() === filter"
+                (click)="setLedgerFilter(filter)"
+              >
+                {{ ledgerFilterLabel(filter) }}
+              </button>
+            }
+          </div>
+        }
+
+        <button type="button" class="fp-filter-clear" (click)="clearFilters()" title="Clear filters">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+    </div>
+
+    @if (activeTab() === 'holdings') {
+      <app-data-grid
+        mode="client"
+        [showFilters]="false"
+        [columns]="holdingColumns()"
+        [data]="filteredHoldings()"
+        [searchKeys]="searchKeys"
+        [loading]="loading()"
+        [query]="holdingsQuery()"
+        emptyMessage="No holdings found. Start by buying your first stock."
+        (queryChange)="onHoldingsQuery($event)"
+        (columnsChange)="onHoldingColumns($event)"
+        (rowClick)="openHoldingDetail($event.stockId)"
+      />
+    }
+
+    @if (activeTab() === 'sold') {
+      <app-data-grid
+        mode="client"
+        [showFilters]="false"
+        [columns]="soldColumns()"
+        [data]="filteredSoldHistory()"
+        [searchKeys]="searchKeys"
+        [loading]="soldLoading()"
+        [query]="soldQuery()"
+        emptyMessage="No sold history yet. Sold lots will appear here once you sell."
+        (queryChange)="onSoldQuery($event)"
+        (columnsChange)="onSoldColumns($event)"
+      />
+    }
+
+    @if (activeTab() === 'ledger') {
+      <app-data-grid
+        mode="client"
+        [showFilters]="false"
+        [columns]="ledgerColumns()"
+        [data]="filteredLedger()"
+        [searchKeys]="searchKeys"
+        [loading]="ledgerLoading()"
+        [query]="ledgerQuery()"
+        emptyMessage="No ledger rows. Buy or sell lots to populate the hold / sell ledger."
+        (queryChange)="onLedgerQuery($event)"
+        (columnsChange)="onLedgerColumns($event)"
+      />
+    }
+  }
+</div>
+
+@if (showPortfolioModal()) {
+  <app-fp-modal
+    [open]="true"
+    [title]="isEditPortfolio() ? 'Edit portfolio' : 'Create portfolio'"
+    size="sm"
+    subtitle="A simple name and an optional note."
+    icon="bi-briefcase"
+    [busy]="portfolioSaving()"
+    [confirmText]="isEditPortfolio() ? 'Save changes' : 'Create portfolio'"
+    (closed)="closePortfolioModal()"
+    (confirmed)="submitPortfolio()"
+  >
+          <div class="fp-field">
+            <label class="form-label">Name <span class="text-danger">*</span></label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-bookmark"></i></span>
+              <input
+                type="text"
+                class="form-control"
+                maxlength="100"
+                [(ngModel)]="portfolioForm.name"
+                [disabled]="portfolioSaving()"
+                [class.is-invalid]="!!portfolioNameError()"
+                (blur)="portfolioNameTouched.set(true)"
+              />
+            </div>
+            @if (portfolioNameError(); as msg) {
+              <div class="invalid-feedback d-block small">{{ msg }}</div>
+            }
+          </div>
+          <div class="fp-field mb-0">
+            <label class="form-label">Description</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-text-left"></i></span>
+              <textarea class="form-control" rows="3" maxlength="500" [(ngModel)]="portfolioForm.description" [disabled]="portfolioSaving()"></textarea>
+            </div>
+          </div>
+  </app-fp-modal>
+}
+
+@if (showBuyModal()) {
+  <app-fp-modal
+    [open]="true"
+    [title]="isEditingHold() ? 'Edit buy lot' : 'Buy stock'"
+    size="md"
+    [subtitle]="isEditingHold() ? 'Correct quantity, price, date or notes for this lot.' : 'Search a symbol, then add a lot to the ledger.'"
+    [icon]="isEditingHold() ? 'bi-pencil' : 'bi-bag-plus'"
+    [busy]="buySaving()"
+    [confirmText]="isEditingHold() ? 'Save lot' : 'Buy'"
+    confirmIcon="bi-check-lg"
+    (closed)="closeBuyModal()"
+    (confirmed)="submitBuy()"
+  >
+@if (!isEditingHold()) {
+<div class="fp-field">
+            <label class="form-label">Search stock <span class="text-danger">*</span></label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Type symbol or company name…"
+                [ngModel]="stockSearch()"
+                (ngModelChange)="onStockSearch($event)"
+                [disabled]="buySaving()"
+                [class.is-invalid]="!!buyFieldError('stock')"
+                (blur)="touchBuy('stock')"
+              />
+            </div>
+            @if (buyFieldError('stock'); as msg) {
+              <div class="invalid-feedback d-block small">{{ msg }}</div>
+            }
+            @if (stockSearching()) {
+              <div class="form-text">Searching…</div>
+            }
+            @if (stockOptions().length > 0) {
+              <div class="fp-stock-results" role="listbox">
+                @for (s of stockOptions(); track s.id) {
+                  <button type="button" class="fp-stock-option" role="option" (click)="selectStock(s)">
+                    <app-stock-logo [symbol]="s.symbol" [logoUrl]="s.logoUrl" [size]="28" />
+                    <span class="flex-grow-1 text-start min-w-0">
+                      <span class="d-block fw-semibold">{{ s.symbol }}</span>
+                      <span class="d-block small text-muted text-truncate">{{ s.companyName }}</span>
+                    </span>
+                    <span class="fp-stock-price">₹{{ s.currentPrice | number:'1.2-2' }}</span>
+                  </button>
+                }
+              </div>
+            }
+          </div>
+}
+
+          @if (buyForm.stockId) {
+            <div class="fp-selected-stock">
+              <app-stock-logo
+                class="fp-selected-logo"
+                [symbol]="buyForm.symbol"
+                [logoUrl]="buyForm.logoUrl"
+                [size]="40"
+                rounded="lg"
+              />
+              <div class="fp-selected-copy">
+                <div class="fp-selected-title">{{ buyForm.symbol }} — {{ buyForm.companyName }}</div>
+              </div>
+            </div>
+          }
+
+          <div class="row g-3">
+            <div class="col-6">
+              <label class="form-label">Quantity <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-hash"></i></span>
+                <input type="number" class="form-control" min="1" [ngModel]="buyForm.quantity" (focus)="onQtyFocus($event)" (input)="onBuyQty($event)" (blur)="onBuyQtyBlur($event)" [disabled]="buySaving()" [class.is-invalid]="!!buyFieldError('quantity')" />
+              </div>
+              @if (buyFieldError('quantity'); as msg) {
+                <div class="invalid-feedback d-block small">{{ msg }}</div>
+              }
+              @if (isEditingHold() && holdSoldQuantity() > 0 && !buyFieldError('quantity')) {
+                <div class="form-text">{{ holdSoldQuantity() }} already sold from this lot — quantity cannot go below that.</div>
+              }
+            </div>
+            <div class="col-6">
+              <label class="form-label">Purchase price <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text">₹</span>
+                <input type="number" class="form-control" min="0" step="0.01" [ngModel]="buyForm.purchasePrice" (focus)="onPriceFocus($event)" (input)="onBuyPriceInput($event)" (blur)="onBuyPriceBlur($event)" [disabled]="buySaving()" [class.is-invalid]="!!buyFieldError('price')" />
+              </div>
+              @if (buyFieldError('price'); as msg) {
+                <div class="invalid-feedback d-block small">{{ msg }}</div>
+              }
+            </div>
+            <div class="col-6">
+              <label class="form-label">Purchase date <span class="text-danger">*</span></label>
+              <div [class.is-invalid]="!!buyFieldError('date')" (focusout)="touchBuy('date')">
+                <app-fp-date name="buyDate" [(ngModel)]="buyForm.purchaseDate" [disabled]="buySaving()" />
+              </div>
+              @if (buyFieldError('date'); as msg) {
+                <div class="invalid-feedback d-block small">{{ msg }}</div>
+              }
+            </div>
+            <div class="col-6">
+              <label class="form-label">Exchange</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-building"></i></span>
+                <select class="form-select" [(ngModel)]="buyForm.exchange" [disabled]="buySaving()">
+                  <option [ngValue]="1">NSE</option>
+                  <option [ngValue]="2">BSE</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Notes</label>
+              <textarea class="form-control" rows="2" placeholder="Optional" [(ngModel)]="buyForm.notes" [disabled]="buySaving()"></textarea>
+            </div>
+          </div>
+  </app-fp-modal>
+}
+
+@if (showSellModal()) {
+  <app-fp-modal
+    [open]="true"
+    title="Sell stock"
+    size="md"
+    subtitle="FIFO — oldest lots are consumed first."
+    icon="bi-box-arrow-right"
+    variant="danger"
+    [busy]="sellSaving()"
+    confirmText="Sell"
+    confirmIcon="bi-box-arrow-right"
+    confirmColor="danger"
+    (closed)="closeSellModal()"
+    (confirmed)="submitSell()"
+  >
+@if (selectedHold(); as h) {
+            <div class="fp-selected-stock mb-3">
+              <app-stock-logo
+                class="fp-selected-logo"
+                [symbol]="h.symbol"
+                [logoUrl]="h.logoUrl"
+                [size]="40"
+                rounded="lg"
+              />
+              <div class="fp-selected-copy">
+                <div class="fp-selected-title">{{ h.symbol }} — {{ h.companyName }}</div>
+                <div class="fp-selected-meta">
+                  This lot {{ h.remainingQuantity }} · Holding {{ sellAvailableQty() }} · Avg ₹{{ h.purchasePrice | number:'1.2-2' }} · Market ₹{{ h.currentPrice | number:'1.2-2' }}
+                </div>
+              </div>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-6">
+                <label class="form-label">Sell quantity <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-hash"></i></span>
+                  <input type="number" class="form-control" min="1" [max]="sellAvailableQty()" [ngModel]="sellForm.sellQuantity" (focus)="onQtyFocus($event)" (input)="onSellQty($event)" (blur)="onSellQtyBlur($event)" [disabled]="sellSaving()" [class.is-invalid]="!!sellFieldError('quantity')" />
+                </div>
+                @if (sellFieldError('quantity'); as msg) {
+                  <div class="invalid-feedback d-block small">{{ msg }}</div>
+                } @else {
+                  <div class="form-text">FIFO · max {{ sellAvailableQty() }}</div>
+                }
+              </div>
+              <div class="col-6">
+                <label class="form-label">Sell price <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text">₹</span>
+                  <input type="number" class="form-control" min="0" step="0.01" [ngModel]="sellForm.sellPrice" (focus)="onPriceFocus($event)" (input)="onSellPriceInput($event)" (blur)="onSellPriceBlur($event)" [disabled]="sellSaving()" [class.is-invalid]="!!sellFieldError('price')" />
+                </div>
+                @if (sellFieldError('price'); as msg) {
+                  <div class="invalid-feedback d-block small">{{ msg }}</div>
+                }
+              </div>
+              <div class="col-6">
+                <label class="form-label">Sold date <span class="text-danger">*</span></label>
+                <div [class.is-invalid]="!!sellFieldError('date')" (focusout)="touchSell('date')">
+                  <app-fp-date name="soldDate" [(ngModel)]="sellForm.soldDate" [disabled]="sellSaving()" />
+                </div>
+                @if (sellFieldError('date'); as msg) {
+                  <div class="invalid-feedback d-block small">{{ msg }}</div>
+                }
+              </div>
+              <div class="col-12">
+                <label class="form-label">Notes</label>
+                <textarea class="form-control" rows="2" placeholder="Optional" [(ngModel)]="sellForm.notes" [disabled]="sellSaving()"></textarea>
+              </div>
+            </div>
+          }
+  </app-fp-modal>
+}
+
+@if (showEditSoldModal()) {
+  <app-fp-modal
+    [open]="true"
+    title="Edit sell"
+    size="md"
+    subtitle="Correct this FIFO allocation. Remaining shares return to the buy lot."
+    icon="bi-pencil"
+    variant="danger"
+    [busy]="editSoldSaving()"
+    confirmText="Save sell"
+    confirmIcon="bi-check-lg"
+    confirmColor="danger"
+    (closed)="closeEditSoldModal()"
+    (confirmed)="submitEditSold()"
+  >
+    @if (selectedSold(); as s) {
+      <div class="fp-selected-stock mb-3">
+        <app-stock-logo
+          class="fp-selected-logo"
+          [symbol]="s.symbol"
+          [logoUrl]="s.logoUrl"
+          [size]="40"
+          rounded="lg"
+        />
+        <div class="fp-selected-copy">
+          <div class="fp-selected-title">{{ s.symbol }} — {{ s.companyName }}</div>
+          <div class="fp-selected-meta">
+            Bought {{ s.purchaseDate | date:'dd MMM yyyy' }} · Buy ₹{{ s.purchasePrice | number:'1.2-2' }} · Max {{ editSoldMaxQty() }}
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-6">
+          <label class="form-label">Sell quantity <span class="text-danger">*</span></label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-hash"></i></span>
+            <input type="number" class="form-control" min="1" [max]="editSoldMaxQty()" [ngModel]="editSoldForm.sellQuantity" (focus)="onQtyFocus($event)" (input)="onEditSoldQty($event)" (blur)="onEditSoldQtyBlur($event)" [disabled]="editSoldSaving()" [class.is-invalid]="!!editSoldFieldError('quantity')" />
+          </div>
+          @if (editSoldFieldError('quantity'); as msg) {
+            <div class="invalid-feedback d-block small">{{ msg }}</div>
+          } @else {
+            <div class="form-text">Max {{ editSoldMaxQty() }} for this lot</div>
+          }
+        </div>
+        <div class="col-6">
+          <label class="form-label">Sell price <span class="text-danger">*</span></label>
+          <div class="input-group">
+            <span class="input-group-text">₹</span>
+            <input type="number" class="form-control" min="0" step="0.01" [ngModel]="editSoldForm.sellPrice" (focus)="onPriceFocus($event)" (input)="onEditSoldPriceInput($event)" (blur)="onEditSoldPriceBlur($event)" [disabled]="editSoldSaving()" [class.is-invalid]="!!editSoldFieldError('price')" />
+          </div>
+          @if (editSoldFieldError('price'); as msg) {
+            <div class="invalid-feedback d-block small">{{ msg }}</div>
+          }
+        </div>
+        <div class="col-6">
+          <label class="form-label">Sold date <span class="text-danger">*</span></label>
+          <div [class.is-invalid]="!!editSoldFieldError('date')" (focusout)="touchEditSold('date')">
+            <app-fp-date name="editSoldDate" [(ngModel)]="editSoldForm.soldDate" [disabled]="editSoldSaving()" />
+          </div>
+          @if (editSoldFieldError('date'); as msg) {
+            <div class="invalid-feedback d-block small">{{ msg }}</div>
+          }
+        </div>
+        <div class="col-12">
+          <label class="form-label">Notes</label>
+          <textarea class="form-control" rows="2" placeholder="Optional" [(ngModel)]="editSoldForm.notes" [disabled]="editSoldSaving()"></textarea>
+        </div>
+      </div>
+    }
+  </app-fp-modal>
+}
+
+@if (showImportModal()) {
+  <app-fp-modal
+    [open]="true"
+    [title]="importTitle()"
+    [subtitle]="importSubtitle()"
+    icon="bi-upload"
+    size="lg"
+    [busy]="importSaving()"
+    [confirmText]="importConfirmLabel()"
+    [confirmDisabled]="importPreview().length === 0"
+    (closed)="closeImportModal()"
+    (confirmed)="submitImport()"
+  >
+    <div class="import-panel">
+      <div class="import-kinds" role="tablist">
+        <button type="button" class="import-kind is-buy" [class.is-active]="importKind() === 'buy'" (click)="setImportKind('buy')">
+          <i class="bi bi-plus-circle"></i> Buys
+        </button>
+        <button type="button" class="import-kind is-sell" [class.is-active]="importKind() === 'sell'" (click)="setImportKind('sell')">
+          <i class="bi bi-dash-circle"></i> Sells
+        </button>
+        <button type="button" class="import-kind is-div" [class.is-active]="importKind() === 'dividend'" (click)="setImportKind('dividend')">
+          <i class="bi bi-cash-coin"></i> Dividends
+        </button>
+      </div>
+
+      <div class="import-hint" [class.is-buy]="importKind() === 'buy'" [class.is-sell]="importKind() === 'sell'" [class.is-div]="importKind() === 'dividend'">
+        <i class="bi bi-info-circle"></i>
+        <div>
+          @if (importKind() === 'buy') {
+            <strong>Required:</strong> Symbol, Quantity, Purchase Price, Purchase Date<br />
+            <strong>Optional:</strong> Notes
+          } @else if (importKind() === 'sell') {
+            <strong>Required:</strong> Symbol, Quantity, Sell Price, Sold Date<br />
+            <strong>Optional:</strong> Notes. FIFO — oldest lots first.
+          } @else {
+            <strong>Required:</strong> Symbol, Quantity, Dividend Date, Amount or Per Share<br />
+            <strong>Optional:</strong> Ex Date, Record Date, Notes
+          }
+        </div>
+      </div>
+
+      <div>
+        <label class="form-label mb-1">Select CSV file</label>
+        <div class="import-file-row">
+          <label class="import-pick">
+            <i class="bi bi-file-earmark-spreadsheet"></i>
+            <span>{{ importFileName() || 'Choose file' }}</span>
+            <input type="file" accept=".csv" (change)="onFileSelected($event)" [disabled]="importSaving()" />
+          </label>
+          <button type="button" class="import-sample" (click)="downloadImportSample()">
+            <i class="bi bi-download"></i> Sample
+          </button>
+        </div>
+      </div>
+    </div>
+
+          @if (importErrors().length > 0) {
+            <div class="alert alert-warning small">
+              <strong>{{ importErrors().length }} row(s) skipped:</strong>
+              <ul class="mb-0 mt-1">
+                @for (err of importErrors(); track err) {
+                  <li>{{ err }}</li>
+                }
+              </ul>
+            </div>
+          }
+
+          @if (importPreview().length > 0) {
+            <div class="table-responsive import-preview">
+              <table class="table table-sm table-bordered mb-0">
+                <thead class="table-light sticky-top">
+                  <tr>
+                    <th>#</th>
+                    <th>Symbol</th>
+                    <th class="text-end">Qty</th>
+                    <th class="text-end">{{ importKind() === 'dividend' ? 'Amount' : 'Price' }}</th>
+                    <th>Date</th>
+                    @if (importKind() === 'dividend') {
+                      <th>Ex date</th>
+                      <th>Record date</th>
+                    }
+                    <th>Notes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (row of importPreview(); track $index) {
+                    <tr>
+                      <td>{{ $index + 1 }}</td>
+                      <td>{{ row.symbol }}</td>
+                      <td class="text-end">{{ row.quantity }}</td>
+                      <td class="text-end">{{ (importKind() === 'dividend' ? row.amount : row.price) | number:'1.2-2' }}</td>
+                      <td>{{ row.date }}</td>
+                      @if (importKind() === 'dividend') {
+                        <td>{{ row.exDate || '—' }}</td>
+                        <td>{{ row.recordDate || '—' }}</td>
+                      }
+                      <td>{{ row.notes || '—' }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+            <div class="form-text mt-2">{{ importPreview().length }} valid row(s) ready to import</div>
+          }
+  </app-fp-modal>
+}

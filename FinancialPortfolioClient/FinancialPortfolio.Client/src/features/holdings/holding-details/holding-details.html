@@ -1,0 +1,603 @@
+<div class="holding-detail-page">
+  <app-page-header
+    [title]="position()?.symbol || 'Holding detail'"
+    [subtitle]="position() ? (position()!.companyName + ' · one stock, all lots, sells and dividends') : 'Full buy/sell/dividend history'"
+    [actions]="headerActions()"
+    (actionClick)="onHeaderAction($event)"
+  />
+
+  @if (loading()) {
+    <div class="card border-0 shadow-sm">
+      <div class="card-body text-center py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="text-muted mt-2 mb-0">Loading stock position…</p>
+      </div>
+    </div>
+  } @else if (notFound() || !detail()) {
+    <div class="card border-0 shadow-sm">
+      <div class="card-body text-center py-5">
+        <i class="bi bi-exclamation-triangle fs-1 text-warning d-block mb-2"></i>
+        <p class="mb-3 fw-semibold">No history for this stock</p>
+        <button type="button" class="btn btn-primary btn-sm" (click)="back()">
+          <i class="bi bi-arrow-left me-1"></i> Back to holdings
+        </button>
+      </div>
+    </div>
+  } @else {
+    @if (detail(); as d) {
+      @if (d.position; as p) {
+        <div class="hd-hero card border-0 shadow-sm mb-3">
+          <div class="card-body p-4">
+            <div class="d-flex flex-wrap gap-3 align-items-start">
+              <app-stock-logo [symbol]="p.symbol" [logoUrl]="p.logoUrl" [size]="72" rounded="lg" />
+              <div class="flex-grow-1 min-w-0">
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+                  <h3 class="mb-0 fw-bold">{{ p.symbol }}</h3>
+                  <span class="badge" [class]="statusBadge(p.status).class">{{ statusBadge(p.status).text }}</span>
+                  <span class="badge text-bg-light border">{{ p.stockCode }}</span>
+                </div>
+                <div class="text-muted mb-2">{{ p.companyName }}</div>
+                <div class="d-flex flex-wrap gap-2 small text-muted">
+                  <span><i class="bi bi-calendar-plus me-1"></i>First buy {{ p.firstPurchaseDate | date:'dd MMM yyyy' }}</span>
+                  @if (p.lastExitDate) {
+                    <span>· Last exit {{ p.lastExitDate | date:'dd MMM yyyy' }}</span>
+                  }
+                  <span>· {{ p.holdDays }} days</span>
+                  <span>· {{ p.buyLotCount }} buy lot(s)</span>
+                </div>
+              </div>
+              <div class="text-md-end">
+                <div class="text-muted small">Market price</div>
+                <div class="hd-price">₹{{ p.marketPrice | number:'1.2-2' }}</div>
+                <div class="small" [class.text-success]="p.totalGainLoss >= 0" [class.text-danger]="p.totalGainLoss < 0">
+                  {{ formatPnL(p.totalGainLoss) }} ({{ p.gainLossPercent | number:'1.2-2' }}%)
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-6 col-lg-3">
+            <div class="stat-pill">
+              <div class="stat-label">Net qty</div>
+              <div class="stat-value">{{ p.currentQuantity }}</div>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="stat-pill">
+              <div class="stat-label">Avg buy</div>
+              <div class="stat-value">{{ p.averageBuyPrice | number:'1.2-2' }}</div>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="stat-pill">
+              <div class="stat-label">Investment</div>
+              <div class="stat-value">{{ p.totalInvestment | currency:'INR':'symbol':'1.2-2' }}</div>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="stat-pill">
+              <div class="stat-label">Current value</div>
+              <div class="stat-value">{{ p.totalCurrentValue | currency:'INR':'symbol':'1.2-2' }}</div>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="stat-pill">
+              <div class="stat-label">Unrealized</div>
+              <div class="stat-value" [class.text-success]="p.unrealizedGainLoss >= 0" [class.text-danger]="p.unrealizedGainLoss < 0">
+                {{ formatPnL(p.unrealizedGainLoss) }}
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="stat-pill">
+              <div class="stat-label">Realized</div>
+              <div class="stat-value" [class.text-success]="p.realizedGainLoss >= 0" [class.text-danger]="p.realizedGainLoss < 0">
+                {{ formatPnL(p.realizedGainLoss) }}
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="stat-pill">
+              <div class="stat-label">Lifetime dividends</div>
+              <div class="stat-value text-warning">{{ p.totalDividends | currency:'INR':'symbol':'1.2-2' }}</div>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="stat-pill">
+              <div class="stat-label">Bought / sold</div>
+              <div class="stat-value">{{ p.lifetimeBoughtQuantity }} / {{ p.lifetimeSoldQuantity }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-12 col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-header bg-white border-0 pb-0">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="hd-section-icon"><i class="bi bi-calculator"></i></span>
+                  <span class="fw-semibold">How average price is calculated</span>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="hd-form-grid">
+                  <div>
+                    <div class="hd-label">Current avg (open lots)</div>
+                    <div class="hd-value">₹{{ p.averageBuyPrice | number:'1.2-4' }}</div>
+                  </div>
+                  <div>
+                    <div class="hd-label">Lifetime avg (all buys)</div>
+                    <div class="hd-value">₹{{ p.lifetimeAverageBuyPrice | number:'1.2-4' }}</div>
+                  </div>
+                  <div>
+                    <div class="hd-label">Lifetime investment</div>
+                    <div class="hd-value">{{ p.lifetimeInvestment | currency:'INR':'symbol':'1.2-2' }}</div>
+                  </div>
+                  <div>
+                    <div class="hd-label">Avg sell</div>
+                    <div class="hd-value">
+                      @if (p.averageSellPrice) {
+                        ₹{{ p.averageSellPrice | number:'1.2-4' }}
+                      } @else {
+                        —
+                      }
+                    </div>
+                  </div>
+                  <div>
+                    <div class="hd-label">Total on sell</div>
+                    <div class="hd-value">{{ p.totalOnSell | currency:'INR':'symbol':'1.2-2' }}</div>
+                  </div>
+                  <div>
+                    <div class="hd-label">Open lots</div>
+                    <div class="hd-value">{{ p.openLotCount }} of {{ p.buyLotCount }}</div>
+                  </div>
+                </div>
+                <p class="small text-muted mb-0 mt-3">
+                  Current average = remaining quantity × each lot’s buy price, then ÷ remaining qty.
+                  If the stock is fully sold, the list shows lifetime average buy instead.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-header bg-white border-0 pb-0">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="hd-section-icon"><i class="bi bi-clock-history"></i></span>
+                  <span class="fw-semibold">Activity timeline</span>
+                </div>
+              </div>
+              <div class="card-body">
+                @if (d.timeline.length === 0) {
+                  <p class="text-muted mb-0">No events yet.</p>
+                } @else {
+                  <ul class="hd-timeline">
+                    @for (e of d.timeline; track e.sourceId + e.eventType) {
+                      <li>
+                        <i class="bi" [class]="eventIcon(e.eventType)"></i>
+                        <div>
+                          <div class="fw-medium">
+                            {{ e.eventType }}
+                            @if (e.quantity) {
+                              · {{ e.quantity }}
+                            }
+                            @if (e.price) {
+                              @ ₹{{ e.price | number:'1.2-2' }}
+                            }
+                          </div>
+                          <div class="small text-muted">
+                            {{ e.eventDate | date:'dd MMM yyyy' }}
+                            · {{ e.amount | currency:'INR':'symbol':'1.2-2' }}
+                            @if (e.notes) {
+                              · {{ e.notes }}
+                            }
+                          </div>
+                        </div>
+                      </li>
+                    }
+                  </ul>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-3">
+          <div class="card-header bg-white border-0">
+            <div class="d-flex align-items-center gap-2">
+              <span class="hd-section-icon"><i class="bi bi-bag-plus"></i></span>
+              <span class="fw-semibold">Buy lots</span>
+              <span class="badge text-bg-light border ms-auto">{{ d.buys.length }}</span>
+            </div>
+          </div>
+          <div class="card-body pt-0">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Date</th>
+                    <th class="text-end">Bought</th>
+                    <th class="text-end">Remaining</th>
+                    <th class="text-end">Buy price</th>
+                    <th class="text-end">Investment</th>
+                    <th class="text-end">Unrealized</th>
+                    <th class="text-center">Status</th>
+                    <th>Notes</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (b of d.buys; track b.id) {
+                    <tr>
+                      <td>{{ b.purchaseDate | date:'dd MMM yyyy' }}</td>
+                      <td class="text-end">{{ b.quantity }}</td>
+                      <td class="text-end">{{ b.remainingQuantity }}</td>
+                      <td class="text-end">{{ b.purchasePrice | number:'1.2-2' }}</td>
+                      <td class="text-end">{{ b.investmentAmount | number:'1.2-2' }}</td>
+                      <td class="text-end" [class.text-success]="b.unrealizedGainLoss >= 0" [class.text-danger]="b.unrealizedGainLoss < 0">
+                        {{ formatPnL(b.unrealizedGainLoss) }}
+                      </td>
+                      <td class="text-center">
+                        <span class="badge" [class]="lotBadge(b.lotStatus).class">{{ lotBadge(b.lotStatus).text }}</span>
+                      </td>
+                      <td class="text-muted small">{{ b.holdNotes || '—' }}</td>
+                      <td class="text-end">
+                        <div class="d-inline-flex gap-1">
+                          <button type="button" class="btn btn-sm btn-outline-primary" title="Edit lot" (click)="openEditHold(b)">
+                            <i class="bi bi-pencil"></i>
+                          </button>
+                          <button type="button" class="btn btn-sm btn-outline-danger" title="Delete lot" (click)="deleteHold(b)">
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-3">
+          <div class="card-header bg-white border-0">
+            <div class="d-flex align-items-center gap-2">
+              <span class="hd-section-icon"><i class="bi bi-box-arrow-right"></i></span>
+              <span class="fw-semibold">Sell history (FIFO)</span>
+              <span class="badge text-bg-light border ms-auto">{{ d.sells.length }}</span>
+            </div>
+          </div>
+          <div class="card-body pt-0">
+            @if (d.sells.length === 0) {
+              <p class="text-muted mb-0">No sells yet for this stock.</p>
+            } @else {
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Sold date</th>
+                      <th>Bought on</th>
+                      <th class="text-end">Qty</th>
+                      <th class="text-end">Buy</th>
+                      <th class="text-end">Sell</th>
+                      <th class="text-end">Cost</th>
+                      <th class="text-end">Proceeds</th>
+                      <th class="text-end">P&amp;L</th>
+                      <th class="text-center">Days</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (s of d.sells; track s.id) {
+                      <tr>
+                        <td>{{ s.soldDate | date:'dd MMM yyyy' }}</td>
+                        <td>{{ s.purchaseDate | date:'dd MMM yyyy' }}</td>
+                        <td class="text-end">{{ s.sellQuantity }}</td>
+                        <td class="text-end">{{ s.purchasePrice | number:'1.2-2' }}</td>
+                        <td class="text-end">{{ s.sellPrice | number:'1.2-2' }}</td>
+                        <td class="text-end">{{ s.costAmount | number:'1.2-2' }}</td>
+                        <td class="text-end">{{ s.sellAmount | number:'1.2-2' }}</td>
+                        <td class="text-end" [class.text-success]="s.realizedGainLoss >= 0" [class.text-danger]="s.realizedGainLoss < 0">
+                          {{ formatPnL(s.realizedGainLoss) }}
+                        </td>
+                        <td class="text-center">{{ s.holdDays ?? 0 }}</td>
+                        <td class="text-end">
+                          <div class="d-inline-flex gap-1">
+                            <button type="button" class="btn btn-sm btn-outline-primary" title="Edit sell" (click)="openEditSold(s)">
+                              <i class="bi bi-pencil"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-danger" title="Delete sell" (click)="deleteSold(s)">
+                              <i class="bi bi-trash"></i>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-3">
+          <div class="card-header bg-white border-0">
+            <div class="d-flex align-items-center justify-content-between">
+              <div class="d-flex align-items-center gap-2">
+                <span class="hd-section-icon"><i class="bi bi-cash-coin"></i></span>
+                <span class="fw-semibold">Dividends</span>
+                <span class="badge text-bg-light border">{{ visibleDividends().length }}</span>
+              </div>
+              <div class="d-flex gap-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="openAllDividends()">
+                  <i class="bi bi-list-ul me-1"></i> All dividends
+                </button>
+                <button type="button" class="btn btn-sm btn-primary" (click)="openDividendModal()">
+                  <i class="bi bi-plus-lg me-1"></i> Add dividend
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body pt-0">
+            <div class="row g-3 align-items-end mb-3">
+              <div class="col-12 col-md-4">
+                <label class="form-label small text-muted text-uppercase fw-semibold">Year</label>
+                <select
+                  class="form-select"
+                  [ngModel]="selectedDividendYear()"
+                  (ngModelChange)="onYearChange($event)"
+                >
+                  <option [ngValue]="'all'">All years · {{ p.totalDividends | currency:'INR':'symbol':'1.2-2' }}</option>
+                  @for (y of dividendsByYear(); track y.year) {
+                    <option [ngValue]="y.year">
+                      {{ y.year }} · {{ y.amount | currency:'INR':'symbol':'1.2-2' }} ({{ y.count }})
+                    </option>
+                  }
+                </select>
+              </div>
+              <div class="col-6 col-md-4">
+                <div class="text-muted small">Amount</div>
+                <div class="fs-5 fw-semibold text-warning">
+                  @if (selectedYearTotal(); as yearTotal) {
+                    {{ yearTotal.amount | currency:'INR':'symbol':'1.2-2' }}
+                  } @else {
+                    {{ p.totalDividends | currency:'INR':'symbol':'1.2-2' }}
+                  }
+                </div>
+              </div>
+              <div class="col-6 col-md-4">
+                <div class="text-muted small">Payouts</div>
+                <div class="fs-5 fw-semibold">
+                  @if (selectedYearTotal(); as yearTotal) {
+                    {{ yearTotal.count }}
+                  } @else {
+                    {{ d.dividends.length }}
+                  }
+                </div>
+              </div>
+            </div>
+
+            @if (visibleDividends().length === 0) {
+              <p class="text-muted mb-0">
+                @if (d.dividends.length === 0) {
+                  No dividends recorded. Add cash dividends when the company pays them.
+                } @else {
+                  No dividends in the selected year.
+                }
+              </p>
+            } @else {
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Credit date</th>
+                      <th>Ex date</th>
+                      <th>Record date</th>
+                      <th class="text-end">Qty</th>
+                      <th class="text-end">Per share</th>
+                      <th class="text-end">Amount</th>
+                      <th>Notes</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (div of visibleDividends(); track div.id) {
+                      <tr>
+                        <td>{{ div.dividendDate | date:'dd MMM yyyy' }}</td>
+                        <td>{{ div.exDate ? (div.exDate | date:'dd MMM yyyy') : '—' }}</td>
+                        <td>{{ div.recordDate ? (div.recordDate | date:'dd MMM yyyy') : '—' }}</td>
+                        <td class="text-end">{{ div.quantity }}</td>
+                        <td class="text-end">{{ div.perShareAmount | number:'1.2-4' }}</td>
+                        <td class="text-end fw-medium">{{ div.amount | number:'1.2-2' }}</td>
+                        <td class="text-muted small">{{ div.notes || '—' }}</td>
+                        <td class="text-end">
+                          <div class="d-inline-flex gap-1">
+                            <button type="button" class="btn btn-sm btn-outline-primary" title="Edit" (click)="openEditDividend(div)">
+                              <i class="bi bi-pencil"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-danger" title="Delete" (click)="deleteDividend(div.id)">
+                              <i class="bi bi-trash"></i>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    }
+  }
+</div>
+
+@if (showDividendModal()) {
+  <app-fp-modal
+    [open]="true"
+    [title]="isEditingDividend() ? 'Edit dividend' : 'Add dividend'"
+    size="md"
+    [subtitle]="isEditingDividend() ? 'Update quantity, rate or credit date.' : 'Cash credited for this holding.'"
+    icon="bi-cash-coin"
+    [busy]="savingDividend()"
+    [confirmText]="isEditingDividend() ? 'Save changes' : 'Save dividend'"
+    (closed)="closeDividendModal()"
+    (confirmed)="submitDividend()"
+  >
+    <div class="row g-3">
+      <div class="col-6">
+        <label class="form-label">Quantity</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-hash"></i></span>
+          <input type="number" min="1" class="form-control" [(ngModel)]="dividendForm.quantity" (ngModelChange)="onDividendCalc()" [class.is-invalid]="!!dividendFieldError('quantity')" (blur)="dividendTouched.update(t => ({...t, quantity: true}))" />
+        </div>
+        @if (dividendFieldError('quantity'); as msg) {
+          <div class="invalid-feedback d-block small">{{ msg }}</div>
+        }
+      </div>
+      <div class="col-6">
+        <label class="form-label">Per share</label>
+        <div class="input-group">
+          <span class="input-group-text">₹</span>
+          <input type="number" min="0" step="0.01" class="form-control" [(ngModel)]="dividendForm.perShareAmount" (ngModelChange)="onDividendCalc()" [class.is-invalid]="!!dividendFieldError('amount')" (blur)="dividendTouched.update(t => ({...t, amount: true}))" />
+        </div>
+        @if (dividendFieldError('amount'); as msg) {
+          <div class="invalid-feedback d-block small">{{ msg }}</div>
+        }
+      </div>
+      <div class="col-12">
+        <label class="form-label">Total amount</label>
+        <div class="input-group">
+          <span class="input-group-text">₹</span>
+          <input type="number" min="0" step="0.01" class="form-control" [(ngModel)]="dividendForm.amount" />
+        </div>
+      </div>
+      <div class="col-12">
+        <label class="form-label">Credit date</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+          <input type="date" class="form-control" [(ngModel)]="dividendForm.dividendDate" [class.is-invalid]="!!dividendFieldError('date')" (blur)="dividendTouched.update(t => ({...t, date: true}))" />
+        </div>
+        @if (dividendFieldError('date'); as msg) {
+          <div class="invalid-feedback d-block small">{{ msg }}</div>
+        }
+      </div>
+      <div class="col-6">
+        <label class="form-label">Ex date</label>
+        <input type="date" class="form-control" [(ngModel)]="dividendForm.exDate" />
+      </div>
+      <div class="col-6">
+        <label class="form-label">Record date</label>
+        <input type="date" class="form-control" [(ngModel)]="dividendForm.recordDate" />
+      </div>
+      <div class="col-12">
+        <label class="form-label">Notes</label>
+        <input type="text" class="form-control" maxlength="1000" placeholder="Optional" [(ngModel)]="dividendForm.notes" />
+      </div>
+    </div>
+  </app-fp-modal>
+}
+
+@if (showHoldModal()) {
+  <app-fp-modal
+    [open]="true"
+    title="Edit buy lot"
+    size="md"
+    subtitle="Correct quantity, price, date or notes. Symbol cannot change — delete and re-buy if the stock is wrong."
+    icon="bi-pencil"
+    [busy]="savingHold()"
+    confirmText="Save lot"
+    (closed)="closeHoldModal()"
+    (confirmed)="submitHold()"
+  >
+    <div class="row g-3">
+      <div class="col-6">
+        <label class="form-label">Quantity <span class="text-danger">*</span></label>
+        <input type="number" min="1" class="form-control" [(ngModel)]="holdForm.quantity" [class.is-invalid]="!!holdFieldError('quantity')" (blur)="holdTouched.update(t => ({...t, quantity: true}))" />
+        @if (holdFieldError('quantity'); as msg) {
+          <div class="invalid-feedback d-block small">{{ msg }}</div>
+        } @else if (holdSoldQuantity() > 0) {
+          <div class="form-text">{{ holdSoldQuantity() }} already sold — cannot go below that.</div>
+        }
+      </div>
+      <div class="col-6">
+        <label class="form-label">Purchase price <span class="text-danger">*</span></label>
+        <div class="input-group">
+          <span class="input-group-text">₹</span>
+          <input type="number" min="0" step="0.01" class="form-control" [(ngModel)]="holdForm.purchasePrice" [class.is-invalid]="!!holdFieldError('price')" (blur)="holdTouched.update(t => ({...t, price: true}))" />
+        </div>
+        @if (holdFieldError('price'); as msg) {
+          <div class="invalid-feedback d-block small">{{ msg }}</div>
+        }
+      </div>
+      <div class="col-6">
+        <label class="form-label">Purchase date <span class="text-danger">*</span></label>
+        <input type="date" class="form-control" [(ngModel)]="holdForm.purchaseDate" [class.is-invalid]="!!holdFieldError('date')" (blur)="holdTouched.update(t => ({...t, date: true}))" />
+        @if (holdFieldError('date'); as msg) {
+          <div class="invalid-feedback d-block small">{{ msg }}</div>
+        }
+      </div>
+      <div class="col-6">
+        <label class="form-label">Exchange</label>
+        <select class="form-select" [(ngModel)]="holdForm.exchange">
+          <option [ngValue]="1">NSE</option>
+          <option [ngValue]="2">BSE</option>
+        </select>
+      </div>
+      <div class="col-12">
+        <label class="form-label">Notes</label>
+        <input type="text" class="form-control" maxlength="1000" [(ngModel)]="holdForm.notes" />
+      </div>
+    </div>
+  </app-fp-modal>
+}
+
+@if (showSoldModal()) {
+  <app-fp-modal
+    [open]="true"
+    title="Edit sell"
+    size="md"
+    subtitle="Correct this allocation. Extra quantity returns to the buy lot."
+    icon="bi-pencil"
+    [busy]="savingSold()"
+    confirmText="Save sell"
+    (closed)="closeSoldModal()"
+    (confirmed)="submitSold()"
+  >
+    <div class="row g-3">
+      <div class="col-6">
+        <label class="form-label">Sell quantity <span class="text-danger">*</span></label>
+        <input type="number" min="1" [max]="soldMaxQty()" class="form-control" [(ngModel)]="soldForm.sellQuantity" [class.is-invalid]="!!soldFieldError('quantity')" (blur)="soldTouched.update(t => ({...t, quantity: true}))" />
+        @if (soldFieldError('quantity'); as msg) {
+          <div class="invalid-feedback d-block small">{{ msg }}</div>
+        } @else {
+          <div class="form-text">Max {{ soldMaxQty() }} for this lot</div>
+        }
+      </div>
+      <div class="col-6">
+        <label class="form-label">Sell price <span class="text-danger">*</span></label>
+        <div class="input-group">
+          <span class="input-group-text">₹</span>
+          <input type="number" min="0" step="0.01" class="form-control" [(ngModel)]="soldForm.sellPrice" [class.is-invalid]="!!soldFieldError('price')" (blur)="soldTouched.update(t => ({...t, price: true}))" />
+        </div>
+        @if (soldFieldError('price'); as msg) {
+          <div class="invalid-feedback d-block small">{{ msg }}</div>
+        }
+      </div>
+      <div class="col-6">
+        <label class="form-label">Sold date <span class="text-danger">*</span></label>
+        <input type="date" class="form-control" [(ngModel)]="soldForm.soldDate" [class.is-invalid]="!!soldFieldError('date')" (blur)="soldTouched.update(t => ({...t, date: true}))" />
+        @if (soldFieldError('date'); as msg) {
+          <div class="invalid-feedback d-block small">{{ msg }}</div>
+        }
+      </div>
+      <div class="col-12">
+        <label class="form-label">Notes</label>
+        <input type="text" class="form-control" maxlength="1000" [(ngModel)]="soldForm.notes" />
+      </div>
+    </div>
+  </app-fp-modal>
+}

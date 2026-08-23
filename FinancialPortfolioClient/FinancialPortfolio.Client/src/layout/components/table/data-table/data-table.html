@@ -1,0 +1,127 @@
+<div class="table-responsive">
+  <table class="table table-hover table-striped mb-0 align-middle">
+    <thead class="table-light">
+      <tr>
+        @if (showSerial()) {
+          <th class="text-nowrap serial-col" style="width: 60px">#</th>
+        }
+
+        @for (col of visibleColumns(); track col.key) {
+          <th [style.width]="col.width" class="text-nowrap" [class]="alignClass(col)">
+            @if (col.type === 'actions') {
+              {{ col.header || 'Actions' }}
+            } @else {
+              <div
+                class="d-flex align-items-center gap-1 w-100"
+                [class.justify-content-end]="isEnd(col)"
+                [class.justify-content-center]="isCenter(col)"
+                [class.sortable]="col.sortable"
+                (click)="onSort(col)"
+              >
+                <span>{{ col.header }}</span>
+                @if (col.sortable) {
+                  <i class="bi" [ngClass]="getSortIcon(col)"></i>
+                }
+              </div>
+            }
+          </th>
+        }
+      </tr>
+    </thead>
+
+    <tbody>
+      @if (loading()) {
+        <tr>
+          <td
+            [attr.colspan]="(visibleColumns().length || 1) + (showSerial() ? 1 : 0)"
+            class="text-center py-5"
+          >
+            <div class="spinner-border text-primary" role="status"></div>
+            <div class="mt-2 text-muted small">Loading...</div>
+          </td>
+        </tr>
+      } @else if (!data()?.length) {
+        <tr>
+          <td
+            [attr.colspan]="(visibleColumns().length || 1) + (showSerial() ? 1 : 0)"
+            class="text-center py-5 text-muted"
+          >
+            <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+            {{ emptyMessage() }}
+          </td>
+        </tr>
+      } @else {
+        @for (row of data(); track $index) {
+          <tr (click)="rowClick.emit(row)">
+            @if (showSerial()) {
+              <td class="text-muted serial-col">{{ serialNo($index) }}</td>
+            }
+
+            @for (col of visibleColumns(); track col.key) {
+              <td [class]="alignClass(col)">
+                @if (col.type === 'actions' && col.actions?.length) {
+                  <div class="d-flex gap-1 flex-wrap justify-content-center">
+                    @for (action of col.actions; track action.icon) {
+                      @if (isActionVisible(action, row)) {
+                        <button
+                          type="button"
+                          class="btn btn-sm dt-action-btn"
+                          [ngClass]="'btn-' + (action.color || 'outline-primary')"
+                          [title]="action.label || ''"
+                          [disabled]="isActionDisabled(action, row)"
+                          (click)="onAction($event, action, row)">
+                          <i class="bi" [ngClass]="action.icon"></i>
+                        </button>
+                      }
+                    }
+                  </div>
+                } @else if (col.formatter && isHtml(getValue(row, col))) {
+                  <span [innerHTML]="getValue(row, col)"></span>
+                } @else if (col.type === 'stock') {
+                  <div class="d-flex align-items-center gap-2">
+                    <app-stock-logo
+                      [symbol]="stockSymbol(row, col)"
+                      [logoUrl]="stockLogo(row, col)"
+                      [size]="32"
+                    />
+                    <div class="min-w-0">
+                      <div class="fw-medium text-truncate">{{ stockName(row, col) }}</div>
+                      <code class="small">{{ stockSymbol(row, col) }}</code>
+                    </div>
+                  </div>
+                } @else if (col.type === 'money') {
+                  {{ formatMoney(getValue(row, col)) }}
+                } @else if (col.type === 'pnl') {
+                  <span
+                    class="fw-medium"
+                    [class.text-success]="numeric(row, col.key) >= 0"
+                    [class.text-danger]="numeric(row, col.key) < 0"
+                  >
+                    {{ formatPnL(getValue(row, col)) }}
+                  </span>
+                  @if (col.percentKey) {
+                    <div
+                      class="small fw-normal"
+                      [class.text-success]="numeric(row, col.percentKey) >= 0"
+                      [class.text-danger]="numeric(row, col.percentKey) < 0"
+                    >
+                      {{ formatPercent(numeric(row, col.percentKey)) }}
+                    </div>
+                  }
+                } @else if (col.type === 'badge') {
+                  <span class="badge" [class]="col.badgeClass ? col.badgeClass(row) : 'text-bg-light border'">
+                    {{ getValue(row, col) }}
+                  </span>
+                } @else if (col.type === 'date') {
+                  {{ formatDate(getValue(row, col)) }}
+                } @else {
+                  {{ getValue(row, col) }}
+                }
+              </td>
+            }
+          </tr>
+        }
+      }
+    </tbody>
+  </table>
+</div>

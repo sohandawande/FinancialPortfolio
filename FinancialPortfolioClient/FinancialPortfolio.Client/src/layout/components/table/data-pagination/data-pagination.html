@@ -1,0 +1,100 @@
+<div class="data-pagination">
+  <div class="pg-meta">
+    <span class="pg-range">{{ rangeText() }}</span>
+
+    <div class="pg-size" [class.open]="sizeOpen()">
+      <button
+        type="button"
+        class="pg-size-btn"
+        [attr.aria-expanded]="sizeOpen()"
+        aria-haspopup="listbox"
+        aria-label="Rows per page"
+        (click)="toggleSizeMenu($event)"
+      >
+        <span>Rows</span>
+        <strong>{{ pageSize() }}</strong>
+        <i class="bi bi-chevron-up"></i>
+      </button>
+
+      @if (sizeOpen()) {
+        <div class="pg-size-menu" role="listbox">
+          @for (size of pageSizeOptions(); track size) {
+            <button
+              type="button"
+              class="pg-size-option"
+              role="option"
+              [class.active]="size === pageSize()"
+              (click)="chooseSize(size, $event)"
+            >
+              <span>{{ size }}</span>
+              @if (size === pageSize()) {
+                <i class="bi bi-check2"></i>
+              }
+            </button>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="pg-nav">
+    <ul class="pagination mb-0">
+      <li class="page-item" [class.disabled]="isFirst()">
+        <button type="button" class="page-link" title="First page" [disabled]="isFirst()" (click)="goFirst()">
+          <i class="bi bi-chevron-double-left"></i>
+        </button>
+      </li>
+      <li class="page-item" [class.disabled]="isFirst()">
+        <button type="button" class="page-link" title="Previous" [disabled]="isFirst()" (click)="goPrev()">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+      </li>
+
+      @if (pages().length && pages()[0] > 1) {
+        <li class="page-item disabled">
+          <span class="page-link">…</span>
+        </li>
+      }
+
+      @for (p of pages(); track p) {
+        <li class="page-item" [class.active]="p === pageNumber()">
+          <button type="button" class="page-link" (click)="goTo(p)">{{ p }}</button>
+        </li>
+      }
+
+      @if (pages().length && pages()[pages().length - 1] < totalPages()) {
+        <li class="page-item disabled">
+          <span class="page-link">…</span>
+        </li>
+      }
+
+      <li class="page-item" [class.disabled]="isLast()">
+        <button type="button" class="page-link" title="Next" [disabled]="isLast()" (click)="goNext()">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </li>
+      <li class="page-item" [class.disabled]="isLast()">
+        <button type="button" class="page-link" title="Last page" [disabled]="isLast()" (click)="goLast()">
+          <i class="bi bi-chevron-double-right"></i>
+        </button>
+      </li>
+    </ul>
+
+    @if (totalPages() > 1) {
+      <label class="pg-jump">
+        <span>Page</span>
+        <input
+          type="number"
+          class="jump-input"
+          min="1"
+          [max]="totalPages()"
+          [ngModel]="jumpPage()"
+          (ngModelChange)="jumpPage.set(+$event)"
+          (keyup.enter)="onJumpSubmit()"
+          (blur)="onJumpSubmit()"
+        />
+        <span class="pg-of">/ {{ totalPages() }}</span>
+      </label>
+    }
+  </div>
+</div>

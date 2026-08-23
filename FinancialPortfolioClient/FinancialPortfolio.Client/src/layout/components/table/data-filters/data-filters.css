@@ -1,0 +1,10 @@
+.data-filters .form-select,
+.data-filters .form-control {
+  font-size: var(--fp-fs-sm);
+}
+
+.data-filters .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

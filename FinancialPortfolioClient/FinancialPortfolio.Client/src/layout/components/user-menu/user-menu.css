@@ -1,0 +1,59 @@
+.user-menu-btn {
+  max-width: 220px;
+  border: 1px solid #e8eef3 !important;
+  background: #fff !important;
+  border-radius: 999px !important;
+  padding: 0.25rem 0.5rem 0.25rem 0.3rem !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.user-menu-btn:hover,
+.user-menu-btn:focus {
+  border-color: #a7e6c9 !important;
+  box-shadow: 0 0 0 3px rgba(66, 184, 131, 0.15);
+}
+
+.user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #42b883, #36a473);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(66, 184, 131, 0.3);
+}
+
+.user-name {
+  max-width: 120px;
+}
+
+.user-dropdown {
+  min-width: 260px;
+  border: 0;
+  border-radius: 0.75rem;
+  box-shadow: 0 12px 40px rgba(53, 73, 94, 0.14);
+  padding: 0.4rem;
+  /* Ensure menu paints above page content when navbar stacking context is established */
+  z-index: 1050;
+}
+
+.user-dropdown .dropdown-item {
+  border-radius: 0.45rem;
+  font-size: 0.875rem;
+  padding: 0.55rem 0.85rem;
+}
+
+.user-dropdown .dropdown-item:hover {
+  background: #e8f8f1;
+  color: #2f9b6d;
+}
+
+.user-dropdown .dropdown-item.text-danger:hover {
+  background: #fef2f2;
+  color: #dc2626;
+}

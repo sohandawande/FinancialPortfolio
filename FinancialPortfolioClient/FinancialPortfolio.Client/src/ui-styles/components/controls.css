@@ -1,0 +1,256 @@
+/* =============================================================================
+   Compact toolbar controls — one height on every page
+   Search, filters, columns, pagination, dropdowns, jump-to-page
+   ============================================================================= */
+
+:root {
+  --fp-ctrl: 36px;
+  --fp-pg: 28px;
+}
+
+/* ---------- Shared compact size ---------- */
+.data-search-box,
+.data-search-box .form-control,
+.data-search-box .input-group-text,
+.data-search-box .btn,
+.dg-actions .btn,
+.dg-btn,
+.data-column-toggler > .btn,
+.data-filters .form-select,
+.data-filters .form-control,
+.data-filters .btn,
+.fp-select-trigger,
+.fp-filter-field,
+.fp-filter-control,
+.fp-filter-clear {
+  height: var(--fp-ctrl);
+  min-height: var(--fp-ctrl);
+  box-sizing: border-box;
+}
+
+/* ---------- Grid toolbar ---------- */
+.dg-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.dg-search,
+.data-search-box {
+  flex: 0 1 280px;
+  width: 100%;
+  max-width: 320px;
+}
+
+.data-search-box.input-group {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  border: 1px solid var(--fp-border);
+  border-radius: var(--fp-radius-sm);
+  overflow: hidden;
+  background: var(--fp-card);
+}
+
+.data-search-box .input-group-text,
+.data-search-box .form-control,
+.data-search-box .btn {
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+.data-search-box .input-group-text {
+  width: var(--fp-ctrl);
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--fp-navy-soft);
+  color: var(--fp-vue);
+}
+
+.data-search-box .form-control {
+  min-width: 0;
+  font-size: var(--fp-fs-sm);
+  padding: 0 0.75rem;
+}
+
+.data-search-box .form-control:focus {
+  box-shadow: none !important;
+}
+
+.data-search-box:focus-within {
+  border-color: var(--fp-vue);
+  box-shadow: 0 0 0 0.15rem rgba(66, 184, 131, 0.2);
+}
+
+.data-search-box .btn {
+  width: var(--fp-ctrl);
+  padding: 0;
+  color: var(--fp-text-muted);
+  background: transparent;
+}
+
+/* Toolbar action buttons sit on the same baseline */
+.dg-actions .btn,
+.dg-btn,
+.data-column-toggler > .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0 0.85rem;
+  font-size: var(--fp-fs-sm);
+  font-weight: 600;
+  line-height: 1;
+  border-radius: var(--fp-radius-sm);
+}
+
+/* ---------- Pagination (smaller than toolbar) ---------- */
+.data-pagination {
+  border-top: 1px solid var(--fp-border-soft);
+  margin-top: 0.35rem;
+  padding-top: 0.65rem !important;
+}
+
+.data-pagination .pagination {
+  --bs-pagination-border-radius: 999px;
+  gap: 0.15rem;
+}
+
+.data-pagination .page-link {
+  width: var(--fp-pg);
+  height: var(--fp-pg);
+  min-width: var(--fp-pg);
+  min-height: var(--fp-pg);
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+  border-radius: 999px !important;
+  margin: 0;
+  color: var(--fp-navy);
+  background: var(--fp-card);
+  border: 1px solid var(--fp-border);
+}
+
+.data-pagination .page-item.active .page-link {
+  background: var(--fp-vue);
+  border-color: var(--fp-vue);
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(66, 184, 131, 0.28);
+}
+
+.data-pagination .page-link:hover {
+  background: var(--fp-vue-soft);
+  border-color: var(--fp-vue-muted);
+  color: var(--fp-vue-dark);
+}
+
+.data-pagination .page-item.disabled .page-link {
+  background: transparent;
+  border-color: transparent;
+  color: #94a3b8;
+}
+
+.data-pagination .page-link i {
+  font-size: 0.7rem;
+}
+
+/* ---------- Custom dropdown (portfolio / holdings filters) ---------- */
+.fp-select-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 148px;
+  padding: 0 0.75rem;
+  border: 1px solid var(--fp-border);
+  border-radius: var(--fp-radius-sm);
+  background: var(--fp-card);
+  color: var(--fp-navy);
+  box-shadow: none;
+  font-size: var(--fp-fs-sm);
+}
+
+.fp-select-trigger.open,
+.fp-select-trigger:focus-visible {
+  outline: 0;
+  border-color: var(--fp-vue);
+  box-shadow: 0 0 0 0.15rem rgba(66, 184, 131, 0.2);
+}
+
+.fp-select-label {
+  font-size: var(--fp-fs-sm);
+  font-weight: 600;
+}
+
+.fp-filter-bar {
+  align-items: center;
+}
+
+.fp-filter-field {
+  border: 1px solid var(--fp-border);
+  border-radius: var(--fp-radius-sm);
+  background: var(--fp-card);
+  box-shadow: none;
+  padding: 0 0.75rem;
+}
+
+.fp-filter-control {
+  min-height: auto;
+  font-size: var(--fp-fs-sm);
+}
+
+.fp-filter-clear {
+  width: var(--fp-ctrl);
+  border: 1px solid var(--fp-border);
+  border-radius: var(--fp-radius-sm);
+}
+
+.fp-filter-pills {
+  min-height: var(--fp-ctrl);
+  align-items: center;
+}
+
+.fp-filter-pill,
+.fp-tab,
+.div-tab {
+  height: 28px;
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.div-search {
+  height: var(--fp-ctrl);
+  min-height: var(--fp-ctrl);
+  padding: 0 0.75rem !important;
+  border-radius: var(--fp-radius-sm) !important;
+}
+
+.btn-group > .btn {
+  height: var(--fp-ctrl);
+  min-height: var(--fp-ctrl);
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--fp-fs-sm);
+}
+
+@media (max-width: 575.98px) {
+  .dg-search,
+  .data-search-box {
+    max-width: none;
+    flex-basis: 100%;
+  }
+
+  .dg-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

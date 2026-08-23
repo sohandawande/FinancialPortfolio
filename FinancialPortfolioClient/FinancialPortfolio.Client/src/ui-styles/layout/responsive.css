@@ -1,0 +1,124 @@
+/* ============================================================
+   GLOBAL RESPONSIVE RULES
+   ============================================================ */
+
+
+/* ============================================================
+   LARGE DESKTOP
+   ============================================================ */
+
+@media (min-width: 1400px) {
+
+  .content {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+}
+
+
+/* ============================================================
+   DESKTOP
+   ============================================================ */
+
+@media (max-width: 1199.98px) {
+
+  .content {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+
+/* ============================================================
+   TABLET
+   ============================================================ */
+
+@media (max-width: 991.98px) {
+
+  .content {
+    padding-left: 0.85rem;
+    padding-right: 0.85rem;
+  }
+
+  .layout {
+    overflow-x: hidden;
+  }
+}
+
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 767.98px) {
+
+  .content {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  h1 {
+    font-size: 1.45rem;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+  }
+
+  h3 {
+    font-size: 1.05rem;
+  }
+}
+
+
+/* ============================================================
+   SMALL MOBILE
+   ============================================================ */
+
+@media (max-width: 575.98px) {
+
+  .content {
+    padding-left: 0.65rem;
+    padding-right: 0.65rem;
+  }
+
+  h1 {
+    font-size: 1.3rem;
+  }
+
+  h2 {
+    font-size: 1.15rem;
+  }
+}
+
+
+/* ============================================================
+   EXTRA SMALL DEVICES
+   ============================================================ */
+
+@media (max-width: 399.98px) {
+
+  .content {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+}
+
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+
+    transition-duration: 0.01ms !important;
+  }
+}

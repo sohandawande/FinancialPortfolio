@@ -1,0 +1,159 @@
+<div class="page-container">
+  <!-- Hero welcome -->
+  <div class="dash-hero mb-4">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+      <div>
+        <p class="dash-eyebrow mb-1">
+          <i class="bi bi-sparkles me-1"></i> Overview
+        </p>
+        <h1 class="dash-title mb-1">Welcome back</h1>
+        <p class="dash-sub mb-0">Track holdings, markets and activity in one place.</p>
+      </div>
+      <div class="d-flex flex-wrap gap-2">
+        <a routerLink="/stocks" class="btn btn-primary btn-sm">
+          <i class="bi bi-graph-up-arrow me-1"></i> View stocks
+        </a>
+        <a routerLink="/portfolio" class="btn btn-outline-primary btn-sm">
+          <i class="bi bi-wallet2 me-1"></i> Portfolio
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stat cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="stat-card">
+        <div class="d-flex align-items-start justify-content-between">
+          <div>
+            <div class="stat-label">Portfolio value</div>
+            <div class="stat-value">—</div>
+            <div class="stat-hint">Coming with portfolio module</div>
+          </div>
+          <div class="stat-icon vue">
+            <i class="bi bi-wallet2"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="stat-card">
+        <div class="d-flex align-items-start justify-content-between">
+          <div>
+            <div class="stat-label">Today’s P&amp;L</div>
+            <div class="stat-value text-vue">—</div>
+            <div class="stat-hint">Live once holdings sync</div>
+          </div>
+          <div class="stat-icon vue">
+            <i class="bi bi-graph-up"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="stat-card">
+        <div class="d-flex align-items-start justify-content-between">
+          <div>
+            <div class="stat-label">Open positions</div>
+            <div class="stat-value">—</div>
+            <div class="stat-hint">Active lots in portfolio</div>
+          </div>
+          <div class="stat-icon navy">
+            <i class="bi bi-collection"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="stat-card">
+        <div class="d-flex align-items-start justify-content-between">
+          <div>
+            <div class="stat-label">Watchlist</div>
+            <div class="stat-value">—</div>
+            <div class="stat-hint">Synced from Google Sheet</div>
+          </div>
+          <div class="stat-icon info">
+            <i class="bi bi-bookmark-star"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick links + tips -->
+  <div class="row g-3">
+    <div class="col-12 col-lg-7">
+      <div class="fp-card h-100 mb-0">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <span class="stat-icon vue" style="width:36px;height:36px;font-size:1rem">
+            <i class="bi bi-lightning-charge-fill"></i>
+          </span>
+          <h2 class="fp-section-title">Quick actions</h2>
+        </div>
+        <div class="row g-2">
+          <div class="col-6 col-md-4">
+            <a routerLink="/stocks" class="quick-tile">
+              <i class="bi bi-graph-up-arrow"></i>
+              <span>Stocks</span>
+            </a>
+          </div>
+          <div class="col-6 col-md-4">
+            <a routerLink="/portfolio" class="quick-tile">
+              <i class="bi bi-wallet2"></i>
+              <span>Portfolio</span>
+            </a>
+          </div>
+          <div class="col-6 col-md-4">
+            <a routerLink="/users/manage" class="quick-tile">
+              <i class="bi bi-people"></i>
+              <span>Users</span>
+            </a>
+          </div>
+          <div class="col-6 col-md-4">
+            <a routerLink="/system-logs" class="quick-tile">
+              <i class="bi bi-journal-text"></i>
+              <span>Logs</span>
+            </a>
+          </div>
+          <div class="col-6 col-md-4">
+            <a routerLink="/change-password" class="quick-tile">
+              <i class="bi bi-key"></i>
+              <span>Password</span>
+            </a>
+          </div>
+          <div class="col-6 col-md-4">
+            <a routerLink="/stocks" class="quick-tile">
+              <i class="bi bi-arrow-repeat"></i>
+              <span>Sync sheet</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-5">
+      <div class="fp-card h-100 mb-0 dash-tip">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="stat-icon navy" style="width:36px;height:36px;font-size:1rem">
+            <i class="bi bi-info-circle"></i>
+          </span>
+          <h2 class="fp-section-title">Getting started</h2>
+        </div>
+        <ul class="dash-tips list-unstyled mb-0">
+          <li>
+            <i class="bi bi-check2-circle text-vue"></i>
+            Sync stocks from Google Sheet under <strong>Stocks</strong>
+          </li>
+          <li>
+            <i class="bi bi-check2-circle text-vue"></i>
+            Approve pending users from <strong>Users</strong>
+          </li>
+          <li>
+            <i class="bi bi-check2-circle text-vue"></i>
+            Portfolio holdings &amp; P&amp;L will appear here soon
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

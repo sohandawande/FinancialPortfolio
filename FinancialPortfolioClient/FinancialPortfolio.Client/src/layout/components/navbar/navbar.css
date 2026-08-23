@@ -1,0 +1,71 @@
+.navbar,
+.fp-navbar {
+  position: relative;
+  z-index: 1030; /* keep dropdowns above page content (hero cards, etc.) but below modal (1055) */
+  height: 64px;
+  min-height: 64px;
+  border-bottom: 1px solid var(--fp-border, #e8eef3) !important;
+  flex-shrink: 0;
+  background: var(--fp-navbar-bg, rgba(255, 255, 255, 0.92)) !important;
+  backdrop-filter: var(--fp-navbar-blur, blur(12px));
+  -webkit-backdrop-filter: var(--fp-navbar-blur, blur(12px));
+  box-shadow: 0 1px 0 rgba(53, 73, 94, 0.04);
+  padding-left: 0.75rem !important;
+  padding-right: 0.75rem !important;
+}
+
+.navbar .btn-outline-secondary {
+  border-color: var(--fp-border, #e2e8f0);
+  color: var(--fp-navy, #35495e);
+  border-radius: 0.5rem;
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.navbar .btn-outline-secondary:hover {
+  background: var(--fp-vue-soft, #e8f8f1);
+  border-color: var(--fp-vue-muted, #a7e6c9);
+  color: var(--fp-vue, #42b883);
+}
+
+.navbar-title {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease;
+  color: var(--fp-navy, #35495e);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  font-size: 1.05rem;
+}
+
+.navbar-title.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (max-width: 991.98px) {
+  .navbar,
+  .fp-navbar {
+    height: 58px;
+    min-height: 58px;
+  }
+
+  .navbar .btn-outline-secondary {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .navbar-title {
+    display: none !important;
+  }
+
+  .navbar .ms-auto {
+    gap: 0.25rem !important;
+  }
+}

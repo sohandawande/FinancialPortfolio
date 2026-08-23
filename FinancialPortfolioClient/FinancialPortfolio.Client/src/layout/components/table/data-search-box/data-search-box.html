@@ -1,0 +1,19 @@
+<div class="data-search-box input-group input-group-sm">
+  <span class="input-group-text">
+    <i class="bi bi-search"></i>
+  </span>
+
+  <input
+    type="search"
+    class="form-control"
+    [placeholder]="placeholder()"
+    [ngModel]="localValue()"
+    (ngModelChange)="onInput($event)"
+  />
+
+  @if (localValue()) {
+    <button type="button" class="btn btn-outline-secondary" (click)="clear()">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  }
+</div>
