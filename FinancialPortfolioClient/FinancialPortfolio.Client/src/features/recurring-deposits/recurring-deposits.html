@@ -1,0 +1,52 @@
+<div class="page-container">
+  <app-page-header title="Recurring deposits" subtitle="Monthly installment, rate and tenure. Current value uses installments paid." [actions]="headerActions" (actionClick)="onHeaderAction($event)" />
+
+  @if (loading()) {
+    <div class="wt-empty">Loading RDs…</div>
+  } @else if (rows().length === 0) {
+    <div class="wt-empty">No recurring deposits yet.</div>
+  } @else {
+    <div class="wt-buckets">
+      @for (row of rows(); track row.id) {
+        <article class="wt-bucket">
+          <div class="wt-bucket-top">
+            <span>{{ statusLabels[row.status] }}</span>
+            <span>{{ row.installmentsPaid }}/{{ row.tenureMonths }}</span>
+          </div>
+          <div class="wt-bucket-value">{{ row.bankName }}</div>
+          <div class="wt-bucket-meta">₹{{ row.monthlyAmount }} / month · {{ row.interestRate }}%</div>
+          <div class="wt-bucket-meta">Invested {{ row.investedAmount | currency:'INR':'symbol':'1.0-0' }} · now {{ row.currentValue | currency:'INR':'symbol':'1.0-0' }} · maturity {{ row.maturityAmount | currency:'INR':'symbol':'1.0-0' }}</div>
+          <div class="d-flex gap-2 mt-2">
+            <button type="button" class="btn btn-sm btn-outline-primary" (click)="open(row)">Edit</button>
+            <button type="button" class="btn btn-sm btn-outline-danger" (click)="remove(row)">Delete</button>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</div>
+
+@if (showModal()) {
+  <app-fp-modal [open]="true" [title]="editId() ? 'Edit RD' : 'Add RD'" icon="bi-calendar-check" [busy]="saving()" confirmText="Save" (closed)="showModal.set(false)" (confirmed)="save()">
+    <div class="div-form">
+      <label class="div-field"><span>Bank</span><input class="form-control" [(ngModel)]="form.bankName" /></label>
+      <label class="div-field"><span>Account / ref</span><input class="form-control" [(ngModel)]="form.accountRef" /></label>
+      <div class="row g-2">
+        <div class="col-4"><label class="div-field"><span>Monthly</span><input type="number" class="form-control" [(ngModel)]="form.monthlyAmount" /></label></div>
+        <div class="col-4"><label class="div-field"><span>Rate %</span><input type="number" class="form-control" [(ngModel)]="form.interestRate" /></label></div>
+        <div class="col-4"><label class="div-field"><span>Tenure months</span><input type="number" class="form-control" [(ngModel)]="form.tenureMonths" /></label></div>
+      </div>
+      <label class="div-field"><span>Installments paid</span><input type="number" class="form-control" [(ngModel)]="form.installmentsPaid" /></label>
+      <label class="div-field"><span>Start date</span><app-fp-date name="rdStart" [(ngModel)]="form.startDate" /></label>
+      <label class="div-field">
+        <span>Status</span>
+        <select class="form-select" [(ngModel)]="form.status">
+          <option [ngValue]="1">Active</option>
+          <option [ngValue]="2">Matured</option>
+          <option [ngValue]="3">Closed</option>
+        </select>
+      </label>
+      <label class="div-field"><span>Notes</span><input class="form-control" [(ngModel)]="form.notes" /></label>
+    </div>
+  </app-fp-modal>
+}

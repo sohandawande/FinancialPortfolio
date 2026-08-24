@@ -1,0 +1,123 @@
+<div class="page-container">
+  <app-page-header
+    title="Mutual funds"
+    subtitle="Search a scheme, store units and avg NAV. Current NAV syncs from mfapi.in, AMFI if that fails. Daily 21:00 IST."
+    [actions]="headerActions"
+    (actionClick)="onHeaderAction($event)"
+  />
+
+  @if (syncing()) {
+    <div class="wt-empty">Refreshing NAV from mfapi / AMFI…</div>
+  }
+
+  @if (loading()) {
+    <div class="wt-empty">Loading schemes…</div>
+  } @else if (rows().length === 0) {
+    <div class="wt-empty">No schemes yet. Search and add a folio you already hold.</div>
+  } @else {
+    <div class="wt-buckets">
+      @for (row of rows(); track row.id) {
+        <article class="wt-bucket">
+          <div class="wt-bucket-top">
+            <span>{{ schemeLabels[row.schemeType] }}</span>
+            <span>{{ row.gainLossPercent }}%</span>
+          </div>
+          <div class="wt-bucket-value">{{ row.schemeName }}</div>
+          <div class="wt-bucket-meta">{{ row.amc }} · {{ row.units }} units @ ₹{{ row.currentNav }}</div>
+          <div class="wt-bucket-meta">
+            Value {{ row.currentValue | currency:'INR':'symbol':'1.2-2' }}
+            · invested {{ row.investedAmount | currency:'INR':'symbol':'1.0-0' }}
+          </div>
+          <div class="wt-bucket-meta">
+            @if (row.schemeCode) { code {{ row.schemeCode }} · }
+            @if (row.navAsOf) { NAV {{ row.navAsOf | date:'dd MMM yyyy' }} ({{ row.navSource || 'manual' }}) }
+            @else { NAV not synced }
+          </div>
+          <div class="d-flex gap-2 mt-2">
+            <button type="button" class="btn btn-sm btn-outline-success" (click)="syncOne(row, $event)">NAV</button>
+            <button type="button" class="btn btn-sm btn-outline-primary" (click)="open(row)">Edit</button>
+            <button type="button" class="btn btn-sm btn-outline-danger" (click)="remove(row)">Delete</button>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</div>
+
+@if (showModal()) {
+  <app-fp-modal
+    [open]="true"
+    [title]="editId() ? 'Edit scheme' : 'Add scheme'"
+    icon="bi-pie-chart"
+    [busy]="saving()"
+    confirmText="Save"
+    (closed)="showModal.set(false)"
+    (confirmed)="save()"
+  >
+    <div class="div-form">
+      <label class="div-field">
+        <span>Search scheme</span>
+        <input class="form-control" [ngModel]="schemeQuery()" (ngModelChange)="onSchemeQuery($event)" placeholder="Type 2+ letters…" />
+        @if (searching()) { <small class="text-muted">Searching mfapi…</small> }
+      </label>
+      @if (suggestions().length) {
+        <div class="list-group mb-2">
+          @for (s of suggestions(); track s.schemeCode) {
+            <button type="button" class="list-group-item list-group-item-action" (click)="pickScheme(s)">
+              <strong>{{ s.schemeName }}</strong>
+              <small class="d-block text-muted">{{ s.schemeCode }}</small>
+            </button>
+          }
+        </div>
+      }
+      <label class="div-field"><span>Scheme</span><input class="form-control" [(ngModel)]="form.schemeName" /></label>
+      <label class="div-field"><span>AMC</span><input class="form-control" [(ngModel)]="form.amc" /></label>
+      <div class="row g-2">
+        <div class="col-6"><label class="div-field"><span>Folio</span><input class="form-control" [(ngModel)]="form.folioNumber" /></label></div>
+        <div class="col-6"><label class="div-field"><span>Scheme code</span><input type="number" class="form-control" [(ngModel)]="form.schemeCode" /></label></div>
+      </div>
+      <label class="div-field">
+        <span>Type</span>
+        <select class="form-select" [(ngModel)]="form.schemeType">
+          <option [ngValue]="1">Equity</option>
+          <option [ngValue]="2">Debt</option>
+          <option [ngValue]="3">Hybrid</option>
+          <option [ngValue]="4">Index</option>
+          <option [ngValue]="5">Other</option>
+        </select>
+      </label>
+      <div class="row g-2">
+        <div class="col-4"><label class="div-field"><span>Units</span><input type="number" class="form-control" [(ngModel)]="form.units" /></label></div>
+        <div class="col-4"><label class="div-field"><span>Avg NAV</span><input type="number" class="form-control" [(ngModel)]="form.averageNav" /></label></div>
+        <div class="col-4"><label class="div-field"><span>Current NAV</span><input type="number" class="form-control" [(ngModel)]="form.currentNav" /></label></div>
+      </div>
+      <label class="div-field"><span>Purchase date</span><app-fp-date name="mfDate" [(ngModel)]="form.purchaseDate" /></label>
+      <label class="div-field"><span>Notes</span><input class="form-control" [(ngModel)]="form.notes" /></label>
+    </div>
+  </app-fp-modal>
+}
+
+@if (showImport()) {
+  <app-fp-modal
+    [open]="true"
+    title="Import mutual funds"
+    icon="bi-upload"
+    [busy]="saving()"
+    [confirmText]="'Import ' + importPreview().length"
+    [confirmDisabled]="importPreview().length === 0"
+    (closed)="showImport.set(false)"
+    (confirmed)="submitImport()"
+  >
+    <p class="small text-muted">Required: SchemeName, Units, AverageNav. Optional: SchemeCode, AMC, Folio, Type, CurrentNav, PurchaseDate, Notes.</p>
+    <input type="file" accept=".csv" class="form-control mb-2" (change)="onImportFile($event)" />
+    <button type="button" class="btn btn-sm btn-outline-secondary mb-2" (click)="downloadSample()">Sample CSV</button>
+    @if (importErrors().length) {
+      <div class="alert alert-warning small">
+        @for (e of importErrors(); track e) { <div>{{ e }}</div> }
+      </div>
+    }
+    @if (importPreview().length) {
+      <div class="small">{{ importPreview().length }} valid row(s)</div>
+    }
+  </app-fp-modal>
+}

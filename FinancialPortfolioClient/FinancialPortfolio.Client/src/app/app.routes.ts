@@ -106,6 +106,28 @@ export const routes: Routes = [
             (c) => c.HoldingDetails,
           ),
       },
+
+      {
+        path: 'wealth',
+        loadComponent: () => import('../features/wealth/wealth').then((c) => c.Wealth),
+      },
+      {
+        path: 'mutual-funds',
+        loadComponent: () =>
+          import('../features/mutual-funds/mutual-funds').then((c) => c.MutualFunds),
+      },
+      {
+        path: 'fixed-deposits',
+        loadComponent: () =>
+          import('../features/fixed-deposits/fixed-deposits').then((c) => c.FixedDeposits),
+      },
+      {
+        path: 'recurring-deposits',
+        loadComponent: () =>
+          import('../features/recurring-deposits/recurring-deposits').then(
+            (c) => c.RecurringDeposits,
+          ),
+      },
       {
         path: 'dividends',
         loadComponent: () =>

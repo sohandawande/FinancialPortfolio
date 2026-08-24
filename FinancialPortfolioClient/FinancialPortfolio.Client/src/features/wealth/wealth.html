@@ -1,0 +1,43 @@
+<div class="page-container wealth-page">
+  <app-page-header
+    title="Wealth"
+    subtitle="Stocks + mutual funds + FD + RD in one place"
+    [actions]="headerActions"
+    (actionClick)="onHeaderAction($event)"
+  />
+
+  @if (loading()) {
+    <div class="wt-empty">Loading wealth…</div>
+  } @else if (summary(); as s) {
+    <section class="wt-hero">
+      <div>
+        <div class="wt-kicker">Total current value</div>
+        <div class="wt-amount">{{ s.totalCurrentValue | currency: 'INR' : 'symbol' : '1.2-2' }}</div>
+      </div>
+      <div class="wt-hero-side">
+        <div>
+          <span class="wt-label">Invested</span>
+          <strong>{{ s.totalInvested | currency: 'INR' : 'symbol' : '1.0-0' }}</strong>
+        </div>
+        <div [class.is-up]="s.totalGainLoss >= 0" [class.is-down]="s.totalGainLoss < 0">
+          <span class="wt-label">P&amp;L</span>
+          <strong>{{ s.totalGainLoss | currency: 'INR' : 'symbol' : '1.0-0' }} ({{ s.totalGainLossPercent | number:'1.2-2' }}%)</strong>
+        </div>
+      </div>
+    </section>
+
+    <div class="wt-buckets">
+      @for (b of s.buckets; track b.key) {
+        <button type="button" class="wt-bucket" (click)="openBucket(b.key)">
+          <div class="wt-bucket-top">
+            <span>{{ b.label }}</span>
+            <span>{{ b.allocationPercent | number:'1.1-1' }}%</span>
+          </div>
+          <div class="wt-bucket-value">{{ b.currentValue | currency: 'INR' : 'symbol' : '1.0-0' }}</div>
+          <div class="wt-bucket-meta">{{ b.count }} · invested {{ b.invested | currency: 'INR' : 'symbol' : '1.0-0' }}</div>
+          <div class="wt-bar"><span [style.width.%]="b.allocationPercent"></span></div>
+        </button>
+      }
+    </div>
+  }
+</div>
