@@ -15,5 +15,8 @@ namespace FinancialPortfolio.Data.Entities.Portfolio
         public AppUserEntity? User { get; set; }
         public ICollection<PortfolioStockHoldEntity> PortfolioStockHolds { get; set; } = [];
         public ICollection<PortfolioStockDividendEntity> PortfolioStockDividends { get; set; } = [];
+        public ICollection<PortfolioMutualFundEntity> PortfolioMutualFunds { get; set; } = [];
+        public ICollection<PortfolioFixedDepositEntity> PortfolioFixedDeposits { get; set; } = [];
+        public ICollection<PortfolioRecurringDepositEntity> PortfolioRecurringDeposits { get; set; } = [];
     }
 }

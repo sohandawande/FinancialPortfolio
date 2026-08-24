@@ -1,0 +1,82 @@
+Replace the overview object construction (the block that new PortfolioDividendOverviewResponse) with the following.
+
+Add these usings if missing: none extra.
+
+After `var years = ...ToList();` insert:
+
+                var now = DateTime.UtcNow;
+                var thisYear = now.Year;
+                var lastYear = thisYear - 1;
+                var thisMonth = now.Month;
+
+                var thisYearAmount = Math.Round(payouts.Where(x => x.DividendDate.Year == thisYear).Sum(x => x.Amount), 2);
+                var lastYearAmount = Math.Round(payouts.Where(x => x.DividendDate.Year == lastYear).Sum(x => x.Amount), 2);
+                var thisMonthAmount = Math.Round(
+                    payouts.Where(x => x.DividendDate.Year == thisYear && x.DividendDate.Month == thisMonth).Sum(x => x.Amount),
+                    2);
+
+                var months = Enumerable.Range(1, 12)
+                    .Select(m =>
+                    {
+                        var monthPayouts = payouts.Where(x => x.DividendDate.Year == thisYear && x.DividendDate.Month == m).ToList();
+                        return new PortfolioDividendMonthTotalResponse
+                        {
+                            Year = thisYear,
+                            Month = m,
+                            Amount = Math.Round(monthPayouts.Sum(x => x.Amount), 2),
+                            PayoutCount = monthPayouts.Count
+                        };
+                    })
+                    .ToList();
+
+                var openHolds = await _context.PortfolioStockHolds
+                    .AsNoTracking()
+                    .Include(h => h.Stock)
+                        .ThenInclude(s => s.StockDetail)
+                    .Where(h => h.PortfolioId == portfolio.Id && h.RemainingQuantity > 0)
+                    .ToListAsync(cancellationToken);
+
+                var tracker = openHolds
+                    .GroupBy(h => h.StockId)
+                    .Select(g =>
+                    {
+                        var stock = g.First().Stock;
+                        var invested = g.Sum(h => h.RemainingQuantity * h.PurchasePrice);
+                        var stockPayouts = payouts.Where(p => p.StockId == g.Key).ToList();
+                        var yearAmt = stockPayouts.Where(p => p.DividendDate.Year == thisYear).Sum(p => p.Amount);
+                        var lifeAmt = stockPayouts.Sum(p => p.Amount);
+                        return new PortfolioDividendTrackerRowResponse
+                        {
+                            StockId = g.Key,
+                            Symbol = stock.Symbol,
+                            CompanyName = stock.CompanyName,
+                            LogoUrl = stock.StockDetail?.LogoUrl,
+                            CurrentQuantity = g.Sum(h => h.RemainingQuantity),
+                            Invested = Math.Round(invested, 2),
+                            ThisYearAmount = Math.Round(yearAmt, 2),
+                            LifetimeAmount = Math.Round(lifeAmt, 2),
+                            YieldOnCostPercent = invested > 0 ? Math.Round(yearAmt / invested * 100m, 2) : 0,
+                            PayoutCount = stockPayouts.Count,
+                            LastDividendDate = stockPayouts.Count == 0 ? null : stockPayouts.Max(p => p.DividendDate)
+                        };
+                    })
+                    .OrderByDescending(r => r.ThisYearAmount)
+                    .ThenBy(r => r.Symbol)
+                    .ToList();
+
+Then set overview:
+
+                var overview = new PortfolioDividendOverviewResponse
+                {
+                    TotalAmount = Math.Round(payouts.Sum(x => x.Amount), 2),
+                    CompanyCount = stocks.Count,
+                    PayoutCount = payouts.Count,
+                    ThisYearAmount = thisYearAmount,
+                    LastYearAmount = lastYearAmount,
+                    ThisMonthAmount = thisMonthAmount,
+                    Stocks = stocks,
+                    Years = years,
+                    Months = months,
+                    Tracker = tracker,
+                    Payouts = payouts
+                };

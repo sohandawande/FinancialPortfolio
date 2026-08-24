@@ -8,6 +8,7 @@ using FinancialPortfolio.Business.Abstractions.ILogo;
 using FinancialPortfolio.Business.Abstractions.IPortfolio;
 using FinancialPortfolio.Business.Abstractions.IStock;
 using FinancialPortfolio.Business.Abstractions.IValidation;
+using FinancialPortfolio.Business.Abstractions.IWealth;
 using FinancialPortfolio.Business.Extensions;
 using FinancialPortfolio.Business.Mapping.Resolver;
 using FinancialPortfolio.Business.Services.Authentication;
@@ -21,6 +22,7 @@ using FinancialPortfolio.Business.Services.Portfolio;
 using FinancialPortfolio.Business.Services.Stock;
 using FinancialPortfolio.Business.Services.User;
 using FinancialPortfolio.Business.Services.Validation;
+using FinancialPortfolio.Business.Services.Wealth;
 using FinancialPortfolio.Models.Abstractions.ICurrentUser;
 using FinancialPortfolio.Models.Model.Settings;
 using Microsoft.Extensions.Configuration;
@@ -59,6 +61,14 @@ namespace FinancialPortfolio.Business.DependencyInjection
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ILogoService, LogoService>();
             services.AddScoped<IPortfolioService, PortfolioService>();
+            services.AddScoped<IWealthTrackerService, WealthTrackerService>();
+            services.Configure<MutualFundNavSettings>(configuration.GetSection(MutualFundNavSettings.SectionName));
+            services.AddHttpClient<MutualFundNavService>(client =>
+            {
+                client.Timeout = TimeSpan.FromSeconds(30);
+                client.DefaultRequestHeaders.UserAgent.ParseAdd("FinancialPortfolio/1.0");
+            });
+            services.AddScoped<IMutualFundNavService>(sp => sp.GetRequiredService<MutualFundNavService>());
 
             return services;
         }

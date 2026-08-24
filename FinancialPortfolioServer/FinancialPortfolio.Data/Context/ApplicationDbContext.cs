@@ -29,6 +29,9 @@ namespace FinancialPortfolio.Data.Context
         public DbSet<PortfolioStockHoldEntity> PortfolioStockHolds => Set<PortfolioStockHoldEntity>();
         public DbSet<PortfolioStockSoldEntity> PortfolioStockSolds => Set<PortfolioStockSoldEntity>();
         public DbSet<PortfolioStockDividendEntity> PortfolioStockDividends => Set<PortfolioStockDividendEntity>();
+        public DbSet<PortfolioMutualFundEntity> PortfolioMutualFunds => Set<PortfolioMutualFundEntity>();
+        public DbSet<PortfolioFixedDepositEntity> PortfolioFixedDeposits => Set<PortfolioFixedDepositEntity>();
+        public DbSet<PortfolioRecurringDepositEntity> PortfolioRecurringDeposits => Set<PortfolioRecurringDepositEntity>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

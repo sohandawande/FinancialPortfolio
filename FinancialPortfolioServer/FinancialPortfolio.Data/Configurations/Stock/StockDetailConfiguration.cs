@@ -66,10 +66,12 @@
                    .HasAnnotation(QueryEngineMetadata.Sortable, true);
 
             builder.Property(sd => sd.Week52High)
+                   .HasPrecision(18, 5)
                    .HasAnnotation(QueryEngineMetadata.Filterable, true)
                    .HasAnnotation(QueryEngineMetadata.Sortable, true);
 
             builder.Property(sd => sd.Week52Low)
+                   .HasPrecision(18, 5)
                    .HasAnnotation(QueryEngineMetadata.Filterable, true)
                    .HasAnnotation(QueryEngineMetadata.Sortable, true);
 
