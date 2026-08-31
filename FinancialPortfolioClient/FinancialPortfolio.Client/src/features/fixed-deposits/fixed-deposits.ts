@@ -18,7 +18,7 @@ import { FixedDeposit, STATUS_LABELS, UpsertFixedDepositRequest } from '../../co
   standalone: true,
   imports: [FpDropdownSelect, CommonModule, FormsModule, PageHeader, FpModal, FpDate, CurrencyPipe, DatePipe],
   templateUrl: './fixed-deposits.html',
-  styleUrl: '../wealth/wealth.css',
+  styleUrl: '../wealth/wealth-list.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FixedDeposits implements OnInit {

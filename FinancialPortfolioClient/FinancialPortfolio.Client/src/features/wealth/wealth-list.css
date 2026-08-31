@@ -1,0 +1,180 @@
+/* Shared list cards for Mutual funds / Fixed deposits / Recurring deposits */
+
+.wl-empty {
+  padding: 2.25rem 1.5rem;
+  text-align: center;
+  color: var(--fp-text-muted);
+  border: 1px dashed var(--fp-border);
+  border-radius: var(--fp-radius-lg, 1rem);
+  background: var(--fp-card);
+}
+
+.wl-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.85rem;
+  width: 100%;
+}
+
+@media (min-width: 992px) {
+  .wl-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1400px) {
+  .wl-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.wl-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  min-width: 0;
+  padding: 1.05rem 1.15rem;
+  border: 1px solid var(--fp-border-soft);
+  border-radius: var(--fp-radius-lg, 1rem);
+  background: var(--fp-card);
+  box-shadow: var(--fp-shadow);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.wl-card:hover {
+  border-color: var(--fp-vue-muted, #a7e6c9);
+  box-shadow: var(--fp-shadow-lg, 0 12px 36px rgba(53, 73, 94, 0.1));
+  transform: translateY(-1px);
+}
+
+.wl-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.wl-card-title {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.wl-card-title h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 750;
+  color: var(--fp-navy);
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.wl-card-sub {
+  margin-top: 0.2rem;
+  font-size: 0.8rem;
+  color: var(--fp-text-muted);
+}
+
+.wl-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  flex-shrink: 0;
+  justify-content: flex-end;
+}
+
+.wl-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: var(--fp-navy-soft);
+  color: var(--fp-navy);
+  white-space: nowrap;
+}
+
+.wl-badge.is-up {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.wl-badge.is-down {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.wl-badge.is-status {
+  background: var(--fp-vue-soft);
+  color: var(--fp-vue-dark);
+}
+
+.wl-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+@media (max-width: 575.98px) {
+  .wl-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.wl-metric {
+  min-width: 0;
+  padding: 0.55rem 0.65rem;
+  border-radius: var(--fp-radius-sm, 0.5rem);
+  background: var(--fp-navy-soft);
+  border: 1px solid transparent;
+}
+
+.wl-metric-label {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--fp-text-muted);
+  margin-bottom: 0.15rem;
+}
+
+.wl-metric-value {
+  display: block;
+  font-size: 0.92rem;
+  font-weight: 750;
+  color: var(--fp-navy);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.25;
+  word-break: break-word;
+}
+
+.wl-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  padding-top: 0.15rem;
+  border-top: 1px solid var(--fp-border-soft);
+}
+
+.wl-foot-meta {
+  font-size: 0.78rem;
+  color: var(--fp-text-muted);
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.wl-actions {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.wl-actions .btn {
+  white-space: nowrap;
+}

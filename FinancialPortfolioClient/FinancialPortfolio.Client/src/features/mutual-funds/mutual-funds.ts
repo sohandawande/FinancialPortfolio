@@ -31,7 +31,7 @@ import {
   standalone: true,
   imports: [CommonModule, FormsModule, PageHeader, FpModal, FpDate, FpDropdownSelect, CurrencyPipe, DatePipe],
   templateUrl: './mutual-funds.html',
-  styleUrl: '../wealth/wealth.css',
+  styleUrl: '../wealth/wealth-list.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MutualFunds implements OnInit {

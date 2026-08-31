@@ -7,36 +7,65 @@
   />
 
   @if (syncing()) {
-    <div class="wt-empty">Refreshing NAV from mfapi / AMFI…</div>
+    <div class="wl-empty">Refreshing NAV from mfapi / AMFI…</div>
   }
 
   @if (loading()) {
-    <div class="wt-empty">Loading schemes…</div>
+    <div class="wl-empty">Loading schemes…</div>
   } @else if (rows().length === 0) {
-    <div class="wt-empty">No schemes yet. Search and add a folio you already hold.</div>
+    <div class="wl-empty">No schemes yet. Search and add a folio you already hold.</div>
   } @else {
-    <div class="wt-buckets">
+    <div class="wl-list">
       @for (row of rows(); track row.id) {
-        <article class="wt-bucket">
-          <div class="wt-bucket-top">
-            <span>{{ schemeLabels[row.schemeType] }}</span>
-            <span>{{ row.gainLossPercent }}%</span>
+        <article class="wl-card">
+          <div class="wl-card-head">
+            <div class="wl-card-title">
+              <h3>{{ row.schemeName }}</h3>
+              <div class="wl-card-sub">
+                {{ row.amc || '—' }}
+                · {{ row.units }} units @ ₹{{ row.currentNav }}
+              </div>
+            </div>
+            <div class="wl-badges">
+              <span class="wl-badge">{{ schemeLabels[row.schemeType] }}</span>
+              <span
+                class="wl-badge"
+                [class.is-up]="row.gainLossPercent >= 0"
+                [class.is-down]="row.gainLossPercent < 0"
+              >
+                {{ row.gainLossPercent >= 0 ? '+' : '' }}{{ row.gainLossPercent }}%
+              </span>
+            </div>
           </div>
-          <div class="wt-bucket-value">{{ row.schemeName }}</div>
-          <div class="wt-bucket-meta">{{ row.amc }} · {{ row.units }} units @ ₹{{ row.currentNav }}</div>
-          <div class="wt-bucket-meta">
-            Value {{ row.currentValue | currency:'INR':'symbol':'1.2-2' }}
-            · invested {{ row.investedAmount | currency:'INR':'symbol':'1.0-0' }}
+
+          <div class="wl-metrics">
+            <div class="wl-metric">
+              <span class="wl-metric-label">Value</span>
+              <span class="wl-metric-value">{{ row.currentValue | currency:'INR':'symbol':'1.2-2' }}</span>
+            </div>
+            <div class="wl-metric">
+              <span class="wl-metric-label">Invested</span>
+              <span class="wl-metric-value">{{ row.investedAmount | currency:'INR':'symbol':'1.0-0' }}</span>
+            </div>
+            <div class="wl-metric">
+              <span class="wl-metric-label">Scheme code</span>
+              <span class="wl-metric-value">{{ row.schemeCode || '—' }}</span>
+            </div>
           </div>
-          <div class="wt-bucket-meta">
-            @if (row.schemeCode) { code {{ row.schemeCode }} · }
-            @if (row.navAsOf) { NAV {{ row.navAsOf | date:'dd MMM yyyy' }} ({{ row.navSource || 'manual' }}) }
-            @else { NAV not synced }
-          </div>
-          <div class="d-flex gap-2 mt-2">
-            <button type="button" class="btn btn-sm btn-outline-success" (click)="syncOne(row, $event)">NAV</button>
-            <button type="button" class="btn btn-sm btn-outline-primary" (click)="open(row)">Edit</button>
-            <button type="button" class="btn btn-sm btn-outline-danger" (click)="remove(row)">Delete</button>
+
+          <div class="wl-foot">
+            <div class="wl-foot-meta">
+              @if (row.navAsOf) {
+                NAV {{ row.navAsOf | date:'dd MMM yyyy' }} ({{ row.navSource || 'manual' }})
+              } @else {
+                NAV not synced
+              }
+            </div>
+            <div class="wl-actions">
+              <button type="button" class="btn btn-sm btn-outline-success" (click)="syncOne(row, $event)">NAV</button>
+              <button type="button" class="btn btn-sm btn-outline-primary" (click)="open(row)">Edit</button>
+              <button type="button" class="btn btn-sm btn-outline-danger" (click)="remove(row)">Delete</button>
+            </div>
           </div>
         </article>
       }

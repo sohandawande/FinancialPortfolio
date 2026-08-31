@@ -1,0 +1,245 @@
+/* RD page — expandable cards + pay installment */
+
+.rd-page {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.rd-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.rd-card {
+  border: 1px solid var(--fp-border-soft);
+  border-radius: var(--fp-radius-lg, 1rem);
+  background: var(--fp-card);
+  box-shadow: var(--fp-shadow);
+  overflow: hidden;
+  transition: box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.rd-card.is-open {
+  border-color: var(--fp-vue-muted, #a7e6c9);
+  box-shadow: var(--fp-shadow-lg, 0 12px 36px rgba(53, 73, 94, 0.1));
+}
+
+.rd-card-summary {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 0.85rem 1rem;
+  align-items: center;
+  width: 100%;
+  padding: 0.95rem 1.1rem;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.rd-card-summary:hover {
+  background: var(--fp-navy-soft);
+}
+
+.rd-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: #fff;
+  background: linear-gradient(145deg, #14b8a6, #0d9488);
+  box-shadow: 0 6px 14px rgba(13, 148, 136, 0.25);
+  flex-shrink: 0;
+}
+
+.rd-main {
+  min-width: 0;
+}
+
+.rd-bank {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 750;
+  color: var(--fp-navy);
+}
+
+.rd-sub {
+  margin-top: 0.15rem;
+  font-size: 0.8rem;
+  color: var(--fp-text-muted);
+}
+
+.rd-progress-block {
+  min-width: 120px;
+}
+
+.rd-progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  font-weight: 650;
+  color: var(--fp-text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.rd-progress {
+  height: 8px;
+  border-radius: 99px;
+  background: var(--fp-navy-soft);
+  overflow: hidden;
+}
+
+.rd-progress > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #14b8a6, #0d9488);
+  transition: width 0.3s ease;
+}
+
+.rd-value-block {
+  text-align: right;
+  min-width: 100px;
+}
+
+.rd-value {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--fp-navy);
+  font-variant-numeric: tabular-nums;
+}
+
+.rd-value-hint {
+  font-size: 0.72rem;
+  color: var(--fp-text-muted);
+}
+
+.rd-chevron {
+  color: var(--fp-text-muted);
+  transition: transform 0.2s ease;
+}
+
+.rd-card.is-open .rd-chevron {
+  transform: rotate(180deg);
+}
+
+.rd-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: var(--fp-vue-soft);
+  color: var(--fp-vue-dark);
+  margin-left: 0.35rem;
+  vertical-align: middle;
+}
+
+.rd-detail {
+  padding: 0 1.1rem 1.1rem;
+  border-top: 1px solid var(--fp-border-soft);
+  background: linear-gradient(180deg, var(--fp-navy-soft) 0%, var(--fp-card) 40%);
+}
+
+.rd-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.55rem;
+  padding-top: 0.95rem;
+}
+
+@media (max-width: 767.98px) {
+  .rd-card-summary {
+    grid-template-columns: auto 1fr;
+  }
+
+  .rd-progress-block,
+  .rd-value-block {
+    grid-column: 2;
+  }
+
+  .rd-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.rd-metric {
+  padding: 0.55rem 0.65rem;
+  border-radius: var(--fp-radius-sm, 0.5rem);
+  background: var(--fp-card);
+  border: 1px solid var(--fp-border-soft);
+}
+
+.rd-metric-label {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--fp-text-muted);
+}
+
+.rd-metric-value {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.95rem;
+  font-weight: 750;
+  color: var(--fp-navy);
+  font-variant-numeric: tabular-nums;
+}
+
+.rd-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.9rem;
+}
+
+.rd-actions .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.rd-pay-hint {
+  margin-top: 0.65rem;
+  font-size: 0.78rem;
+  color: var(--fp-text-muted);
+}
+
+/* Modal form — readonly core fields */
+.rd-form .rd-readonly input.form-control:read-only,
+.rd-form input[readonly] {
+  background: var(--fp-navy-soft);
+  color: var(--fp-text-muted);
+  cursor: default;
+}
+
+.rd-form-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.65rem 0.75rem;
+  margin-bottom: 0.85rem;
+  border-radius: var(--fp-radius-sm);
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+  font-size: 0.82rem;
+}
+
+.rd-form-banner i {
+  margin-top: 0.1rem;
+}
+
+html[data-theme="dark"] .rd-form-banner {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #6ee7b7;
+}

@@ -18,7 +18,7 @@ import { RecurringDeposit, STATUS_LABELS, UpsertRecurringDepositRequest } from '
   standalone: true,
   imports: [FpDropdownSelect, CommonModule, FormsModule, PageHeader, FpModal, FpDate, CurrencyPipe, DatePipe],
   templateUrl: './recurring-deposits.html',
-  styleUrl: '../wealth/wealth.css',
+  styleUrls: ['../wealth/wealth-list.css', './recurring-deposits.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RecurringDeposits implements OnInit {
@@ -30,14 +30,18 @@ export class RecurringDeposits implements OnInit {
   readonly loading = signal(true);
   readonly saving = signal(false);
   readonly showModal = signal(false);
+  readonly editId = signal<number | null>(null);
+  readonly expandedId = signal<number | null>(null);
+  readonly payingId = signal<number | null>(null);
 
   readonly statusOptions: FpDropdownSelectOption[] = [
     { value: 1, label: 'Active' },
     { value: 2, label: 'Matured' },
     { value: 3, label: 'Closed' },
   ];
-  readonly editId = signal<number | null>(null);
+
   readonly statusLabels = STATUS_LABELS;
+
   form: UpsertRecurringDepositRequest = this.empty();
 
   readonly headerActions: PageHeaderAction[] = [
@@ -45,21 +49,30 @@ export class RecurringDeposits implements OnInit {
     { id: 'add', label: 'Add RD', icon: 'bi-plus-lg', color: 'primary' },
   ];
 
-  ngOnInit(): void { this.load(); }
+  ngOnInit(): void {
+    this.load();
+  }
+
   onHeaderAction(id: string): void {
     if (id === 'refresh') this.load();
     if (id === 'add') this.open();
-    if (id === 'export') {
-      const rows = this.rows();
-      if (!rows.length) { this.toast.warning('Nothing to export'); return; }
-      const header = 'Bank,AccountRef,MonthlyAmount,Rate,TenureMonths,InstallmentsPaid,StartDate,Status,Notes';
-      const lines = [header, ...rows.map((r) => [r.bankName, r.accountRef ?? '', r.monthlyAmount, r.interestRate, r.tenureMonths, r.installmentsPaid, (r.startDate ?? '').substring(0, 10), r.status, `"${(r.notes ?? '').replaceAll('"', '""')}"`].join(','))];
-      const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `recurring-deposits-${new Date().toISOString().slice(0, 10)}.csv`;
-      a.click();
-    }
+  }
+
+  toggle(row: RecurringDeposit): void {
+    this.expandedId.set(this.expandedId() === row.id ? null : row.id);
+  }
+
+  isOpen(row: RecurringDeposit): boolean {
+    return this.expandedId() === row.id;
+  }
+
+  progressPct(row: RecurringDeposit): number {
+    if (!row.tenureMonths) return 0;
+    return Math.min(100, Math.round((row.installmentsPaid / row.tenureMonths) * 100));
+  }
+
+  canPay(row: RecurringDeposit): boolean {
+    return row.status === 1 && row.installmentsPaid < row.tenureMonths;
   }
 
   open(row?: RecurringDeposit): void {
@@ -85,32 +98,108 @@ export class RecurringDeposits implements OnInit {
     if (n >= 1 && n <= 3) this.form.status = n as 1 | 2 | 3;
   }
 
-  save(): void {
-    if (!this.form.bankName || this.form.monthlyAmount <= 0 || this.form.tenureMonths < 1) {
-      this.toast.warning('Bank, installment and tenure are required');
+  /** Pay next installment without re-entering bank/rate/tenure. */
+  async payInstallment(row: RecurringDeposit, event?: Event): Promise<void> {
+    event?.stopPropagation();
+    if (!this.canPay(row)) {
+      this.toast.info('All installments already paid or RD is not active');
       return;
     }
+
+    const next = row.installmentsPaid + 1;
+    const ok = await this.confirm.open({
+      title: 'Pay installment',
+      message: `Record installment #${next} of ${row.tenureMonths} for ${row.bankName}?\n\nAmount: ₹${row.monthlyAmount.toLocaleString('en-IN')}\nRate stays ${row.interestRate}% (unchanged).`,
+      confirmText: 'Record payment',
+    });
+    if (!ok) return;
+
+    this.payingId.set(row.id);
+    const body: UpsertRecurringDepositRequest = {
+      bankName: row.bankName,
+      accountRef: row.accountRef ?? '',
+      monthlyAmount: row.monthlyAmount,
+      interestRate: row.interestRate,
+      tenureMonths: row.tenureMonths,
+      installmentsPaid: next,
+      startDate: row.startDate.substring(0, 10),
+      notes: row.notes ?? '',
+      status: next >= row.tenureMonths ? 2 : row.status,
+    };
+
+    this.api.updateRecurringDeposit(row.id, body).subscribe({
+      next: (res) => {
+        this.payingId.set(null);
+        if (!res.success) {
+          this.toast.error(res.message);
+          return;
+        }
+        this.toast.success(`Installment ${next}/${row.tenureMonths} recorded`);
+        this.expandedId.set(row.id);
+        this.load();
+      },
+      error: (err) => {
+        this.payingId.set(null);
+        this.toast.error(apiErrorMessage(err, 'Could not record installment'));
+      },
+    });
+  }
+
+  save(): void {
+    if (!this.form.bankName?.trim()) {
+      this.toast.warning('Bank name is required');
+      return;
+    }
+    if (!(this.form.monthlyAmount > 0)) {
+      this.toast.warning('Monthly installment must be greater than 0');
+      return;
+    }
+    if (!(this.form.tenureMonths >= 1)) {
+      this.toast.warning('Tenure must be at least 1 month');
+      return;
+    }
+    if (this.form.installmentsPaid < 0 || this.form.installmentsPaid > this.form.tenureMonths) {
+      this.toast.warning('Installments paid must be between 0 and tenure');
+      return;
+    }
+
     this.saving.set(true);
     const req$ = this.editId()
       ? this.api.updateRecurringDeposit(this.editId()!, this.form)
       : this.api.addRecurringDeposit(this.form);
+
     req$.subscribe({
       next: (res) => {
         this.saving.set(false);
-        if (!res.success) { this.toast.error(res.message); return; }
-        this.toast.success(res.message);
+        if (!res.success) {
+          this.toast.error(res.message);
+          return;
+        }
+        this.toast.success(res.message || 'Saved');
         this.showModal.set(false);
         this.load();
       },
-      error: (err) => { this.saving.set(false); this.toast.error(apiErrorMessage(err, 'Save failed')); },
+      error: (err) => {
+        this.saving.set(false);
+        this.toast.error(apiErrorMessage(err, 'Save failed'));
+      },
     });
   }
 
-  async remove(row: RecurringDeposit): Promise<void> {
-    const ok = await this.confirm.open({ title: 'Delete RD', message: `Remove ${row.bankName} RD?`, confirmText: 'Delete' });
+  async remove(row: RecurringDeposit, event?: Event): Promise<void> {
+    event?.stopPropagation();
+    const ok = await this.confirm.open({
+      title: 'Delete RD',
+      message: `Remove ${row.bankName} RD permanently?`,
+      confirmText: 'Delete',
+    });
     if (!ok) return;
     this.api.deleteRecurringDeposit(row.id).subscribe({
-      next: () => { this.toast.success('Deleted'); this.load(); },
+      next: () => {
+        this.toast.success('Deleted');
+        if (this.expandedId() === row.id) this.expandedId.set(null);
+        this.load();
+      },
       error: (err) => this.toast.error(apiErrorMessage(err, 'Delete failed')),
     });
   }
@@ -118,8 +207,14 @@ export class RecurringDeposits implements OnInit {
   load(): void {
     this.loading.set(true);
     this.api.recurringDeposits().subscribe({
-      next: (rows) => { this.rows.set(rows); this.loading.set(false); },
-      error: () => this.loading.set(false),
+      next: (rows) => {
+        this.rows.set(rows ?? []);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        this.loading.set(false);
+        this.toast.error(apiErrorMessage(err, 'Failed to load RDs'));
+      },
     });
   }
 
@@ -128,9 +223,9 @@ export class RecurringDeposits implements OnInit {
       bankName: '',
       accountRef: '',
       monthlyAmount: 0,
-      interestRate: 7,
+      interestRate: 0,
       tenureMonths: 12,
-      installmentsPaid: 1,
+      installmentsPaid: 0,
       startDate: new Date().toISOString().substring(0, 10),
       notes: '',
       status: 1,
