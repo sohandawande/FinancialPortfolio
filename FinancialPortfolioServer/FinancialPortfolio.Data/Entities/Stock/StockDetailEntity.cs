@@ -23,6 +23,7 @@
         public decimal EPS { get; set; }
         public decimal MarketCap { get; set; }
         public decimal PriceChange { get; set; }
+        public decimal PriceChangePercentage { get; set; }
         public bool IsActive { get; set; }
         public string? LogoUrl { get; set; }
         public DateTime? LastUpdated { get; set; }

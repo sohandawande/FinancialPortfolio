@@ -1,0 +1,72 @@
+/* Reusable form layout helpers. */
+
+.fp-form-section {
+  padding: 1rem;
+  border: 1px solid var(--fp-border-soft);
+  border-radius: var(--fp-radius);
+  background: var(--fp-card);
+}
+
+.fp-form-section + .fp-form-section {
+  margin-top: 1rem;
+}
+
+.fp-form-section-title {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  margin: 0 0 .9rem;
+  color: var(--fp-navy);
+  font-size: .92rem;
+  font-weight: 700;
+}
+
+.fp-form-section-title i {
+  color: var(--fp-vue);
+}
+
+.fp-form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+
+.fp-form-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: .4rem;
+  padding: .7rem .8rem;
+  border: 1px solid var(--fp-border-soft);
+  border-radius: var(--fp-radius-sm);
+  background: var(--fp-navy-soft);
+  color: var(--fp-text-muted);
+  font-size: var(--fp-fs-xs);
+  line-height: 1.45;
+}
+
+.fp-form-hint i {
+  color: var(--fp-vue);
+  margin-top: .08rem;
+}
+
+@media (max-width: 575.98px) {
+  .fp-form-actions {
+    justify-content: stretch;
+  }
+
+  .fp-form-actions .btn {
+    flex: 1 1 auto;
+  }
+}
+
+html[data-theme="dark"] .fp-form-section,
+html[data-theme="dark"] .fp-form-hint {
+  background: var(--fp-card);
+  border-color: var(--fp-border);
+}
+
+html[data-theme="dark"] .fp-form-section-title {
+  color: var(--fp-text);
+}

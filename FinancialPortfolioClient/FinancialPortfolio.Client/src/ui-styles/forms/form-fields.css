@@ -1,0 +1,228 @@
+/* Financial Portfolio - reusable field primitives
+   Benchmark: Buy Stock + Dividend modals.
+*/
+
+.fp-form,
+.div-form {
+  --fp-form-gap: .9rem;
+}
+
+.fp-field,
+.div-field {
+  display: grid;
+  gap: .38rem;
+  margin: 0 0 var(--fp-form-gap);
+}
+
+.fp-field:last-child,
+.div-field:last-child {
+  margin-bottom: 0;
+}
+
+.fp-field > .form-label,
+.div-field > span,
+.div-field > label > span {
+  display: inline-flex;
+  align-items: center;
+  gap: .2rem;
+  margin: 0;
+  color: var(--fp-navy);
+  font-size: var(--fp-fs-sm);
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.fp-field .form-control,
+.fp-field .form-select,
+.div-field .form-control,
+.div-field .form-select {
+  min-height: 42px;
+  border: 1px solid var(--fp-border);
+  border-radius: .65rem;
+  background: var(--fp-card);
+  color: var(--fp-text);
+  font-size: var(--fp-fs-sm);
+  transition: border-color var(--fp-transition), box-shadow var(--fp-transition), background-color var(--fp-transition);
+}
+
+.fp-field .form-control,
+.div-field .form-control {
+  padding: .58rem .75rem;
+}
+
+.fp-field .form-select,
+.div-field .form-select {
+  padding: .58rem 2.25rem .58rem .75rem;
+}
+
+.fp-field .form-control::placeholder,
+.div-field .form-control::placeholder {
+  color: #94a3b8;
+}
+
+.fp-field .form-control:hover,
+.fp-field .form-select:hover,
+.div-field .form-control:hover,
+.div-field .form-select:hover {
+  border-color: #c5d0dc;
+}
+
+.fp-field .form-control:focus,
+.fp-field .form-select:focus,
+.div-field .form-control:focus,
+.div-field .form-select:focus {
+  border-color: var(--fp-vue);
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(66, 184, 131, .15);
+}
+
+.fp-field textarea.form-control,
+.div-field textarea.form-control {
+  min-height: 92px;
+  resize: vertical;
+}
+
+.fp-field .input-group,
+.div-field .input-group {
+  border-radius: .65rem;
+}
+
+.fp-field .input-group-text,
+.div-field .input-group-text {
+  min-width: 42px;
+  justify-content: center;
+  border-color: var(--fp-border);
+  background: var(--fp-navy-soft);
+  color: var(--fp-vue-dark);
+  font-size: .82rem;
+}
+
+.fp-field .input-group > .form-control,
+.div-field .input-group > .form-control {
+  border-left-width: 0;
+}
+
+.fp-field .input-group:focus-within .input-group-text,
+.div-field .input-group:focus-within .input-group-text {
+  border-color: var(--fp-vue);
+  background: var(--fp-vue-soft);
+}
+
+.fp-field input[type="number"],
+.div-field input[type="number"] {
+  font-variant-numeric: tabular-nums;
+}
+
+.fp-field .form-control:disabled,
+.fp-field .form-select:disabled,
+.div-field .form-control:disabled,
+.div-field .form-select:disabled {
+  opacity: .68;
+  cursor: not-allowed;
+  background: var(--fp-navy-soft);
+}
+
+.fp-field .is-invalid,
+.div-field .is-invalid {
+  border-color: var(--fp-danger) !important;
+}
+
+.fp-field .invalid-feedback,
+.div-field .invalid-feedback {
+  margin-top: -.08rem;
+  font-size: var(--fp-fs-xs);
+  font-weight: 500;
+}
+
+/* Reusable stock/selection summary used by financial forms. */
+.fp-form-selection {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .78rem .85rem;
+  margin-bottom: var(--fp-form-gap);
+  border: 1px solid rgba(66, 184, 131, .18);
+  border-radius: var(--fp-radius-sm);
+  background: var(--fp-vue-soft);
+}
+
+.fp-form-selection-content {
+  min-width: 0;
+}
+
+.fp-form-selection-title {
+  color: var(--fp-navy);
+  font-size: var(--fp-fs-sm);
+  font-weight: 700;
+}
+
+.fp-form-selection-meta {
+  margin-top: .12rem;
+  color: var(--fp-text-muted);
+  font-size: var(--fp-fs-xs);
+}
+
+/* Two-column financial fields. */
+.fp-form-grid,
+.div-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--fp-form-gap);
+}
+
+/* Calculated/readonly financial value. */
+.fp-form-value {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  min-height: 42px;
+  padding: .58rem .75rem;
+  border: 1px solid var(--fp-border-soft);
+  border-radius: .65rem;
+  background: var(--fp-navy-soft);
+}
+
+.fp-form-value-label {
+  color: var(--fp-text-muted);
+  font-size: var(--fp-fs-xs);
+  font-weight: 600;
+}
+
+.fp-form-value-number {
+  color: var(--fp-navy);
+  font-size: var(--fp-fs-md);
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 575.98px) {
+  .fp-form-grid,
+  .div-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+html[data-theme="dark"] .fp-field > .form-label,
+html[data-theme="dark"] .div-field > span,
+html[data-theme="dark"] .div-field > label > span,
+html[data-theme="dark"] .fp-form-selection-title,
+html[data-theme="dark"] .fp-form-value-number {
+  color: var(--fp-text);
+}
+
+html[data-theme="dark"] .fp-field .form-control,
+html[data-theme="dark"] .fp-field .form-select,
+html[data-theme="dark"] .div-field .form-control,
+html[data-theme="dark"] .div-field .form-select {
+  background: var(--fp-card);
+  border-color: var(--fp-border);
+  color: var(--fp-text);
+}
+
+html[data-theme="dark"] .fp-field .input-group-text,
+html[data-theme="dark"] .div-field .input-group-text,
+html[data-theme="dark"] .fp-form-value {
+  background: var(--fp-navy-soft);
+  border-color: var(--fp-border);
+}

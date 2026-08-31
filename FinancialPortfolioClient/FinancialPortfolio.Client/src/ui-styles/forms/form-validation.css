@@ -1,0 +1,33 @@
+/* Reusable form validation states. */
+
+.fp-field-error,
+.fp-form-error {
+  display: flex;
+  align-items: flex-start;
+  gap: .35rem;
+  margin-top: .05rem;
+  color: var(--fp-danger);
+  font-size: var(--fp-fs-xs);
+  font-weight: 500;
+}
+
+.fp-field-error i,
+.fp-form-error i {
+  margin-top: .08rem;
+}
+
+.fp-field .is-valid,
+.div-field .is-valid {
+  border-color: var(--fp-vue) !important;
+}
+
+.fp-field .is-valid:focus,
+.div-field .is-valid:focus {
+  box-shadow: 0 0 0 3px rgba(66, 184, 131, .12);
+}
+
+.fp-required::after {
+  content: "*";
+  margin-left: .15rem;
+  color: var(--fp-danger);
+}

@@ -1,59 +1,229 @@
-/* Sober, attractive form language used by auth + portfolio modals */
+/* =============================================================================
+   Financial Portfolio — Reusable Form Design System
+   Location: src/ui-styles/forms/forms.css
+
+   Purpose:
+   - One reusable visual language for every form field in the application.
+   - Works with Bootstrap 5 controls and existing Financial Portfolio tokens.
+   - Supports light/dark themes through the existing --fp-* variables.
+   - Feature components should NOT duplicate field styling.
+   ============================================================================= */
+
+/* ---------- Form layout ---------- */
 
 .fp-form .fp-field,
-.fp-form-modal .fp-field {
+.fp-form-modal .fp-field,
+.fp-field {
   margin-bottom: 1rem;
 }
 
+.fp-form-section {
+  padding: 1.15rem;
+  border: 1px solid var(--fp-border-soft);
+  border-radius: var(--fp-radius);
+  background: var(--fp-card);
+}
+
+.fp-form-section + .fp-form-section {
+  margin-top: 1rem;
+}
+
+.fp-form-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0 0 1rem;
+  color: var(--fp-navy);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.fp-form-section-title i {
+  color: var(--fp-vue);
+}
+
+/* ---------- Labels ---------- */
+
+.form-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  margin-bottom: 0.42rem;
+  color: var(--fp-navy);
+  font-size: var(--fp-fs-sm);
+  font-weight: 650;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+}
+
+.fp-required::after,
+.form-label .required::after {
+  content: "*";
+  margin-left: 0.15rem;
+  color: var(--fp-danger);
+  font-weight: 700;
+}
+
+.fp-field-hint,
+.form-text {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--fp-text-muted);
+  font-size: var(--fp-fs-xs);
+  line-height: 1.45;
+}
+
+/* ---------- Inputs / selects / textarea ---------- */
+
 .form-control,
 .form-select {
+  width: 100%;
   min-height: 44px;
   border: 1px solid var(--fp-border);
   border-radius: 0.65rem;
   color: var(--fp-text);
-  background: #fff;
-  font-size: 0.9rem;
+  background-color: var(--fp-card);
+  background-clip: padding-box;
+  font-size: var(--fp-fs-md);
+  line-height: 1.4;
   transition:
     border-color var(--fp-transition),
     box-shadow var(--fp-transition),
-    background var(--fp-transition);
+    background-color var(--fp-transition),
+    transform var(--fp-transition);
 }
 
-textarea.form-control {
-  min-height: 88px;
-  padding-top: 0.7rem;
+.form-control {
+  padding: 0.58rem 0.78rem;
+}
+
+.form-select {
+  padding: 0.58rem 2.35rem 0.58rem 0.78rem;
+}
+
+.form-control::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
+  opacity: 1;
 }
 
 .form-control:hover,
 .form-select:hover {
   border-color: #c5d0dc;
+  background-color: var(--fp-card);
 }
 
 .form-control:focus,
 .form-select:focus {
   border-color: var(--fp-vue);
+  outline: 0;
   box-shadow: 0 0 0 4px rgba(66, 184, 131, 0.16);
+  background-color: var(--fp-card);
+  color: var(--fp-text);
 }
 
-.form-label {
-  margin-bottom: 0.4rem;
-  color: #35495e;
-  font-size: 0.78rem;
-  font-weight: 650;
-  letter-spacing: 0.01em;
+textarea.form-control {
+  min-height: 96px;
+  resize: vertical;
+  padding-top: 0.68rem;
+}
+
+.form-control[readonly],
+.form-select[readonly] {
+  background-color: var(--fp-navy-soft);
+  cursor: default;
+}
+
+.form-control:disabled,
+.form-select:disabled {
+  opacity: 0.7;
+  background-color: var(--fp-navy-soft);
+  cursor: not-allowed;
+}
+
+/* ---------- Compact controls ---------- */
+
+.form-control-sm,
+.form-select-sm,
+.input-group-sm > .form-control,
+.input-group-sm > .form-select,
+.input-group-sm > .input-group-text,
+.input-group-sm > .btn {
+  min-height: var(--fp-ctrl, 36px);
+  height: var(--fp-ctrl, 36px);
+  font-size: var(--fp-fs-sm);
+}
+
+.form-control-sm,
+.form-select-sm {
+  padding-top: 0.35rem;
+  padding-bottom: 0.35rem;
+}
+
+/* ---------- Search fields ---------- */
+
+.fp-search-field {
+  position: relative;
+}
+
+.fp-search-field .form-control {
+  padding-left: 2.45rem;
+  padding-right: 2.45rem;
+}
+
+.fp-search-field > i:first-child {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 0.85rem;
+  color: var(--fp-text-muted);
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.fp-search-field .fp-search-clear {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  right: 0.55rem;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--fp-text-muted);
+  transform: translateY(-50%);
+}
+
+.fp-search-field .fp-search-clear:hover {
+  background: var(--fp-navy-soft);
+  color: var(--fp-navy);
+}
+
+/* ---------- Input groups ---------- */
+
+.input-group {
+  border-radius: 0.65rem;
 }
 
 .input-group-text {
-  border-color: var(--fp-border);
-  color: #42b883;
-  background: #f3faf7;
   min-width: 2.6rem;
   justify-content: center;
+  border-color: var(--fp-border);
+  color: var(--fp-vue);
+  background: var(--fp-navy-soft);
+  font-size: var(--fp-fs-sm);
 }
 
-.input-group .form-control,
-.input-group .form-select {
-  border-left: 0;
+.input-group > .form-control,
+.input-group > .form-select {
+  border-left-width: 0;
+}
+
+.input-group > .form-control:first-child,
+.input-group > .form-select:first-child {
+  border-left-width: 1px;
 }
 
 .input-group:focus-within .input-group-text,
@@ -62,12 +232,231 @@ textarea.form-control {
   border-color: var(--fp-vue);
 }
 
+.input-group:focus-within .input-group-text {
+  background: var(--fp-vue-soft);
+  color: var(--fp-vue);
+}
+
+/* ---------- Date / number / currency fields ---------- */
+
+input[type="date"],
+input[type="datetime-local"],
+input[type="month"],
+input[type="time"],
+input[type="number"] {
+  font-variant-numeric: tabular-nums;
+}
+
+input[type="number"] {
+  text-align: right;
+}
+
+.fp-number-field .form-control {
+  font-variant-numeric: tabular-nums;
+}
+
+.fp-currency-field {
+  position: relative;
+}
+
+.fp-currency-field .form-control {
+  padding-left: 2.45rem;
+}
+
+.fp-currency-symbol {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 0.8rem;
+  color: var(--fp-text-muted);
+  font-weight: 650;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+/* ---------- Checkbox / radio / switch ---------- */
+
+.form-check {
+  min-height: 1.5rem;
+  margin-bottom: 0.55rem;
+}
+
+.form-check-input {
+  border-color: var(--fp-border);
+  box-shadow: none;
+}
+
+.form-check-input:hover {
+  border-color: var(--fp-vue);
+}
+
+.form-check-input:checked {
+  background-color: var(--fp-vue);
+  border-color: var(--fp-vue);
+}
+
+.form-check-input:focus {
+  border-color: var(--fp-vue);
+  box-shadow: 0 0 0 0.2rem rgba(66, 184, 131, 0.2);
+}
+
+.form-check-label {
+  color: var(--fp-text);
+  font-size: var(--fp-fs-sm);
+  cursor: pointer;
+}
+
+.form-switch .form-check-input {
+  width: 2.35rem;
+  height: 1.25rem;
+  margin-top: 0.12rem;
+}
+
+.form-switch .form-check-input:checked {
+  background-color: var(--fp-vue);
+  border-color: var(--fp-vue);
+}
+
+/* ---------- Validation ---------- */
+
+.form-control.is-valid,
+.form-select.is-valid {
+  border-color: var(--fp-vue);
+}
+
+.form-control.is-valid:focus,
+.form-select.is-valid:focus {
+  border-color: var(--fp-vue);
+  box-shadow: 0 0 0 4px rgba(66, 184, 131, 0.14);
+}
+
+.form-control.is-invalid,
+.form-select.is-invalid {
+  border-color: var(--fp-danger);
+}
+
+.form-control.is-invalid:focus,
+.form-select.is-invalid:focus {
+  border-color: var(--fp-danger);
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.12);
+}
+
+.invalid-feedback,
+.valid-feedback {
+  margin-top: 0.35rem;
+  font-size: var(--fp-fs-xs);
+  font-weight: 500;
+}
+
+.invalid-feedback {
+  color: var(--fp-danger);
+}
+
+.valid-feedback {
+  color: var(--fp-vue-dark);
+}
+
+.fp-field-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+  color: var(--fp-danger);
+  font-size: var(--fp-fs-xs);
+  font-weight: 500;
+}
+
+.fp-field-error i {
+  margin-top: 0.08rem;
+}
+
+/* ---------- Select / dropdown presentation ---------- */
+
+.form-select {
+  cursor: pointer;
+}
+
+.form-select:disabled {
+  cursor: not-allowed;
+}
+
+.fp-select-wrap {
+  position: relative;
+}
+
+.fp-select-wrap .form-select {
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.fp-select-wrap::after {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  right: 0.85rem;
+  color: var(--fp-text-muted);
+  font-family: "bootstrap-icons";
+  font-size: 0.8rem;
+  pointer-events: none;
+  content: "\f282";
+  transform: translateY(-50%);
+}
+
+.fp-select-wrap:focus-within::after {
+  color: var(--fp-vue);
+}
+
+/* Native option menus cannot be fully themed consistently across browsers.
+   These rules keep their readable typography and palette where supported. */
+.form-select option {
+  color: var(--fp-text);
+  background: var(--fp-card);
+}
+
+/* ---------- Reusable dropdown menu ---------- */
+
+.fp-dropdown {
+  min-width: 12rem;
+  padding: 0.4rem;
+  border: 1px solid var(--fp-border);
+  border-radius: 0.75rem;
+  background: var(--fp-card);
+  box-shadow: var(--fp-shadow-lg);
+}
+
+.fp-dropdown .dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 36px;
+  border-radius: 0.5rem;
+  color: var(--fp-text);
+  font-size: var(--fp-fs-sm);
+}
+
+.fp-dropdown .dropdown-item:hover,
+.fp-dropdown .dropdown-item:focus,
+.fp-dropdown .dropdown-item.active {
+  background: var(--fp-vue-soft);
+  color: var(--fp-vue-dark);
+}
+
+/* ---------- Form cards ---------- */
+
 .fp-form-card {
+  border: 1px solid var(--fp-border-soft);
   border-radius: 1.15rem;
   background:
-    linear-gradient(#fff, #fff) padding-box,
-    linear-gradient(135deg, rgba(66, 184, 131, 0.18), rgba(53, 73, 94, 0.08)) border-box;
+    linear-gradient(var(--fp-card), var(--fp-card)) padding-box,
+    linear-gradient(
+      135deg,
+      rgba(66, 184, 131, 0.18),
+      rgba(53, 73, 94, 0.08)
+    ) border-box;
+  box-shadow: var(--fp-shadow);
 }
+
+/* ---------- Modal forms ---------- */
 
 .fp-modal-backdrop {
   background: rgba(36, 52, 68, 0.48);
@@ -75,9 +464,9 @@ textarea.form-control {
 }
 
 .fp-form-modal {
+  overflow: hidden;
   border: 0;
   border-radius: 1.15rem;
-  overflow: hidden;
   box-shadow: 0 24px 60px rgba(36, 52, 68, 0.22);
 }
 
@@ -86,8 +475,7 @@ textarea.form-control {
   align-items: flex-start;
   gap: 0.85rem;
   padding: 1.15rem 1.25rem 1rem;
-  background:
-    linear-gradient(135deg, #f3faf7 0%, #eef3f7 100%);
+  background: linear-gradient(135deg, #f3faf7 0%, #eef3f7 100%);
   border-bottom: 1px solid var(--fp-border);
 }
 
@@ -96,28 +484,29 @@ textarea.form-control {
 }
 
 .fp-form-modal-head h5 {
+  margin: 0;
+  color: var(--fp-navy);
   font-size: 1.05rem;
   font-weight: 700;
-  color: #35495e;
 }
 
 .fp-form-modal-head p {
+  margin: 0.15rem 0 0;
+  color: var(--fp-text-muted);
   font-size: 0.8rem;
-  color: #64748b;
-  margin-top: 0.15rem;
 }
 
 .fp-form-modal-icon {
+  display: inline-flex;
+  flex: 0 0 42px;
+  align-items: center;
+  justify-content: center;
   width: 42px;
   height: 42px;
   border-radius: 12px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   background: linear-gradient(145deg, #42b883, #36a473);
   color: #fff;
   font-size: 1.15rem;
-  flex-shrink: 0;
   box-shadow: 0 8px 16px rgba(66, 184, 131, 0.28);
 }
 
@@ -131,10 +520,12 @@ textarea.form-control {
 }
 
 .fp-form-modal .modal-footer {
-  border-top: 1px solid var(--fp-border);
   padding: 0.85rem 1.25rem 1.1rem;
-  background: #f8fafc;
+  border-top: 1px solid var(--fp-border);
+  background: var(--fp-navy-soft);
 }
+
+/* ---------- Selection / preview helpers ---------- */
 
 .fp-selected-stock,
 .fp-hint {
@@ -142,69 +533,187 @@ textarea.form-control {
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem 0.9rem;
-  border-radius: 0.85rem;
-  border: 1px solid #d7eee4;
-  background: #f4fbf7;
   margin-bottom: 1rem;
+  border: 1px solid #d7eee4;
+  border-radius: 0.85rem;
+  background: var(--fp-vue-soft);
 }
 
 .fp-hint {
   align-items: flex-start;
-  color: #475569;
+  color: var(--fp-text);
   font-size: 0.82rem;
 }
 
 .fp-hint i {
-  color: #42b883;
   margin-top: 0.15rem;
+  color: var(--fp-vue);
 }
 
 .fp-stock-results {
-  margin-top: 0.45rem;
   max-height: 220px;
+  margin-top: 0.45rem;
   overflow: auto;
   border: 1px solid var(--fp-border);
   border-radius: 0.75rem;
-  background: #fff;
+  background: var(--fp-card);
 }
 
 .fp-stock-option {
-  width: 100%;
   display: flex;
   align-items: center;
+  width: 100%;
   gap: 0.7rem;
   padding: 0.55rem 0.75rem;
   border: 0;
   border-bottom: 1px solid var(--fp-border-soft);
   background: transparent;
+  color: var(--fp-text);
+  text-align: left;
 }
 
 .fp-stock-option:last-child {
   border-bottom: 0;
 }
 
-.fp-stock-option:hover {
-  background: #f3faf7;
+.fp-stock-option:hover,
+.fp-stock-option:focus {
+  background: var(--fp-vue-soft);
 }
 
 .fp-stock-price {
+  color: var(--fp-navy);
   font-weight: 650;
-  color: #35495e;
   font-variant-numeric: tabular-nums;
 }
 
 .fp-preview-table {
   max-height: 280px;
   overflow-y: auto;
-  border-radius: 0.65rem;
   border: 1px solid var(--fp-border);
+  border-radius: 0.65rem;
 }
 
+/* ---------- Dark theme ---------- */
+
+html[data-theme="dark"] .form-control,
+html[data-theme="dark"] .form-select {
+  background-color: var(--fp-card);
+  border-color: var(--fp-border);
+  color: var(--fp-text);
+}
+
+html[data-theme="dark"] .form-control:hover,
+html[data-theme="dark"] .form-select:hover {
+  border-color: rgba(148, 163, 184, 0.3);
+  background-color: var(--fp-card);
+}
+
+html[data-theme="dark"] .form-control:focus,
+html[data-theme="dark"] .form-select:focus {
+  background-color: var(--fp-card);
+  border-color: var(--fp-vue);
+  color: var(--fp-text);
+  box-shadow: 0 0 0 4px rgba(74, 222, 128, 0.16);
+}
+
+html[data-theme="dark"] .form-control::placeholder {
+  color: #64748b;
+}
+
+html[data-theme="dark"] .form-control[readonly],
+html[data-theme="dark"] .form-select[readonly],
+html[data-theme="dark"] .form-control:disabled,
+html[data-theme="dark"] .form-select:disabled {
+  background-color: rgba(11, 18, 32, 0.72);
+}
+
+html[data-theme="dark"] .form-select option {
+  background: var(--fp-card);
+  color: var(--fp-text);
+}
+
+html[data-theme="dark"] .input-group-text {
+  background: var(--fp-navy-soft);
+  border-color: var(--fp-border);
+  color: var(--fp-vue);
+}
+
+html[data-theme="dark"] .fp-form-section,
+html[data-theme="dark"] .fp-form-card {
+  background: var(--fp-card);
+  border-color: var(--fp-border);
+}
+
+html[data-theme="dark"] .fp-form-modal {
+  background: var(--fp-card);
+}
+
+html[data-theme="dark"] .fp-form-modal-head {
+  background: linear-gradient(
+    135deg,
+    rgba(74, 222, 128, 0.08),
+    rgba(21, 30, 46, 0.95)
+  );
+  border-color: var(--fp-border);
+}
+
+html[data-theme="dark"] .fp-form-modal-head.is-sell {
+  background: linear-gradient(
+    135deg,
+    rgba(251, 113, 133, 0.08),
+    rgba(21, 30, 46, 0.95)
+  );
+}
+
+html[data-theme="dark"] .fp-form-modal-head h5 {
+  color: var(--fp-text);
+}
+
+html[data-theme="dark"] .fp-form-modal .modal-footer {
+  background: rgba(11, 18, 32, 0.55);
+  border-color: var(--fp-border);
+}
+
+html[data-theme="dark"] .fp-selected-stock,
+html[data-theme="dark"] .fp-hint {
+  border-color: rgba(74, 222, 128, 0.18);
+  background: rgba(74, 222, 128, 0.08);
+}
+
+html[data-theme="dark"] .fp-stock-results {
+  background: var(--fp-card);
+  border-color: var(--fp-border);
+}
+
+html[data-theme="dark"] .fp-stock-option {
+  border-bottom-color: var(--fp-border-soft);
+  color: var(--fp-text);
+}
+
+html[data-theme="dark"] .fp-stock-price {
+  color: var(--fp-text);
+}
+
+/* ---------- Responsive ---------- */
+
 @media (max-width: 575.98px) {
+  .fp-form-section {
+    padding: 0.9rem;
+  }
+
   .fp-form-modal-head,
   .fp-form-modal .modal-body,
   .fp-form-modal .modal-footer {
     padding-left: 1rem;
     padding-right: 1rem;
+  }
+
+  .fp-form-modal .modal-footer {
+    gap: 0.5rem;
+  }
+
+  .fp-form-modal .modal-footer .btn {
+    flex: 1 1 auto;
   }
 }

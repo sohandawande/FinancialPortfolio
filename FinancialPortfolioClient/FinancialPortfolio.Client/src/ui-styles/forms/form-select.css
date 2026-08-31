@@ -1,0 +1,54 @@
+/* Reusable select/dropdown presentation. */
+
+.fp-select-wrap {
+  position: relative;
+}
+
+.fp-select-wrap .form-select {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.fp-select-wrap::after {
+  position: absolute;
+  top: 50%;
+  right: .8rem;
+  z-index: 2;
+  color: var(--fp-text-muted);
+  font-family: "bootstrap-icons";
+  font-size: .78rem;
+  pointer-events: none;
+  content: "\f282";
+  transform: translateY(-50%);
+}
+
+.fp-select-wrap:focus-within::after {
+  color: var(--fp-vue);
+}
+
+.fp-dropdown-menu {
+  min-width: 12rem;
+  padding: .4rem;
+  border: 1px solid var(--fp-border);
+  border-radius: .75rem;
+  background: var(--fp-card);
+  box-shadow: var(--fp-shadow-lg);
+}
+
+.fp-dropdown-menu .dropdown-item {
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  border-radius: .5rem;
+  color: var(--fp-text);
+  font-size: var(--fp-fs-sm);
+}
+
+.fp-dropdown-menu .dropdown-item:hover,
+.fp-dropdown-menu .dropdown-item:focus,
+.fp-dropdown-menu .dropdown-item.active {
+  background: var(--fp-vue-soft);
+  color: var(--fp-vue-dark);
+}

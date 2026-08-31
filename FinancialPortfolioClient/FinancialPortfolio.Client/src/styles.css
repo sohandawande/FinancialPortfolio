@@ -12,6 +12,11 @@
 @import 'ui-styles/auth/auth.css';
 @import 'ui-styles/users/users.css';
 @import 'ui-styles/themes/dark-themes.css';
+@import 'ui-styles/forms/forms.css';
+@import 'ui-styles/forms/form-fields.css';
+@import 'ui-styles/forms/form-select.css';
+@import 'ui-styles/forms/form-validation.css';
+@import 'ui-styles/forms/form-layout.css';
 
 /* ---------- Design tokens ---------- */
 :root {
