@@ -1,43 +1,86 @@
 <div class="page-container wealth-page">
   <app-page-header
     title="Wealth"
-    subtitle="Stocks + mutual funds + FD + RD in one place"
+    subtitle="Stocks + ETFs + mutual funds + FD + RD in one place"
     [actions]="headerActions"
     (actionClick)="onHeaderAction($event)"
   />
 
   @if (loading()) {
-    <div class="wt-empty">Loading wealth…</div>
+    <div class="wt-empty">
+      <div class="wt-empty-spinner"></div>
+      <p>Loading wealth…</p>
+    </div>
   } @else if (summary(); as s) {
     <section class="wt-hero">
-      <div>
+      <div class="wt-hero-main">
         <div class="wt-kicker">Total current value</div>
         <div class="wt-amount">{{ s.totalCurrentValue | currency: 'INR' : 'symbol' : '1.2-2' }}</div>
+        <div class="wt-hero-hint">Across all asset classes</div>
       </div>
       <div class="wt-hero-side">
-        <div>
+        <div class="wt-hero-chip">
           <span class="wt-label">Invested</span>
           <strong>{{ s.totalInvested | currency: 'INR' : 'symbol' : '1.0-0' }}</strong>
         </div>
-        <div [class.is-up]="s.totalGainLoss >= 0" [class.is-down]="s.totalGainLoss < 0">
+        <div
+          class="wt-hero-chip"
+          [class.is-up]="s.totalGainLoss >= 0"
+          [class.is-down]="s.totalGainLoss < 0"
+        >
           <span class="wt-label">P&amp;L</span>
-          <strong>{{ s.totalGainLoss | currency: 'INR' : 'symbol' : '1.0-0' }} ({{ s.totalGainLossPercent | number:'1.2-2' }}%)</strong>
+          <strong>
+            {{ s.totalGainLoss | currency: 'INR' : 'symbol' : '1.0-0' }}
+            <span class="wt-pct">({{ s.totalGainLossPercent | number: '1.2-2' }}%)</span>
+          </strong>
         </div>
       </div>
     </section>
 
-    <div class="wt-buckets">
+    <div class="wt-buckets" [attr.data-count]="s.buckets.length">
       @for (b of s.buckets; track b.key) {
-        <button type="button" class="wt-bucket" (click)="openBucket(b.key)">
-          <div class="wt-bucket-top">
-            <span>{{ b.label }}</span>
-            <span>{{ b.allocationPercent | number:'1.1-1' }}%</span>
+        <button
+          type="button"
+          class="wt-bucket"
+          [attr.data-key]="b.key"
+          (click)="openBucket(b.key)"
+        >
+          <div class="wt-bucket-icon" aria-hidden="true">
+            @switch (b.key) {
+              @case ('equity') { <i class="bi bi-graph-up-arrow"></i> }
+              @case ('stocks') { <i class="bi bi-graph-up-arrow"></i> }
+              @case ('etf') { <i class="bi bi-bar-chart-steps"></i> }
+              @case ('etfs') { <i class="bi bi-bar-chart-steps"></i> }
+              @case ('mf') { <i class="bi bi-pie-chart"></i> }
+              @case ('fd') { <i class="bi bi-bank"></i> }
+              @case ('rd') { <i class="bi bi-calendar-check"></i> }
+              @default { <i class="bi bi-wallet2"></i> }
+            }
           </div>
-          <div class="wt-bucket-value">{{ b.currentValue | currency: 'INR' : 'symbol' : '1.0-0' }}</div>
-          <div class="wt-bucket-meta">{{ b.count }} · invested {{ b.invested | currency: 'INR' : 'symbol' : '1.0-0' }}</div>
-          <div class="wt-bar"><span [style.width.%]="b.allocationPercent"></span></div>
+
+          <div class="wt-bucket-body">
+            <div class="wt-bucket-top">
+              <span class="wt-bucket-label">{{ b.label }}</span>
+              <span class="wt-bucket-pct">{{ b.allocationPercent | number: '1.1-1' }}%</span>
+            </div>
+            <div class="wt-bucket-value">
+              {{ b.currentValue | currency: 'INR' : 'symbol' : '1.0-0' }}
+            </div>
+            <div class="wt-bucket-meta">
+              <span>{{ b.count }} holding{{ b.count === 1 ? '' : 's' }}</span>
+              <span>Invested {{ b.invested | currency: 'INR' : 'symbol' : '1.0-0' }}</span>
+            </div>
+            <div class="wt-bar" aria-hidden="true">
+              <span [style.width.%]="b.allocationPercent"></span>
+            </div>
+          </div>
         </button>
       }
+    </div>
+  } @else {
+    <div class="wt-empty">
+      <i class="bi bi-pie-chart wt-empty-icon"></i>
+      <p>No wealth data yet. Create a portfolio and add holdings.</p>
     </div>
   }
 </div>

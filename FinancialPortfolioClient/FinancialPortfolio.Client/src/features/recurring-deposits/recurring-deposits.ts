@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { PageHeader } from '../../layout/components/page-header/page-header';
 import { FpModal } from '../../layout/components/fp-modal/fp-modal';
 import { FpDate } from '../../layout/components/fp-date/fp-date';
+import { FpDropdownSelect, FpDropdownSelectOption } from '../../layout/components/fp-dropdown-select/fp-dropdown-select';
 import { PageHeaderAction } from '../../core/models/page-header/page-header-action.model';
 import { WealthService } from '../../core/services/wealth/wealth.service';
 import { ToastService } from '../../core/services/toast/toast.service';
@@ -15,7 +16,7 @@ import { RecurringDeposit, STATUS_LABELS, UpsertRecurringDepositRequest } from '
 @Component({
   selector: 'app-recurring-deposits',
   standalone: true,
-  imports: [CommonModule, FormsModule, PageHeader, FpModal, FpDate, CurrencyPipe, DatePipe],
+  imports: [FpDropdownSelect, CommonModule, FormsModule, PageHeader, FpModal, FpDate, CurrencyPipe, DatePipe],
   templateUrl: './recurring-deposits.html',
   styleUrl: '../wealth/wealth.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -29,6 +30,12 @@ export class RecurringDeposits implements OnInit {
   readonly loading = signal(true);
   readonly saving = signal(false);
   readonly showModal = signal(false);
+
+  readonly statusOptions: FpDropdownSelectOption[] = [
+    { value: 1, label: 'Active' },
+    { value: 2, label: 'Matured' },
+    { value: 3, label: 'Closed' },
+  ];
   readonly editId = signal<number | null>(null);
   readonly statusLabels = STATUS_LABELS;
   form: UpsertRecurringDepositRequest = this.empty();
@@ -71,6 +78,11 @@ export class RecurringDeposits implements OnInit {
         }
       : this.empty();
     this.showModal.set(true);
+  }
+
+  onStatusChange(value: number | string | null): void {
+    const n = Number(value);
+    if (n >= 1 && n <= 3) this.form.status = n as 1 | 2 | 3;
   }
 
   save(): void {

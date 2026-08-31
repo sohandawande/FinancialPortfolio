@@ -51,6 +51,27 @@ namespace FinancialPortfolio.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Etfs",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Symbol = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    CompanyName = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
+                    Industry = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    ISINCode = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Series = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    CreatedBy = table.Column<long>(type: "bigint", nullable: false),
+                    ModifiedBy = table.Column<long>(type: "bigint", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Etfs", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Stocks",
                 columns: table => new
                 {
@@ -270,6 +291,47 @@ namespace FinancialPortfolio.Data.Migrations
                         name: "FK_RefreshTokens_AspNetUsers_IdentityUserId",
                         column: x => x.IdentityUserId,
                         principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EtfDetails",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    EtfId = table.Column<long>(type: "bigint", nullable: false),
+                    Category = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    CurrentPrice = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    PreviousClose = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    OpenPrice = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    HighPrice = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    LowPrice = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    Volume = table.Column<long>(type: "bigint", nullable: false),
+                    AverageVolume = table.Column<long>(type: "bigint", nullable: false),
+                    Week52High = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    Week52Low = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    PE = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    EPS = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    MarketCap = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    PriceChange = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    PriceChangePercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    LogoUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    LastUpdated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<long>(type: "bigint", nullable: false),
+                    ModifiedBy = table.Column<long>(type: "bigint", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EtfDetails", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EtfDetails_Etfs_EtfId",
+                        column: x => x.EtfId,
+                        principalTable: "Etfs",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -638,6 +700,24 @@ namespace FinancialPortfolio.Data.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_EtfDetails_EtfId",
+                table: "EtfDetails",
+                column: "EtfId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Etfs_ISINCode",
+                table: "Etfs",
+                column: "ISINCode",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Etfs_Symbol",
+                table: "Etfs",
+                column: "Symbol",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PortfolioFixedDeposits_PortfolioId",
                 table: "PortfolioFixedDeposits",
                 column: "PortfolioId");
@@ -787,6 +867,9 @@ namespace FinancialPortfolio.Data.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "EtfDetails");
+
+            migrationBuilder.DropTable(
                 name: "PortfolioFixedDeposits");
 
             migrationBuilder.DropTable(
@@ -812,6 +895,9 @@ namespace FinancialPortfolio.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "Etfs");
 
             migrationBuilder.DropTable(
                 name: "PortfolioStockHolds");

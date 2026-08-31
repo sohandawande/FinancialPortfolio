@@ -51,3 +51,28 @@
   justify-content: center;
   min-width: 4.5rem;
 }
+
+/* Keep action icon buttons on one row */
+.dt-actions-row,
+td .d-flex.gap-1 {
+  display: inline-flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+
+.dt-action-btn {
+  width: 30px !important;
+  height: 30px !important;
+  min-width: 30px !important;
+  min-height: 30px !important;
+  flex: 0 0 auto;
+}
+
+th.actions-col,
+td:has(.dt-action-btn) {
+  width: 1%;
+  white-space: nowrap;
+}

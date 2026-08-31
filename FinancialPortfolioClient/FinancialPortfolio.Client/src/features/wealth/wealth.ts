@@ -28,6 +28,9 @@ export class Wealth implements OnInit {
 
   readonly headerActions: PageHeaderAction[] = [
     { id: 'refresh', label: 'Refresh', icon: 'bi-arrow-clockwise', color: 'outline-secondary' },
+    { id: 'stocks', label: 'Stocks', icon: 'bi-graph-up-arrow', color: 'outline-secondary' },
+    { id: 'etfs', label: 'ETFs', icon: 'bi-bar-chart-steps', color: 'outline-secondary' },
+    { id: 'portfolio', label: 'Portfolio', icon: 'bi-briefcase', color: 'outline-secondary' },
     { id: 'mf', label: 'Mutual funds', icon: 'bi-pie-chart', color: 'outline-secondary' },
     { id: 'fd', label: 'FD', icon: 'bi-bank', color: 'outline-secondary' },
     { id: 'rd', label: 'RD', icon: 'bi-calendar-check', color: 'outline-secondary' },
@@ -39,13 +42,17 @@ export class Wealth implements OnInit {
 
   onHeaderAction(id: string): void {
     if (id === 'refresh') this.load();
+    if (id === 'stocks') void this.router.navigate(['/stocks']);
+    if (id === 'etfs') void this.router.navigate(['/etfs']);
+    if (id === 'portfolio') void this.router.navigate(['/portfolio']);
     if (id === 'mf') void this.router.navigate(['/mutual-funds']);
     if (id === 'fd') void this.router.navigate(['/fixed-deposits']);
     if (id === 'rd') void this.router.navigate(['/recurring-deposits']);
   }
 
   openBucket(key: string): void {
-    if (key === 'equity') void this.router.navigate(['/holdings']);
+    if (key === 'equity' || key === 'stocks') void this.router.navigate(['/holdings']);
+    if (key === 'etf' || key === 'etfs') void this.router.navigate(['/etfs']);
     if (key === 'mf') void this.router.navigate(['/mutual-funds']);
     if (key === 'fd') void this.router.navigate(['/fixed-deposits']);
     if (key === 'rd') void this.router.navigate(['/recurring-deposits']);

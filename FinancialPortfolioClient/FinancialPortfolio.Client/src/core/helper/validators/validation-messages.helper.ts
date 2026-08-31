@@ -1,5 +1,8 @@
 import { AbstractControl } from '@angular/forms';
 
+/**
+ * Client-side control error → user-facing message.
+ */
 export function getControlError(
   control: AbstractControl | null,
   fieldLabel = 'Field',
@@ -41,7 +44,69 @@ export function getControlError(
   if (errors['max']) return `${fieldLabel} cannot be more than ${errors['max'].max}`;
   if (errors['minValue']) return `${fieldLabel} must be greater than 0`;
   if (errors['futureDate']) return `${fieldLabel} cannot be in the future`;
+  if (errors['pastDate']) return `${fieldLabel} cannot be in the past`;
   if (errors['stock']) return 'Select a stock';
+  if (errors['etf']) return 'Select an ETF';
+  if (errors['pattern']) return `${fieldLabel} format is invalid`;
+  if (errors['server']) return String(errors['server']);
 
   return `${fieldLabel} is invalid`;
+}
+
+/**
+ * Simple field error for template-driven / signal forms (touched map).
+ */
+export function fieldError(
+  touched: Record<string, boolean> | Set<string> | null | undefined,
+  field: string,
+  value: unknown,
+  rules: {
+    required?: boolean;
+    min?: number;
+    max?: number;
+    minLength?: number;
+    maxLength?: number;
+    email?: boolean;
+    pattern?: RegExp;
+    custom?: () => string | null;
+  } = {},
+  label = 'Field',
+): string {
+  const isTouched =
+    touched instanceof Set
+      ? touched.has(field)
+      : !!(touched && (touched as Record<string, boolean>)[field]);
+
+  if (!isTouched) return '';
+
+  if (rules.custom) {
+    const msg = rules.custom();
+    if (msg) return msg;
+  }
+
+  const str = value == null ? '' : String(value).trim();
+  const num = typeof value === 'number' ? value : Number(value);
+
+  if (rules.required && (value === null || value === undefined || str === '')) {
+    return `${label} is required`;
+  }
+  if (rules.email && str && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(str)) {
+    return 'Enter a valid email address';
+  }
+  if (rules.minLength != null && str.length < rules.minLength) {
+    return `${label} must be at least ${rules.minLength} characters`;
+  }
+  if (rules.maxLength != null && str.length > rules.maxLength) {
+    return `${label} must be at most ${rules.maxLength} characters`;
+  }
+  if (rules.min != null && !Number.isNaN(num) && num < rules.min) {
+    return `${label} must be at least ${rules.min}`;
+  }
+  if (rules.max != null && !Number.isNaN(num) && num > rules.max) {
+    return `${label} cannot be more than ${rules.max}`;
+  }
+  if (rules.pattern && str && !rules.pattern.test(str)) {
+    return `${label} format is invalid`;
+  }
+  return '';
 }

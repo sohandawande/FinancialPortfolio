@@ -1,0 +1,210 @@
+<div class="page-container">
+  <app-page-header
+    title="ETFs"
+    subtitle="Live market details snapshot of {{ etf()?.symbol }} etf."
+    [actions]="headerActions()"
+    (actionClick)="onHeaderAction($event)"
+  >
+  </app-page-header>
+
+  @if (loading()) {
+    <div class="card border-0 shadow-sm">
+      <div class="card-body text-center py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="text-muted mt-2 mb-0">Loading etf…</p>
+      </div>
+    </div>
+  } @else if (notFound() || !etf()) {
+    <div class="card border-0 shadow-sm">
+      <div class="card-body text-center py-5">
+        <i class="bi bi-exclamation-triangle fs-2 text-warning d-block mb-2"></i>
+        <p class="mb-3">ETF not found</p>
+        <button type="button" class="btn btn-primary btn-sm" (click)="back()">
+          Back to list
+        </button>
+      </div>
+    </div>
+  } @else {
+    @if (etf(); as s) {
+      <!-- Hero -->
+      <div class="sd-hero card border-0 shadow-sm mb-3">
+        <div class="card-body p-4">
+          <div class="d-flex flex-wrap gap-3 align-items-start">
+            <div class="sd-logo">
+              <!-- <img [src]="logoUrl()" [alt]="s.symbol" (error)="$any($event.target).style.display='none'" /> -->
+              <img [src]="logoUrl()" [alt]="s.symbol" (error)="onLogoError($event)" />
+              <span class="sd-logo-fallback">{{ initials() }}</span>
+            </div>
+
+            <div class="flex-grow-1">
+              <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+                <h3 class="mb-0 fw-bold">{{ s.symbol }}</h3>
+                @if (s.isActive) {
+                  <span class="badge text-bg-success">Active</span>
+                } @else {
+                  <span class="badge text-bg-secondary">Inactive</span>
+                }
+                @if (s.series) {
+                  <span class="badge text-bg-light border text-dark">{{ s.series }}</span>
+                }
+                @if (s.category) {
+                  <span class="badge text-bg-primary-subtle text-primary border border-primary-subtle">
+                    {{ s.category }}
+                  </span>
+                }
+              </div>
+
+              <div class="text-muted mb-2">{{ s.companyName }}</div>
+
+              @if (s.industry) {
+                <span class="badge rounded-pill text-bg-light border">
+                  <i class="bi bi-building me-1"></i>{{ s.industry }}
+                </span>
+              }
+              @if (s.isinCode) {
+                <span class="badge rounded-pill text-bg-light border ms-1">
+                  ISIN {{ s.isinCode }}
+                </span>
+              }
+            </div>
+
+            <div class="sd-price text-md-end">
+              <div class="sd-price-value">₹{{ money(s.currentPrice) }}</div>
+
+              <div
+                class="sd-change"
+                [class.up]="isUp()"
+                [class.down]="isDown()"
+                [class.flat]="isFlat()">
+                @if (isUp()) {
+                  <i class="bi bi-arrow-up-right"></i>
+                } @else if (isDown()) {
+                  <i class="bi bi-arrow-down-right"></i>
+                } @else {
+                  <i class="bi bi-dash"></i>
+                }
+                <span>
+                  {{ isUp() ? '+' : '' }}{{ money(s.priceChange) }}
+                  ({{ isUp() ? '+' : '' }}{{ changePercent() | number: '1.2-2' }}%)
+                </span>
+              </div>
+
+              <div class="small text-muted mt-1">
+                Prev close ₹{{ money(s.previousClose) }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3">
+        <!-- Day range -->
+        <div class="col-12 col-lg-6">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <div class="fw-semibold mb-2">Day range</div>
+              <div class="d-flex justify-content-between small text-muted mb-1">
+                <span>₹{{ money(s.lowPrice) }}</span>
+                <span>₹{{ money(s.highPrice) }}</span>
+              </div>
+              <div class="sd-range">
+                <div class="sd-range-bar" [style.width.%]="dayRangePct()"></div>
+                <div class="sd-range-dot" [style.left.%]="dayRangePct()"></div>
+              </div>
+              <div class="row g-2 mt-3 small">
+                <div class="col-4">
+                  <div class="text-muted">Open</div>
+                  <div class="fw-semibold text-warning">₹{{ money(s.openPrice) }}</div>
+                </div>
+                <div class="col-4">
+                  <div class="text-muted">High</div>
+                  <div class="fw-semibold text-success">₹{{ money(s.highPrice) }}</div>
+                </div>
+                <div class="col-4">
+                  <div class="text-muted">Low</div>
+                  <div class="fw-semibold text-danger">₹{{ money(s.lowPrice) }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 52W range -->
+        <div class="col-12 col-lg-6">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <div class="fw-semibold mb-2">52-week range</div>
+              <div class="d-flex justify-content-between small text-muted mb-1">
+                <span>₹{{ money(s.week52Low) }}</span>
+                <span>₹{{ money(s.week52High) }}</span>
+              </div>
+              <div class="sd-range">
+                <div class="sd-range-bar week" [style.width.%]="weekRangePct()"></div>
+                <div class="sd-range-dot" [style.left.%]="weekRangePct()"></div>
+              </div>
+              <div class="row g-2 mt-3 small">
+                <div class="col-6">
+                  <div class="text-muted">52W High</div>
+                  <div class="fw-semibold">₹{{ money(s.week52High) }}</div>
+                </div>
+                <div class="col-6">
+                  <div class="text-muted">52W Low</div>
+                  <div class="fw-semibold">₹{{ money(s.week52Low) }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Key metrics -->
+        <div class="col-12">
+          <div class="card border-0 shadow-sm">
+            <div class="card-body">
+              <div class="fw-semibold mb-3">Key metrics</div>
+              <div class="row g-3">
+                <div class="col-6 col-md-4 col-xl-2">
+                  <div class="sd-metric">
+                    <div class="sd-metric-label">Volume</div>
+                    <div class="sd-metric-value">{{ num(s.volume) }}</div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-4 col-xl-2">
+                  <div class="sd-metric">
+                    <div class="sd-metric-label">Avg volume</div>
+                    <div class="sd-metric-value">{{ num(s.averageVolume) }}</div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-4 col-xl-2">
+                  <div class="sd-metric">
+                    <div class="sd-metric-label">P/E</div>
+                    <div class="sd-metric-value">{{ s.pe ? (s.pe | number: '1.2-2') : '—' }}</div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-4 col-xl-2">
+                  <div class="sd-metric">
+                    <div class="sd-metric-label">EPS</div>
+                    <div class="sd-metric-value">{{ money(s.eps) }}</div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-4 col-xl-2">
+                  <div class="sd-metric">
+                    <div class="sd-metric-label">Market cap</div>
+                    <div class="sd-metric-value">₹{{ money(s.marketCap) }}</div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-4 col-xl-2">
+                  <div class="sd-metric">
+                    <div class="sd-metric-label">Updated</div>
+                    <div class="sd-metric-value small">
+                      {{ s.lastUpdated ? (s.lastUpdated | date: 'medium') : '—' }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  }
+</div>

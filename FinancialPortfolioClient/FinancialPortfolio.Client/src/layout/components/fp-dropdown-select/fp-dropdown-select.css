@@ -1,66 +1,8 @@
 :host {
   position: relative;
   display: inline-flex;
-}
-
-.fp-select-icon {
-  color: var(--fp-vue);
-  line-height: 1;
-  font-size: 0.9rem;
-}
-
-.fp-select-label {
-  flex: 1;
-  text-align: left;
-  white-space: nowrap;
-}
-
-.fp-select-caret {
-  color: var(--fp-text-muted);
-  font-size: 0.7rem;
-  transition: transform 0.15s ease;
-}
-
-.fp-select-trigger.open .fp-select-caret {
-  transform: rotate(180deg);
-}
-
-.fp-select-menu {
-  position: absolute;
-  top: calc(100% + 0.35rem);
-  left: 0;
-  z-index: 30;
-  min-width: 100%;
-  padding: 0.3rem;
-  border-radius: var(--fp-radius-sm);
-  background: var(--fp-card);
-  border: 1px solid var(--fp-border-soft);
-  box-shadow: var(--fp-shadow-lg);
-}
-
-.fp-select-option {
   width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  border: 0;
-  border-radius: 0.4rem;
-  background: transparent;
-  color: var(--fp-navy);
-  padding: 0.45rem 0.65rem;
-  font-size: var(--fp-fs-sm);
-  font-weight: 600;
-  text-align: left;
-  min-height: var(--fp-ctrl);
+  min-width: 0;
 }
 
-.fp-select-option:hover,
-.fp-select-option.active {
-  background: var(--fp-vue-soft);
-  color: var(--fp-vue-dark);
-}
-
-.fp-select-option i {
-  color: var(--fp-vue);
-}
+/* Visual styles live in ui-styles/forms/form-select.css so every dropdown matches. */

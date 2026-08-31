@@ -46,11 +46,13 @@
       <label class="div-field"><span>Start date</span><app-fp-date name="fdStart" [(ngModel)]="form.startDate" /></label>
       <label class="div-field">
         <span>Status</span>
-        <select class="form-select" [(ngModel)]="form.status">
-          <option [ngValue]="1">Active</option>
-          <option [ngValue]="2">Matured</option>
-          <option [ngValue]="3">Closed</option>
-        </select>
+        <app-fp-dropdown-select
+          icon="bi-flag"
+          ariaLabel="Status"
+          [options]="statusOptions"
+          [value]="form.status"
+          (valueChange)="onStatusChange($event)"
+        />
       </label>
       <label class="div-field"><span>Notes</span><input class="form-control" [(ngModel)]="form.notes" /></label>
     </div>

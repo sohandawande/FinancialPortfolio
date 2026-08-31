@@ -105,120 +105,104 @@
   background: var(--fp-vue-soft);
 }
 
+
+/* ===== Dividends strip: single clean row ===== */
 .income-panel {
   display: flex;
+  flex-wrap: nowrap;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.45rem;
   margin-bottom: 1rem;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid var(--fp-border-soft);
+  border-radius: var(--fp-radius);
+  background: var(--fp-card);
+  box-shadow: var(--fp-shadow);
+  overflow-x: auto;
 }
 
 .income-heading,
 .income-stat,
-.income-all,
-.income-panel :is(.fp-select-trigger) {
-  height: var(--fp-ctrl);
-  min-height: var(--fp-ctrl);
+.income-all {
+  height: 34px;
+  min-height: 34px;
 }
 
 .income-heading {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.4rem;
   flex: 0 0 auto;
-  padding-right: 0.35rem;
+  padding-right: 0.5rem;
+  margin-right: 0.15rem;
+  border-right: 1px solid var(--fp-border-soft);
 }
 
 .income-heading-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  display: grid;
-  place-items: center;
-  background: var(--fp-vue-soft);
-  color: var(--fp-vue-dark);
-  font-size: 0.85rem;
-}
-
-.income-heading-text {
-  font-size: 0.92rem;
-  font-weight: 700;
-  color: var(--fp-navy);
-  letter-spacing: -0.02em;
-}
-
-.income-stat {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  min-width: 0;
-  flex: 1 1 0;
-  padding: 0 0.6rem 0 0.3rem;
-  border: 1px solid var(--fp-border-soft);
-  border-radius: var(--fp-radius-sm);
-  background: var(--fp-card);
-}
-
-.income-stat-icon {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   border-radius: 7px;
   display: grid;
   place-items: center;
-  flex-shrink: 0;
-  font-size: 0.75rem;
-}
-
-.income-stat.is-year {
-  background: linear-gradient(180deg, rgba(194, 65, 12, 0.08) 0%, var(--fp-card) 70%);
-}
-
-.income-stat.is-year .income-stat-icon {
-  background: #fff4e8;
-  color: #c2410c;
-}
-
-.income-stat.is-share {
-  background: linear-gradient(180deg, rgba(124, 58, 237, 0.08) 0%, var(--fp-card) 70%);
-}
-
-.income-stat.is-share .income-stat-icon {
-  background: #f5f3ff;
-  color: #6d28d9;
-}
-
-.income-stat.is-payouts {
-  background: linear-gradient(180deg, rgba(37, 99, 235, 0.08) 0%, var(--fp-card) 70%);
-}
-
-.income-stat.is-payouts .income-stat-icon {
-  background: #e8f3ff;
-  color: #2563eb;
-}
-
-.income-stat.is-life {
-  background: linear-gradient(180deg, rgba(66, 184, 131, 0.12) 0%, var(--fp-card) 70%);
-}
-
-.income-stat.is-life .income-stat-icon {
   background: var(--fp-vue-soft);
   color: var(--fp-vue-dark);
+  font-size: 0.8rem;
 }
 
-.income-stat-label {
-  font-size: 0.68rem;
+.income-heading-text {
+  font-size: 0.82rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  color: var(--fp-navy);
+  white-space: nowrap;
+}
+
+.income-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 180px;
+  padding: 0 0.55rem 0 0.35rem;
+  border: 1px solid var(--fp-border-soft);
+  border-radius: 999px;
+  background: var(--fp-navy-soft);
+}
+
+.income-stat-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  font-size: 0.7rem;
+}
+
+.income-stat.is-year { background: #fff7ed; border-color: #fed7aa; }
+.income-stat.is-year .income-stat-icon { background: #ffedd5; color: #c2410c; }
+.income-stat.is-share { background: #f5f3ff; border-color: #ddd6fe; }
+.income-stat.is-share .income-stat-icon { background: #ede9fe; color: #6d28d9; }
+.income-stat.is-payouts { background: #eff6ff; border-color: #bfdbfe; }
+.income-stat.is-payouts .income-stat-icon { background: #dbeafe; color: #2563eb; }
+.income-stat.is-life { background: var(--fp-vue-soft); border-color: var(--fp-vue-muted); }
+.income-stat.is-life .income-stat-icon { background: #d1fae5; color: var(--fp-vue-dark); }
+
+.income-stat-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
   color: var(--fp-text-muted);
+  white-space: nowrap;
 }
 
 .income-stat-value {
-  margin-left: auto;
-  font-size: 0.92rem;
+  margin-left: 0.15rem;
+  font-size: 0.8rem;
   font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .income-stat.is-year .income-stat-value { color: #c2410c; }
@@ -226,31 +210,35 @@
 .income-stat.is-payouts .income-stat-value { color: #2563eb; }
 .income-stat.is-life .income-stat-value { color: var(--fp-vue-dark); }
 
-.income-stat-chip {
-  height: 20px;
-  padding: 0 0.4rem;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  background: #fff4e8;
-  color: #c2410c;
-  font-size: 0.65rem;
-  font-weight: 700;
+.income-year {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: 140px;
 }
 
-.income-year {
-  flex: 0 0 auto;
+:host ::ng-deep .income-year.fp-select,
+:host ::ng-deep app-fp-dropdown-select.income-year,
+:host ::ng-deep .income-year {
+  width: auto !important;
+  max-width: 140px;
+  display: inline-flex !important;
 }
 
 :host ::ng-deep .income-year .fp-select-trigger {
-  min-width: 0 !important;
-  width: auto;
-  padding-left: 0.5rem;
-  padding-right: 0.45rem;
+  width: auto !important;
+  min-width: 110px !important;
+  max-width: 140px;
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 0 0.55rem !important;
+  font-size: 0.78rem !important;
 }
 
 :host ::ng-deep .income-year .fp-select-label {
-  flex: 0 0 auto;
+  flex: 0 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .income-all {
@@ -258,9 +246,13 @@
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
-  padding: 0 0.85rem;
-  font-size: 0.78rem;
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 0 0.75rem !important;
+  font-size: 0.75rem !important;
   font-weight: 600;
+  white-space: nowrap;
+  margin-left: auto;
 }
 
 @media (max-width: 991.98px) {
@@ -270,5 +262,10 @@
 
   .income-stat {
     flex: 1 1 calc(50% - 0.5rem);
+    max-width: none;
+  }
+
+  .income-all {
+    margin-left: 0;
   }
 }

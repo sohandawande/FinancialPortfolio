@@ -388,3 +388,82 @@ select.fp-filter-control {
     width: 100%;
   }
 }
+
+
+
+/* ===== Compact portfolio filters: one row, small dropdowns ===== */
+.portfolio-toolbar {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  margin-bottom: 0.85rem;
+}
+
+.portfolio-toolbar .fp-filter-bar,
+.fp-filter-bar {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 0.4rem !important;
+  margin-left: auto;
+  margin-bottom: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  width: auto !important;
+}
+
+/* Small dropdowns in filter bar only */
+.portfolio-toolbar app-fp-dropdown-select,
+.fp-filter-bar app-fp-dropdown-select {
+  width: auto !important;
+  min-width: 0 !important;
+  flex: 0 0 auto !important;
+  display: inline-flex !important;
+}
+
+:host ::ng-deep .portfolio-toolbar .fp-select-trigger,
+:host ::ng-deep .fp-filter-bar .fp-select-trigger {
+  width: auto !important;
+  min-width: 118px !important;
+  max-width: 160px;
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 0 0.55rem !important;
+  font-size: 0.78rem !important;
+  border-radius: var(--fp-radius-sm);
+}
+
+:host ::ng-deep .portfolio-toolbar .fp-select-label,
+:host ::ng-deep .fp-filter-bar .fp-select-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fp-filter-clear {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px;
+  flex: 0 0 auto;
+}
+
+.fp-filter-field {
+  height: 34px !important;
+  min-height: 34px !important;
+}
+
+@media (max-width: 767.98px) {
+  .portfolio-toolbar {
+    flex-wrap: wrap;
+  }
+
+  .portfolio-toolbar .fp-filter-bar,
+  .fp-filter-bar {
+    flex-wrap: wrap !important;
+    width: 100%;
+    margin-left: 0;
+  }
+}

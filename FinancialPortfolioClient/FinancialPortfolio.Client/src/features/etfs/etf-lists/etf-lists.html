@@ -1,0 +1,20 @@
+<div class="page-container">
+  <app-page-header
+    title="ETFs"
+    subtitle="Live market snapshot from your synced Google Sheet data."
+    [actions]="headerActions()"
+    (actionClick)="onHeaderAction($event)">
+  </app-page-header>
+
+  <app-data-grid
+    [columns]="columns()"
+    [data]="etfs()"
+    [loading]="loading()"
+    [totalRecords]="totalRecords()"
+    [query]="query()"
+    emptyMessage="No etfs found"
+    (queryChange)="onQueryChange($event)"
+    (columnsChange)="onColumnsChange($event)"
+  >
+  </app-data-grid>
+</div>

@@ -43,9 +43,16 @@ namespace FinancialPortfolio.Business.Services.Wealth
             var funds = await MapFundsAsync(portfolio.Id, cancellationToken);
             var fds = await MapFdsAsync(portfolio.Id, cancellationToken);
             var rds = await MapRdsAsync(portfolio.Id, cancellationToken);
-            var equity = await MapEquityAsync(portfolio.Id, cancellationToken);
+            var (equity, etfs) = await MapEquityBucketsAsync(portfolio.Id, cancellationToken);
 
-            var buckets = new List<WealthBucketResponse> { equity, Bucket("mf", "Mutual funds", funds.Sum(x => x.InvestedAmount), funds.Sum(x => x.CurrentValue), funds.Count), Bucket("fd", "Fixed deposits", fds.Sum(x => x.Principal), fds.Sum(x => x.CurrentValue), fds.Count), Bucket("rd", "Recurring deposits", rds.Sum(x => x.InvestedAmount), rds.Sum(x => x.CurrentValue), rds.Count) };
+            var buckets = new List<WealthBucketResponse>
+            {
+                equity,
+                etfs, // always present so Wealth UI shows an ETFs card
+                Bucket("mf", "Mutual funds", funds.Sum(x => x.InvestedAmount), funds.Sum(x => x.CurrentValue), funds.Count),
+                Bucket("fd", "Fixed deposits", fds.Sum(x => x.Principal), fds.Sum(x => x.CurrentValue), fds.Count),
+                Bucket("rd", "Recurring deposits", rds.Sum(x => x.InvestedAmount), rds.Sum(x => x.CurrentValue), rds.Count)
+            };
             var invested = buckets.Sum(b => b.Invested);
             var value = buckets.Sum(b => b.CurrentValue);
             foreach (var b in buckets)
@@ -196,7 +203,7 @@ namespace FinancialPortfolio.Business.Services.Wealth
             return tracked ?? throw new NotFoundException("Create a portfolio first.");
         }
 
-        private async Task<WealthBucketResponse> MapEquityAsync(long portfolioId, CancellationToken cancellationToken)
+        private async Task<(WealthBucketResponse Stocks, WealthBucketResponse Etfs)> MapEquityBucketsAsync(long portfolioId, CancellationToken cancellationToken)
         {
             var holds = await _context.PortfolioStockHolds
                 .AsNoTracking()
@@ -204,10 +211,35 @@ namespace FinancialPortfolio.Business.Services.Wealth
                 .Where(h => h.PortfolioId == portfolioId && h.RemainingQuantity > 0)
                 .ToListAsync(cancellationToken);
 
+            var etfHolds = holds.Where(IsEtfHolding).ToList();
+            var stockHolds = holds.Where(h => !IsEtfHolding(h)).ToList();
+
+            return (
+                BucketFromHolds("equity", "Stocks", stockHolds),
+                BucketFromHolds("etf", "ETFs", etfHolds)
+            );
+        }
+
+        private static bool IsEtfHolding(PortfolioStockHoldEntity hold)
+        {
+            var series = hold.Stock?.Series ?? string.Empty;
+            var category = hold.Stock?.StockDetail?.Category ?? string.Empty;
+            var company = hold.Stock?.CompanyName ?? string.Empty;
+            var symbol = hold.Stock?.Symbol ?? string.Empty;
+
+            static bool HasEtf(string value) =>
+                value.Contains("ETF", StringComparison.OrdinalIgnoreCase)
+                || value.Contains("Exchange Traded", StringComparison.OrdinalIgnoreCase);
+
+            return HasEtf(series) || HasEtf(category) || HasEtf(company) || HasEtf(symbol);
+        }
+
+        private static WealthBucketResponse BucketFromHolds(string key, string label, List<PortfolioStockHoldEntity> holds)
+        {
             var invested = holds.Sum(h => h.RemainingQuantity * h.PurchasePrice);
             var value = holds.Sum(h => h.RemainingQuantity * (h.Stock.StockDetail?.CurrentPrice ?? h.PurchasePrice));
             var count = holds.Select(h => h.StockId).Distinct().Count();
-            return Bucket("equity", "Stocks", invested, value, count);
+            return Bucket(key, label, invested, value, count);
         }
 
         private async Task<List<MutualFundResponse>> MapFundsAsync(long portfolioId, CancellationToken cancellationToken)

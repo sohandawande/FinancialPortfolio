@@ -60,7 +60,7 @@
             @for (col of visibleColumns(); track col.key) {
               <td [class]="alignClass(col)">
                 @if (col.type === 'actions' && col.actions?.length) {
-                  <div class="d-flex gap-1 flex-wrap justify-content-center">
+                  <div class="d-flex gap-1 flex-nowrap justify-content-center dt-actions-row">
                     @for (action of col.actions; track action.icon) {
                       @if (isActionVisible(action, row)) {
                         <button

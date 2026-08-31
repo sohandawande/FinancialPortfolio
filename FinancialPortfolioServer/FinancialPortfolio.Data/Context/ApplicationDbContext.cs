@@ -1,4 +1,5 @@
 ﻿using FinancialPortfolio.Data.Entities.AppUser;
+using FinancialPortfolio.Data.Entities.Etf;
 using FinancialPortfolio.Data.Entities.Portfolio;
 using FinancialPortfolio.Data.Entities.RefreshToken;
 using FinancialPortfolio.Data.Entities.Stock;
@@ -22,6 +23,8 @@ namespace FinancialPortfolio.Data.Context
         public DbSet<RefreshTokenEntity> RefreshTokens => Set<RefreshTokenEntity>();
         public DbSet<StockEntity> Stocks => Set<StockEntity>();
         public DbSet<StockDetailEntity> StockDetails => Set<StockDetailEntity>();
+        public DbSet<EtfEntity> Etfs => Set<EtfEntity>();
+        public DbSet<EtfDetailEntity> EtfDetails => Set<EtfDetailEntity>();
         public DbSet<AppUserEntity> AppUsers => Set<AppUserEntity>();
         public DbSet<SystemLogEntity> SystemLogs => Set<SystemLogEntity>();
         public DbSet<SystemLogDetailEntity> SystemLogDetails => Set<SystemLogDetailEntity>();

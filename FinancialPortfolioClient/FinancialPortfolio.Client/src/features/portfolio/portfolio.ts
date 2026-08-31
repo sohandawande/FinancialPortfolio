@@ -283,7 +283,12 @@ export class Portfolio implements OnInit {
   { value: 2, label: 'Partial' },
 ];
 
-readonly exchangeOptions: FpDropdownSelectOption[] = [
+readonly exchangeBuyOptions: { value: number; label: string }[] = [
+    { value: 1, label: 'NSE' },
+    { value: 2, label: 'BSE' },
+  ];
+
+  readonly exchangeOptions: FpDropdownSelectOption[] = [
   { value: null, label: 'All exchange' },
   { value: 1, label: 'NSE' },
   { value: 2, label: 'BSE' },
@@ -429,7 +434,12 @@ onStatusChange(value: number | string | null): void {
   this.holdingsQuery.update((q) => ({ ...q, pageNumber: 1 }));
 }
 
-onExchangeChange(value: number | string | null): void {
+onBuyExchangeChange(value: number | string | null): void {
+    const n = Number(value);
+    if (n === 1 || n === 2) this.buyForm.exchange = n;
+  }
+
+  onExchangeChange(value: number | string | null): void {
   this.filterExchange.set(value === '' || value === null ? null : Number(value));
   this.holdingsQuery.update((q) => ({ ...q, pageNumber: 1 }));
   this.soldQuery.update((q) => ({ ...q, pageNumber: 1 }));

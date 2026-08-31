@@ -54,45 +54,124 @@
     (closed)="showModal.set(false)"
     (confirmed)="save()"
   >
-    <div class="div-form">
+    <div class="div-form fp-form">
       <label class="div-field">
-        <span>Search scheme</span>
-        <input class="form-control" [ngModel]="schemeQuery()" (ngModelChange)="onSchemeQuery($event)" placeholder="Type 2+ letters…" />
-        @if (searching()) { <small class="text-muted">Searching mfapi…</small> }
+        <span>Search scheme <span class="text-danger">*</span></span>
+        <input
+          class="form-control"
+          [ngModel]="schemeQuery()"
+          (ngModelChange)="onSchemeQuery($event)"
+          placeholder="Type 2+ letters…"
+          autocomplete="off"
+        />
+        @if (searching()) {
+          <small class="text-muted">Searching mfapi…</small>
+        }
+        @if (form.schemeName && !suggestions().length) {
+          <small class="text-muted d-block mt-1">Selected: <strong>{{ form.schemeName }}</strong></small>
+        }
       </label>
+
       @if (suggestions().length) {
-        <div class="list-group mb-2">
+        <div class="list-group mb-2 fp-scheme-suggestions">
           @for (s of suggestions(); track s.schemeCode) {
             <button type="button" class="list-group-item list-group-item-action" (click)="pickScheme(s)">
               <strong>{{ s.schemeName }}</strong>
-              <small class="d-block text-muted">{{ s.schemeCode }}</small>
+              <small class="d-block text-muted">
+                Code {{ s.schemeCode }}
+                @if (s.amc) { · {{ s.amc }} }
+              </small>
             </button>
           }
         </div>
       }
-      <label class="div-field"><span>Scheme</span><input class="form-control" [(ngModel)]="form.schemeName" /></label>
-      <label class="div-field"><span>AMC</span><input class="form-control" [(ngModel)]="form.amc" /></label>
+
+      <label class="div-field">
+        <span>AMC</span>
+        <input class="form-control" [(ngModel)]="form.amc" placeholder="Auto-filled from scheme" />
+      </label>
+
       <div class="row g-2">
-        <div class="col-6"><label class="div-field"><span>Folio</span><input class="form-control" [(ngModel)]="form.folioNumber" /></label></div>
-        <div class="col-6"><label class="div-field"><span>Scheme code</span><input type="number" class="form-control" [(ngModel)]="form.schemeCode" /></label></div>
+        <div class="col-6">
+          <label class="div-field">
+            <span>Folio</span>
+            <input class="form-control" [(ngModel)]="form.folioNumber" />
+          </label>
+        </div>
+        <div class="col-6">
+          <label class="div-field">
+            <span>Scheme code</span>
+            <input
+              type="number"
+              class="form-control"
+              [(ngModel)]="form.schemeCode"
+              readonly
+              tabindex="-1"
+            />
+          </label>
+        </div>
       </div>
+
       <label class="div-field">
         <span>Type</span>
-        <select class="form-select" [(ngModel)]="form.schemeType">
-          <option [ngValue]="1">Equity</option>
-          <option [ngValue]="2">Debt</option>
-          <option [ngValue]="3">Hybrid</option>
-          <option [ngValue]="4">Index</option>
-          <option [ngValue]="5">Other</option>
-        </select>
+        <app-fp-dropdown-select
+          icon="bi-tags"
+          ariaLabel="Scheme type"
+          [options]="schemeTypeOptions"
+          [value]="form.schemeType"
+          (valueChange)="onSchemeTypeChange($event)"
+        />
       </label>
+
       <div class="row g-2">
-        <div class="col-4"><label class="div-field"><span>Units</span><input type="number" class="form-control" [(ngModel)]="form.units" /></label></div>
-        <div class="col-4"><label class="div-field"><span>Avg NAV</span><input type="number" class="form-control" [(ngModel)]="form.averageNav" /></label></div>
-        <div class="col-4"><label class="div-field"><span>Current NAV</span><input type="number" class="form-control" [(ngModel)]="form.currentNav" /></label></div>
+        <div class="col-4">
+          <label class="div-field">
+            <span>Units <span class="text-danger">*</span></span>
+            <input
+              type="number"
+              class="form-control"
+              [(ngModel)]="form.units"
+              name="mfUnits"
+              [class.is-invalid]="mfTouched['units'] && !(form.units > 0)"
+              (blur)="mfTouched['units'] = true"
+            />
+            @if (mfTouched['units'] && !(form.units > 0)) {
+              <div class="invalid-feedback d-block small">Units must be greater than 0</div>
+            }
+          </label>
+        </div>
+        <div class="col-4">
+          <label class="div-field">
+            <span>Avg NAV <span class="text-danger">*</span></span>
+            <input
+              type="number"
+              class="form-control"
+              [(ngModel)]="form.averageNav"
+              name="mfAvg"
+              [class.is-invalid]="mfTouched['averageNav'] && !(form.averageNav > 0)"
+              (blur)="mfTouched['averageNav'] = true"
+            />
+            @if (mfTouched['averageNav'] && !(form.averageNav > 0)) {
+              <div class="invalid-feedback d-block small">Average NAV must be greater than 0</div>
+            }
+          </label>
+        </div>
+        <div class="col-4">
+          <label class="div-field">
+            <span>Current NAV</span>
+            <input type="number" class="form-control" [(ngModel)]="form.currentNav" />
+          </label>
+        </div>
       </div>
-      <label class="div-field"><span>Purchase date</span><app-fp-date name="mfDate" [(ngModel)]="form.purchaseDate" /></label>
-      <label class="div-field"><span>Notes</span><input class="form-control" [(ngModel)]="form.notes" /></label>
+
+      <label class="div-field">
+        <span>Purchase date</span>
+        <app-fp-date name="mfDate" [(ngModel)]="form.purchaseDate" />
+      </label>
+      <label class="div-field">
+        <span>Notes</span>
+        <input class="form-control" [(ngModel)]="form.notes" />
+      </label>
     </div>
   </app-fp-modal>
 }

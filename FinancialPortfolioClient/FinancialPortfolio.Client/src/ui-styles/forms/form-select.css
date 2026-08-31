@@ -1,37 +1,266 @@
-/* Reusable select/dropdown presentation. */
+/* =============================================================================
+   Unified dropdown / select design
+   - Native <select class="form-select">
+   - Wrapper .fp-select-wrap
+   - Custom app-fp-dropdown-select (.fp-select / .fp-select-trigger)
+   All should look identical: height, radius, border, focus ring, chevron.
+   ============================================================================= */
 
-.fp-select-wrap {
-  position: relative;
+:root {
+  --fp-select-height: 44px;
+  --fp-select-height-sm: 36px;
+  --fp-select-radius: 0.65rem;
+  --fp-select-padding-x: 0.78rem;
 }
 
-.fp-select-wrap .form-select {
+/* ---- Native Bootstrap select (single look) ---- */
+
+.form-select {
+  width: 100%;
+  min-height: var(--fp-select-height);
+  height: var(--fp-select-height);
+  padding: 0.45rem 2.4rem 0.45rem var(--fp-select-padding-x);
+  border: 1px solid var(--fp-border);
+  border-radius: var(--fp-select-radius);
+  color: var(--fp-text);
+  background-color: var(--fp-card);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+  background-size: 12px 12px;
+  font-size: var(--fp-fs-md);
+  font-weight: 500;
+  line-height: 1.4;
+  box-shadow: none;
   appearance: none;
   -webkit-appearance: none;
   cursor: pointer;
+  transition:
+    border-color var(--fp-transition),
+    box-shadow var(--fp-transition),
+    background-color var(--fp-transition);
 }
 
-.fp-select-wrap::after {
-  position: absolute;
-  top: 50%;
-  right: .8rem;
-  z-index: 2;
+.form-select:hover {
+  border-color: #c5d0dc;
+}
+
+.form-select:focus {
+  border-color: var(--fp-vue);
+  outline: 0;
+  box-shadow: 0 0 0 4px rgba(66, 184, 131, 0.16);
+  background-color: var(--fp-card);
+  color: var(--fp-text);
+}
+
+.form-select:disabled {
+  opacity: 0.7;
+  background-color: var(--fp-navy-soft);
+  cursor: not-allowed;
+}
+
+.form-select-sm,
+.input-group-sm > .form-select {
+  min-height: var(--fp-select-height-sm);
+  height: var(--fp-select-height-sm);
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  font-size: var(--fp-fs-sm);
+  background-position: right 0.65rem center;
+  background-size: 11px 11px;
+}
+
+/* Optional wrapper (hides default arrow if you use ::after) */
+.fp-select-wrap {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.fp-select-wrap .form-select {
+  width: 100%;
+}
+
+/* ---- Custom app-fp-dropdown-select host ---- */
+
+.fp-select,
+app-fp-dropdown-select {
+  position: relative;
+  display: inline-flex;
+  width: auto; /* toolbar/filter: shrink-to-fit */
+  min-width: 0;
+  max-width: 100%;
+  vertical-align: middle;
+}
+
+/* Full width only inside forms / modal fields */
+.fp-form app-fp-dropdown-select,
+.fp-form-modal app-fp-dropdown-select,
+.fp-field app-fp-dropdown-select,
+.modal-body app-fp-dropdown-select,
+.div-field app-fp-dropdown-select {
+  width: 100%;
+}
+
+.fp-form .fp-select-trigger,
+.fp-form-modal .fp-select-trigger,
+.fp-field .fp-select-trigger,
+.modal-body .fp-select-trigger {
+  width: 100%;
+}
+
+.fp-select-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: auto;
+  min-width: 7.5rem;
+  min-height: var(--fp-select-height);
+  height: var(--fp-select-height);
+  padding: 0.35rem 0.75rem 0.35rem var(--fp-select-padding-x);
+  border: 1px solid var(--fp-border);
+  border-radius: var(--fp-select-radius);
+  background: var(--fp-card);
+  color: var(--fp-text);
+  font-size: var(--fp-fs-md);
+  font-weight: 500;
+  line-height: 1.3;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color var(--fp-transition),
+    box-shadow var(--fp-transition),
+    background-color var(--fp-transition);
+}
+
+.fp-select-trigger:hover:not(:disabled) {
+  border-color: #c5d0dc;
+}
+
+.fp-select-trigger.open,
+.fp-select-trigger:focus-visible {
+  border-color: var(--fp-vue);
+  outline: 0;
+  box-shadow: 0 0 0 4px rgba(66, 184, 131, 0.16);
+}
+
+.fp-select-trigger:disabled {
+  opacity: 0.7;
+  background: var(--fp-navy-soft);
+  cursor: not-allowed;
+}
+
+.fp-select-icon {
+  color: var(--fp-vue);
+  line-height: 1;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.fp-select-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fp-select-caret {
   color: var(--fp-text-muted);
-  font-family: "bootstrap-icons";
-  font-size: .78rem;
-  pointer-events: none;
-  content: "\f282";
-  transform: translateY(-50%);
+  font-size: 0.7rem;
+  margin-left: auto;
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
 }
 
-.fp-select-wrap:focus-within::after {
+.fp-select-trigger.open .fp-select-caret {
+  transform: rotate(180deg);
+}
+
+.fp-select-menu {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  left: 0;
+  right: 0;
+  z-index: 1080;
+  min-width: 100%;
+  max-height: 260px;
+  overflow: auto;
+  padding: 0.35rem;
+  border-radius: var(--fp-select-radius);
+  background: var(--fp-card);
+  border: 1px solid var(--fp-border-soft);
+  box-shadow: var(--fp-shadow-lg);
+}
+
+.fp-select-option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border: 0;
+  border-radius: 0.45rem;
+  background: transparent;
+  color: var(--fp-navy);
+  padding: 0.5rem 0.65rem;
+  font-size: var(--fp-fs-sm);
+  font-weight: 600;
+  text-align: left;
+  min-height: var(--fp-select-height-sm);
+  cursor: pointer;
+}
+
+.fp-select-option:hover,
+.fp-select-option.active {
+  background: var(--fp-vue-soft);
+  color: var(--fp-vue-dark);
+}
+
+.fp-select-option i {
   color: var(--fp-vue);
 }
 
+/* Compact variant for toolbars / filters */
+.fp-select.fp-select-sm .fp-select-trigger,
+.fp-select-sm .fp-select-trigger {
+  min-height: var(--fp-select-height-sm);
+  height: var(--fp-select-height-sm);
+  font-size: var(--fp-fs-sm);
+  padding-left: 0.65rem;
+  padding-right: 0.55rem;
+}
+
+/* Dark theme */
+html[data-theme="dark"] .form-select,
+html[data-theme="dark"] .fp-select-trigger {
+  background-color: var(--fp-card);
+  border-color: var(--fp-border);
+  color: var(--fp-text);
+}
+
+html[data-theme="dark"] .fp-select-menu {
+  background: var(--fp-card);
+  border-color: var(--fp-border);
+}
+
+html[data-theme="dark"] .fp-select-option {
+  color: var(--fp-text);
+}
+
+html[data-theme="dark"] .fp-select-option:hover,
+html[data-theme="dark"] .fp-select-option.active {
+  background: rgba(66, 184, 131, 0.15);
+  color: var(--fp-vue);
+}
+
+/* Bootstrap dropdown menus (if used) */
 .fp-dropdown-menu {
   min-width: 12rem;
-  padding: .4rem;
+  padding: 0.4rem;
   border: 1px solid var(--fp-border);
-  border-radius: .75rem;
+  border-radius: 0.75rem;
   background: var(--fp-card);
   box-shadow: var(--fp-shadow-lg);
 }
@@ -40,8 +269,8 @@
   min-height: 36px;
   display: flex;
   align-items: center;
-  gap: .5rem;
-  border-radius: .5rem;
+  gap: 0.5rem;
+  border-radius: 0.5rem;
   color: var(--fp-text);
   font-size: var(--fp-fs-sm);
 }

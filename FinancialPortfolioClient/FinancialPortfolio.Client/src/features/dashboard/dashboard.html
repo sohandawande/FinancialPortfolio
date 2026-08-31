@@ -1,159 +1,201 @@
-<div class="page-container">
-  <!-- Hero welcome -->
-  <div class="dash-hero mb-4">
-    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-      <div>
-        <p class="dash-eyebrow mb-1">
-          <i class="bi bi-sparkles me-1"></i> Overview
-        </p>
-        <h1 class="dash-title mb-1">Welcome back</h1>
-        <p class="dash-sub mb-0">Track holdings, markets and activity in one place.</p>
-      </div>
-      <div class="d-flex flex-wrap gap-2">
-        <a routerLink="/stocks" class="btn btn-primary btn-sm">
-          <i class="bi bi-graph-up-arrow me-1"></i> View stocks
-        </a>
-        <a routerLink="/portfolio" class="btn btn-outline-primary btn-sm">
-          <i class="bi bi-wallet2 me-1"></i> Portfolio
-        </a>
-      </div>
+<div class="page-container dash-page">
+  <!-- Hero -->
+  <section class="dash-hero">
+    <div class="dash-hero-copy">
+      <p class="dash-eyebrow">
+        <i class="bi bi-stars"></i>
+        <span>Overview · {{ todayLabel }}</span>
+      </p>
+      <h1 class="dash-title">{{ greeting }}</h1>
+      <p class="dash-sub">
+        Your portfolio, markets and wealth — clear at a glance.
+      </p>
     </div>
+    <div class="dash-hero-actions">
+      <a routerLink="/wealth" class="btn btn-primary dash-btn">
+        <i class="bi bi-pie-chart-fill"></i> Wealth
+      </a>
+      <a routerLink="/portfolio" class="btn btn-outline-primary dash-btn">
+        <i class="bi bi-briefcase"></i> Portfolio
+      </a>
+      <a routerLink="/stocks" class="btn btn-outline-secondary dash-btn">
+        <i class="bi bi-graph-up-arrow"></i> Stocks
+      </a>
+    </div>
+  </section>
+
+  <!-- KPI row -->
+  <div class="dash-kpis">
+    <article class="dash-kpi is-value">
+      <div class="dash-kpi-icon"><i class="bi bi-wallet2"></i></div>
+      <div class="dash-kpi-body">
+        <span class="dash-kpi-label">Portfolio value</span>
+        @if (loading()) {
+          <span class="dash-kpi-value is-muted">…</span>
+        } @else if (summary(); as s) {
+          <span class="dash-kpi-value">{{ s.totalCurrentValue | currency: 'INR' : 'symbol' : '1.0-0' }}</span>
+          <span class="dash-kpi-hint">Invested {{ s.totalInvested | currency: 'INR' : 'symbol' : '1.0-0' }}</span>
+        } @else {
+          <span class="dash-kpi-value is-muted">—</span>
+          <span class="dash-kpi-hint">Create a portfolio to start</span>
+        }
+      </div>
+    </article>
+
+    <article class="dash-kpi is-pnl">
+      <div class="dash-kpi-icon"><i class="bi bi-graph-up-arrow"></i></div>
+      <div class="dash-kpi-body">
+        <span class="dash-kpi-label">Overall P&amp;L</span>
+        @if (loading()) {
+          <span class="dash-kpi-value is-muted">…</span>
+        } @else if (summary(); as s) {
+          <span
+            class="dash-kpi-value"
+            [class.is-up]="s.totalGainLoss >= 0"
+            [class.is-down]="s.totalGainLoss < 0"
+          >
+            {{ s.totalGainLoss | currency: 'INR' : 'symbol' : '1.0-0' }}
+            <small>({{ s.totalGainLossPercent | number: '1.2-2' }}%)</small>
+          </span>
+          <span class="dash-kpi-hint">Across stocks, MF, FD &amp; RD</span>
+        } @else {
+          <span class="dash-kpi-value is-muted">—</span>
+          <span class="dash-kpi-hint">Live once holdings sync</span>
+        }
+      </div>
+    </article>
+
+    <article class="dash-kpi is-positions">
+      <div class="dash-kpi-icon"><i class="bi bi-layers"></i></div>
+      <div class="dash-kpi-body">
+        <span class="dash-kpi-label">Open positions</span>
+        @if (loading()) {
+          <span class="dash-kpi-value is-muted">…</span>
+        } @else {
+          <span class="dash-kpi-value">
+            {{ (bucket('equity')?.count ?? 0) + (bucket('etf')?.count ?? 0) }}
+          </span>
+          <span class="dash-kpi-hint">Active stock &amp; ETF lots</span>
+        }
+      </div>
+    </article>
+
+    <article class="dash-kpi is-wealth">
+      <div class="dash-kpi-icon"><i class="bi bi-pie-chart"></i></div>
+      <div class="dash-kpi-body">
+        <span class="dash-kpi-label">Asset classes</span>
+        @if (loading()) {
+          <span class="dash-kpi-value is-muted">…</span>
+        } @else {
+          <span class="dash-kpi-value">{{ summary()?.buckets?.length || 0 }}</span>
+          <span class="dash-kpi-hint">Tracked in Wealth</span>
+        }
+      </div>
+    </article>
   </div>
 
-  <!-- Stat cards -->
-  <div class="row g-3 mb-4">
-    <div class="col-12 col-sm-6 col-xl-3">
-      <div class="stat-card">
-        <div class="d-flex align-items-start justify-content-between">
-          <div>
-            <div class="stat-label">Portfolio value</div>
-            <div class="stat-value">—</div>
-            <div class="stat-hint">Coming with portfolio module</div>
-          </div>
-          <div class="stat-icon vue">
-            <i class="bi bi-wallet2"></i>
-          </div>
+  <!-- Allocation strip -->
+  @if (summary(); as s) {
+    @if (s.buckets.length) {
+      <section class="dash-alloc">
+        <div class="dash-alloc-head">
+          <h2>Allocation</h2>
+          <a routerLink="/wealth" class="dash-link">Open wealth <i class="bi bi-arrow-right"></i></a>
         </div>
-      </div>
-    </div>
-    <div class="col-12 col-sm-6 col-xl-3">
-      <div class="stat-card">
-        <div class="d-flex align-items-start justify-content-between">
-          <div>
-            <div class="stat-label">Today’s P&amp;L</div>
-            <div class="stat-value text-vue">—</div>
-            <div class="stat-hint">Live once holdings sync</div>
-          </div>
-          <div class="stat-icon vue">
-            <i class="bi bi-graph-up"></i>
-          </div>
+        <div class="dash-alloc-grid">
+          @for (b of s.buckets; track b.key) {
+            <a class="dash-alloc-card" [routerLink]="b.key === 'equity' || b.key === 'stocks' ? '/holdings' : b.key === 'etf' || b.key === 'etfs' ? '/etfs' : b.key === 'mf' ? '/mutual-funds' : b.key === 'fd' ? '/fixed-deposits' : b.key === 'rd' ? '/recurring-deposits' : '/wealth'" [attr.data-key]="b.key">
+              <div class="dash-alloc-top">
+                <span>{{ b.label }}</span>
+                <span>{{ b.allocationPercent | number: '1.1-1' }}%</span>
+              </div>
+              <div class="dash-alloc-val">{{ b.currentValue | currency: 'INR' : 'symbol' : '1.0-0' }}</div>
+              <div class="dash-alloc-bar"><span [style.width.%]="b.allocationPercent"></span></div>
+            </a>
+          }
         </div>
-      </div>
-    </div>
-    <div class="col-12 col-sm-6 col-xl-3">
-      <div class="stat-card">
-        <div class="d-flex align-items-start justify-content-between">
-          <div>
-            <div class="stat-label">Open positions</div>
-            <div class="stat-value">—</div>
-            <div class="stat-hint">Active lots in portfolio</div>
-          </div>
-          <div class="stat-icon navy">
-            <i class="bi bi-collection"></i>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-12 col-sm-6 col-xl-3">
-      <div class="stat-card">
-        <div class="d-flex align-items-start justify-content-between">
-          <div>
-            <div class="stat-label">Watchlist</div>
-            <div class="stat-value">—</div>
-            <div class="stat-hint">Synced from Google Sheet</div>
-          </div>
-          <div class="stat-icon info">
-            <i class="bi bi-bookmark-star"></i>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+      </section>
+    }
+  }
 
-  <!-- Quick links + tips -->
-  <div class="row g-3">
-    <div class="col-12 col-lg-7">
-      <div class="fp-card h-100 mb-0">
-        <div class="d-flex align-items-center gap-2 mb-3">
-          <span class="stat-icon vue" style="width:36px;height:36px;font-size:1rem">
-            <i class="bi bi-lightning-charge-fill"></i>
-          </span>
-          <h2 class="fp-section-title">Quick actions</h2>
-        </div>
-        <div class="row g-2">
-          <div class="col-6 col-md-4">
-            <a routerLink="/stocks" class="quick-tile">
-              <i class="bi bi-graph-up-arrow"></i>
-              <span>Stocks</span>
-            </a>
-          </div>
-          <div class="col-6 col-md-4">
-            <a routerLink="/portfolio" class="quick-tile">
-              <i class="bi bi-wallet2"></i>
-              <span>Portfolio</span>
-            </a>
-          </div>
-          <div class="col-6 col-md-4">
-            <a routerLink="/users/manage" class="quick-tile">
-              <i class="bi bi-people"></i>
-              <span>Users</span>
-            </a>
-          </div>
-          <div class="col-6 col-md-4">
-            <a routerLink="/system-logs" class="quick-tile">
-              <i class="bi bi-journal-text"></i>
-              <span>Logs</span>
-            </a>
-          </div>
-          <div class="col-6 col-md-4">
-            <a routerLink="/change-password" class="quick-tile">
-              <i class="bi bi-key"></i>
-              <span>Password</span>
-            </a>
-          </div>
-          <div class="col-6 col-md-4">
-            <a routerLink="/stocks" class="quick-tile">
-              <i class="bi bi-arrow-repeat"></i>
-              <span>Sync sheet</span>
-            </a>
-          </div>
-        </div>
+  <!-- Bottom: quick actions + tips -->
+  <div class="dash-bottom">
+    <section class="dash-panel dash-quick">
+      <div class="dash-panel-head">
+        <span class="dash-panel-icon is-bolt"><i class="bi bi-lightning-charge-fill"></i></span>
+        <h2>Quick actions</h2>
       </div>
-    </div>
+      <div class="dash-tiles">
+        <a routerLink="/stocks" class="quick-tile">
+          <i class="bi bi-graph-up-arrow"></i>
+          <span>Stocks</span>
+        </a>
+        <a routerLink="/etfs" class="quick-tile">
+          <i class="bi bi-bar-chart-steps"></i>
+          <span>ETFs</span>
+        </a>
+        <a routerLink="/portfolio" class="quick-tile">
+          <i class="bi bi-briefcase"></i>
+          <span>Portfolio</span>
+        </a>
+        <a routerLink="/wealth" class="quick-tile">
+          <i class="bi bi-pie-chart"></i>
+          <span>Wealth</span>
+        </a>
+        <a routerLink="/holdings" class="quick-tile">
+          <i class="bi bi-layers"></i>
+          <span>Holdings</span>
+        </a>
+        <a routerLink="/mutual-funds" class="quick-tile">
+          <i class="bi bi-pie-chart-fill"></i>
+          <span>Mutual funds</span>
+        </a>
+        <a routerLink="/dividends" class="quick-tile">
+          <i class="bi bi-cash-coin"></i>
+          <span>Dividends</span>
+        </a>
+        <a routerLink="/users/manage" class="quick-tile">
+          <i class="bi bi-people"></i>
+          <span>Users</span>
+        </a>
+        <a routerLink="/system-logs" class="quick-tile">
+          <i class="bi bi-journal-text"></i>
+          <span>Logs</span>
+        </a>
+        <a routerLink="/change-password" class="quick-tile">
+          <i class="bi bi-key"></i>
+          <span>Password</span>
+        </a>
+      </div>
+    </section>
 
-    <div class="col-12 col-lg-5">
-      <div class="fp-card h-100 mb-0 dash-tip">
-        <div class="d-flex align-items-center gap-2 mb-2">
-          <span class="stat-icon navy" style="width:36px;height:36px;font-size:1rem">
-            <i class="bi bi-info-circle"></i>
-          </span>
-          <h2 class="fp-section-title">Getting started</h2>
-        </div>
-        <ul class="dash-tips list-unstyled mb-0">
-          <li>
-            <i class="bi bi-check2-circle text-vue"></i>
-            Sync stocks from Google Sheet under <strong>Stocks</strong>
-          </li>
-          <li>
-            <i class="bi bi-check2-circle text-vue"></i>
-            Approve pending users from <strong>Users</strong>
-          </li>
-          <li>
-            <i class="bi bi-check2-circle text-vue"></i>
-            Portfolio holdings &amp; P&amp;L will appear here soon
-          </li>
-        </ul>
+    <section class="dash-panel dash-tips-panel">
+      <div class="dash-panel-head">
+        <span class="dash-panel-icon is-info"><i class="bi bi-lightbulb"></i></span>
+        <h2>Getting started</h2>
       </div>
-    </div>
+      <ul class="dash-tips">
+        <li>
+          <i class="bi bi-check2-circle"></i>
+          <span>Sync market data under <strong>Stocks</strong> or <strong>ETFs</strong></span>
+        </li>
+        <li>
+          <i class="bi bi-check2-circle"></i>
+          <span>Buy lots from <strong>Portfolio</strong> to track holdings &amp; P&amp;L</span>
+        </li>
+        <li>
+          <i class="bi bi-check2-circle"></i>
+          <span>See full allocation on the <strong>Wealth</strong> page</span>
+        </li>
+        <li>
+          <i class="bi bi-check2-circle"></i>
+          <span>Approve new accounts from <strong>Users</strong></span>
+        </li>
+      </ul>
+      <a routerLink="/wealth" class="dash-cta">
+        Explore wealth overview
+        <i class="bi bi-arrow-right"></i>
+      </a>
+    </section>
   </div>
 </div>

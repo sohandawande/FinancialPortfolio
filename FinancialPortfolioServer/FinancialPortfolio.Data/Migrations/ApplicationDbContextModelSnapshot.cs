@@ -105,6 +105,215 @@ namespace FinancialPortfolio.Data.Migrations
                     b.ToTable("AppUsers", (string)null);
                 });
 
+            modelBuilder.Entity("FinancialPortfolio.Data.Entities.Etf.EtfDetailEntity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("AverageVolume")
+                        .HasColumnType("bigint")
+                        .HasAnnotation("QueryEngine:Filterable", true)
+                        .HasAnnotation("QueryEngine:Sortable", true);
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasAnnotation("QueryEngine:Filterable", true)
+                        .HasAnnotation("QueryEngine:Searchable", true)
+                        .HasAnnotation("QueryEngine:Sortable", true);
+
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2")
+                        .HasAnnotation("QueryEngine:Filterable", true)
+                        .HasAnnotation("QueryEngine:Sortable", true);
+
+                    b.Property<decimal>("CurrentPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasAnnotation("QueryEngine:Filterable", true)
+                        .HasAnnotation("QueryEngine:Sortable", true);
+
+                    b.Property<decimal>("EPS")
+                        .HasColumnType("decimal(18,2)")
+                        .HasAnnotation("QueryEngine:Filterable", true)
+                        .HasAnnotation("QueryEngine:Sortable", true);
+
+                    b.Property<long>("EtfId")
+                        .HasColumnType("bigint");
+
+                    b.Property<decimal>("HighPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasAnnotation("QueryEngine:Filterable", true)
+                        .HasAnnotation("QueryEngine:Sortable", true);
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true)
+                        .HasAnnotation("QueryEngine:Filterable", true)
+                        .HasAnnotation("QueryEngine:Sortable", true);
+
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("datetime2")
+                        .HasAnnotation("QueryEngine:Filterable", true)
+                        .HasAnnotation("QueryEngine:Sortable", true);
+
+                    b.Property<string>("LogoUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<decimal>("LowPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasAnnotation("QueryEngine:Filterable", true)
+                        .HasAnnotation("QueryEngine:Sortable", true);
+
+                    b.Property<decimal>("MarketCap")
+                        .HasPrecision(18, 5)
+                        .HasColumnType("decimal(18,5)")
+                        .HasAnnotation("QueryEngine:Filterable", true)
+                        .HasAnnotation("QueryEngine:Searchable", true)
+                        .HasAnnotation("QueryEngine:Sortable", true);
+
+                    b.Property<long>("ModifiedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2")
+                        .HasAnnotation("QueryEngine:Filterable", true)
+                        .HasAnnotation("QueryEngine:Sortable", true);
+
+                    b.Property<decimal>("OpenPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasAnnotation("QueryEngine:Filterable", true)
+                        .HasAnnotation("QueryEngine:Sortable", true);
+
+                    b.Property<decimal>("PE")
+                        .HasColumnType("decimal(18,2)")
+                        .HasAnnotation("QueryEngine:Filterable", true)
+                        .HasAnnotation("QueryEngine:Sortable", true);
+
+                    b.Property<decimal>("PreviousClose")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasAnnotation("QueryEngine:Filterable", true)
+                        .HasAnnotation("QueryEngine:Sortable", true);
+
+                    b.Property<decimal>("PriceChange")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasAnnotation("QueryEngine:Filterable", true)
+                        .HasAnnotation("QueryEngine:Sortable", true);
+
+                    b.Property<decimal>("PriceChangePercentage")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<long>("Volume")
+                        .HasColumnType("bigint")
+                        .HasAnnotation("QueryEngine:Filterable", true)
+                        .HasAnnotation("QueryEngine:Sortable", true);
+
+                    b.Property<decimal>("Week52High")
+                        .HasPrecision(18, 5)
+                        .HasColumnType("decimal(18,5)")
+                        .HasAnnotation("QueryEngine:Filterable", true)
+                        .HasAnnotation("QueryEngine:Sortable", true);
+
+                    b.Property<decimal>("Week52Low")
+                        .HasPrecision(18, 5)
+                        .HasColumnType("decimal(18,5)")
+                        .HasAnnotation("QueryEngine:Filterable", true)
+                        .HasAnnotation("QueryEngine:Sortable", true);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EtfId")
+                        .IsUnique();
+
+                    b.ToTable("EtfDetails", (string)null);
+                });
+
+            modelBuilder.Entity("FinancialPortfolio.Data.Entities.Etf.EtfEntity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("CompanyName")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)")
+                        .HasAnnotation("QueryEngine:Filterable", true)
+                        .HasAnnotation("QueryEngine:Searchable", true)
+                        .HasAnnotation("QueryEngine:Sortable", true);
+
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2")
+                        .HasAnnotation("QueryEngine:Filterable", true)
+                        .HasAnnotation("QueryEngine:Sortable", true);
+
+                    b.Property<string>("ISINCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasAnnotation("QueryEngine:Filterable", true)
+                        .HasAnnotation("QueryEngine:Searchable", true)
+                        .HasAnnotation("QueryEngine:Sortable", true);
+
+                    b.Property<string>("Industry")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasAnnotation("QueryEngine:Filterable", true)
+                        .HasAnnotation("QueryEngine:Searchable", true)
+                        .HasAnnotation("QueryEngine:Sortable", true);
+
+                    b.Property<long>("ModifiedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2")
+                        .HasAnnotation("QueryEngine:Filterable", true)
+                        .HasAnnotation("QueryEngine:Sortable", true);
+
+                    b.Property<string>("Series")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Symbol")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasAnnotation("QueryEngine:Filterable", true)
+                        .HasAnnotation("QueryEngine:Searchable", true)
+                        .HasAnnotation("QueryEngine:Sortable", true);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ISINCode")
+                        .IsUnique();
+
+                    b.HasIndex("Symbol")
+                        .IsUnique();
+
+                    b.ToTable("Etfs", (string)null);
+                });
+
             modelBuilder.Entity("FinancialPortfolio.Data.Entities.Portfolio.PortfolioEntity", b =>
                 {
                     b.Property<long>("Id")
@@ -1187,6 +1396,17 @@ namespace FinancialPortfolio.Data.Migrations
                     b.Navigation("IdentityUser");
                 });
 
+            modelBuilder.Entity("FinancialPortfolio.Data.Entities.Etf.EtfDetailEntity", b =>
+                {
+                    b.HasOne("FinancialPortfolio.Data.Entities.Etf.EtfEntity", "Etf")
+                        .WithOne("EtfDetail")
+                        .HasForeignKey("FinancialPortfolio.Data.Entities.Etf.EtfDetailEntity", "EtfId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Etf");
+                });
+
             modelBuilder.Entity("FinancialPortfolio.Data.Entities.Portfolio.PortfolioEntity", b =>
                 {
                     b.HasOne("FinancialPortfolio.Data.Entities.AppUser.AppUserEntity", "User")
@@ -1370,6 +1590,11 @@ namespace FinancialPortfolio.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("FinancialPortfolio.Data.Entities.Etf.EtfEntity", b =>
+                {
+                    b.Navigation("EtfDetail");
                 });
 
             modelBuilder.Entity("FinancialPortfolio.Data.Entities.Portfolio.PortfolioEntity", b =>

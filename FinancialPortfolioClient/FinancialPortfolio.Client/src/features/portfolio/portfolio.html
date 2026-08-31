@@ -450,13 +450,14 @@
             </div>
             <div class="col-6">
               <label class="form-label">Exchange</label>
-              <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-building"></i></span>
-                <select class="form-select" [(ngModel)]="buyForm.exchange" [disabled]="buySaving()">
-                  <option [ngValue]="1">NSE</option>
-                  <option [ngValue]="2">BSE</option>
-                </select>
-              </div>
+              <app-fp-dropdown-select
+                icon="bi-building"
+                ariaLabel="Exchange"
+                [options]="exchangeBuyOptions"
+                [value]="buyForm.exchange"
+                [disabled]="buySaving()"
+                (valueChange)="onBuyExchangeChange($event)"
+              />
             </div>
             <div class="col-12">
               <label class="form-label">Notes</label>

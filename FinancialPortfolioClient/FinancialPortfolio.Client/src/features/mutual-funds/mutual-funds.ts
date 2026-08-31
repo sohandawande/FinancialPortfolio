@@ -6,6 +6,7 @@ import { Subject, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import { PageHeader } from '../../layout/components/page-header/page-header';
 import { FpModal } from '../../layout/components/fp-modal/fp-modal';
 import { FpDate } from '../../layout/components/fp-date/fp-date';
+import { FpDropdownSelect, FpDropdownSelectOption } from '../../layout/components/fp-dropdown-select/fp-dropdown-select';
 import { PageHeaderAction } from '../../core/models/page-header/page-header-action.model';
 import { WealthService } from '../../core/services/wealth/wealth.service';
 import { ToastService } from '../../core/services/toast/toast.service';
@@ -28,7 +29,7 @@ import {
 @Component({
   selector: 'app-mutual-funds',
   standalone: true,
-  imports: [CommonModule, FormsModule, PageHeader, FpModal, FpDate, CurrencyPipe, DatePipe],
+  imports: [CommonModule, FormsModule, PageHeader, FpModal, FpDate, FpDropdownSelect, CurrencyPipe, DatePipe],
   templateUrl: './mutual-funds.html',
   styleUrl: '../wealth/wealth.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -37,6 +38,7 @@ export class MutualFunds implements OnInit {
   private readonly api = inject(WealthService);
   private readonly toast = inject(ToastService);
   private readonly confirm = inject(ConfirmModalService);
+  readonly mfTouched: Record<string, boolean> = {};
   private readonly search$ = new Subject<string>();
 
   readonly rows = signal<MutualFund[]>([]);
@@ -48,6 +50,14 @@ export class MutualFunds implements OnInit {
   readonly editId = signal<number | null>(null);
   readonly schemeQuery = signal('');
   readonly suggestions = signal<MutualFundSchemeLookup[]>([]);
+
+  readonly schemeTypeOptions: FpDropdownSelectOption[] = [
+    { value: 1, label: 'Equity' },
+    { value: 2, label: 'Debt' },
+    { value: 3, label: 'Hybrid' },
+    { value: 4, label: 'Index' },
+    { value: 5, label: 'Other' },
+  ];
   readonly searching = signal(false);
   readonly importErrors = signal<string[]>([]);
   readonly importPreview = signal<UpsertMutualFundRequest[]>([]);
@@ -97,7 +107,11 @@ export class MutualFunds implements OnInit {
 
   onSchemeQuery(value: string): void {
     this.schemeQuery.set(value);
-    this.form.schemeName = value;
+    // Keep form.schemeName only from a picked suggestion (avoid duplicate "Scheme" field).
+    if (value.trim() !== (this.form.schemeName || '').trim()) {
+      this.form.schemeName = '';
+      this.form.schemeCode = null;
+    }
     if (value.trim().length >= 2) this.search$.next(value.trim());
     else this.suggestions.set([]);
   }
@@ -105,9 +119,67 @@ export class MutualFunds implements OnInit {
   pickScheme(item: MutualFundSchemeLookup): void {
     this.form.schemeName = item.schemeName;
     this.form.schemeCode = item.schemeCode;
-    if (item.amc) this.form.amc = item.amc;
+    this.form.amc = (item.amc && item.amc.trim()) || this.guessAmc(item.schemeName);
     this.schemeQuery.set(item.schemeName);
     this.suggestions.set([]);
+  }
+
+  onSchemeTypeChange(value: number | string | null): void {
+    const n = Number(value);
+    if (n >= 1 && n <= 5) this.form.schemeType = n as 1 | 2 | 3 | 4 | 5;
+  }
+
+  /** mfapi search rarely returns AMC — derive a sensible house name from the scheme title. */
+  private guessAmc(schemeName: string): string {
+    const name = (schemeName || '').trim();
+    if (!name) return '';
+
+    const known = [
+      'Aditya Birla Sun Life',
+      'Franklin Templeton',
+      'DSP BlackRock',
+      'DSP Mutual Fund',
+      'Nippon India',
+      'Mirae Asset',
+      'Canara Robeco',
+      'PGIM India',
+      'Edelweiss',
+      'Motilal Oswal',
+      'Bandhan',
+      'Mahindra Manulife',
+      'Quant',
+      'Parag Parikh',
+      'PPFAS',
+      'Tata',
+      'ICICI Prudential',
+      'SBI',
+      'HDFC',
+      'Axis',
+      'Kotak',
+      'UTI',
+      'HSBC',
+      'Invesco',
+      'LIC',
+      'Baroda BNP',
+      'BOI',
+      'ITI',
+      'JM Financial',
+      'Sundaram',
+      'Union',
+      'WhiteOak',
+      'Navi',
+      'Groww',
+      'Zerodha',
+    ];
+
+    const lower = name.toLowerCase();
+    for (const amc of known) {
+      if (lower.startsWith(amc.toLowerCase())) return amc;
+    }
+
+    // Fallback: first word (e.g. "HSBC Small Cap…" → HSBC)
+    const first = name.split(/\s+/)[0] || '';
+    return first.replace(/[^A-Za-z0-9&.-]/g, '') || 'Unknown AMC';
   }
 
   open(row?: MutualFund): void {
@@ -133,6 +205,8 @@ export class MutualFunds implements OnInit {
   }
 
   save(): void {
+    this.mfTouched['units'] = true;
+    this.mfTouched['averageNav'] = true;
     if (!this.form.schemeName || this.form.units <= 0 || this.form.averageNav <= 0) {
       this.toast.warning('Scheme, units and average NAV are required');
       return;

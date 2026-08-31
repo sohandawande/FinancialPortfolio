@@ -86,6 +86,16 @@ export const routes: Routes = [
           import('../features/stocks/stock-details/stock-details').then((c) => c.StockDetails),
       },
       {
+        path: 'etfs',
+        loadComponent: () =>
+          import('../features/etfs/etf-lists/etf-lists').then((c) => c.EtfLists),
+      },
+      {
+        path: 'etfs/:id',
+        loadComponent: () =>
+          import('../features/etfs/etf-details/etf-details').then((c) => c.EtfDetails),
+      },
+      {
         path: 'change-password',
         loadComponent: () =>
           import('../auth/change-password/change-password').then((c) => c.ChangePassword),
