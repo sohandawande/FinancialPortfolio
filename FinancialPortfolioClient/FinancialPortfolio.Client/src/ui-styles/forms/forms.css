@@ -717,3 +717,172 @@ html[data-theme="dark"] .fp-stock-price {
     flex: 1 1 auto;
   }
 }
+
+/* =============================================================================
+   Extra reusable patterns — grid forms, list filters, detail panels
+   Use these classes on any feature so every screen looks the same.
+   ============================================================================= */
+
+.fp-form-grid {
+  display: grid;
+  gap: 0.9rem 1rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 576px) {
+  .fp-form-grid.cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 768px) {
+  .fp-form-grid.cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.fp-form-grid .fp-field-span-2 {
+  grid-column: 1 / -1;
+}
+
+.fp-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem 1rem;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--fp-border-soft);
+  border-radius: var(--fp-radius);
+  background: var(--fp-card);
+  box-shadow: var(--fp-shadow);
+}
+
+.fp-filter-bar .fp-field {
+  margin-bottom: 0;
+  min-width: 160px;
+  flex: 1 1 160px;
+}
+
+.fp-filter-bar .fp-filter-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.fp-detail-panel {
+  border: 1px solid var(--fp-border-soft);
+  border-radius: var(--fp-radius);
+  background: var(--fp-card);
+  box-shadow: var(--fp-shadow);
+  overflow: hidden;
+}
+
+.fp-detail-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.9rem 1.15rem;
+  border-bottom: 1px solid var(--fp-border-soft);
+  background: linear-gradient(135deg, var(--fp-vue-soft) 0%, var(--fp-navy-soft) 100%);
+}
+
+.fp-detail-panel-header h2,
+.fp-detail-panel-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--fp-navy);
+}
+
+.fp-detail-panel-body {
+  padding: 1.1rem 1.15rem;
+}
+
+.fp-detail-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 180px) 1fr;
+  gap: 0.5rem 1rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--fp-border-soft);
+  font-size: var(--fp-fs-sm);
+}
+
+.fp-detail-row:last-child {
+  border-bottom: 0;
+}
+
+.fp-detail-label {
+  color: var(--fp-text-muted);
+  font-weight: 600;
+}
+
+.fp-detail-value {
+  color: var(--fp-text);
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.fp-simple-form-card {
+  max-width: 480px;
+  margin: 0 auto;
+  border: 0;
+  border-radius: var(--fp-radius-lg);
+  box-shadow: var(--fp-shadow-lg);
+  background: var(--fp-card);
+}
+
+.fp-simple-form-card .card-body {
+  padding: 1.5rem 1.6rem;
+}
+
+.fp-simple-form-card.wide {
+  max-width: 640px;
+}
+
+.fp-list-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.fp-list-toolbar .fp-list-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+html[data-theme="dark"] .fp-filter-bar,
+html[data-theme="dark"] .fp-detail-panel,
+html[data-theme="dark"] .fp-simple-form-card {
+  background: var(--fp-card);
+  border-color: var(--fp-border);
+}
+
+html[data-theme="dark"] .fp-detail-panel-header {
+  background: linear-gradient(135deg, rgba(66, 184, 131, 0.12) 0%, var(--fp-navy-soft) 100%);
+}
+
+html[data-theme="dark"] .fp-detail-panel-header h2,
+html[data-theme="dark"] .fp-detail-panel-header h3 {
+  color: var(--fp-text);
+}
+
+@media (max-width: 575.98px) {
+  .fp-detail-row {
+    grid-template-columns: 1fr;
+    gap: 0.15rem;
+  }
+
+  .fp-filter-bar .fp-filter-actions {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .fp-filter-bar .fp-filter-actions .btn {
+    flex: 1 1 auto;
+  }
+}

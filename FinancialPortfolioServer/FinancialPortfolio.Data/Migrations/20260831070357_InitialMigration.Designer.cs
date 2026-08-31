@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FinancialPortfolio.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260823143040_InitialMigration")]
+    [Migration("20260831070357_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -738,6 +738,9 @@ namespace FinancialPortfolio.Data.Migrations
                         .HasColumnType("decimal(18,2)")
                         .HasAnnotation("QueryEngine:Filterable", true)
                         .HasAnnotation("QueryEngine:Sortable", true);
+
+                    b.Property<decimal>("PriceChangePercentage")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<long>("StockId")
                         .HasColumnType("bigint");

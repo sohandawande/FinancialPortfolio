@@ -295,6 +295,7 @@ namespace FinancialPortfolio.Data.Migrations
                     EPS = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     MarketCap = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
                     PriceChange = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    PriceChangePercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
                     LogoUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     LastUpdated = table.Column<DateTime>(type: "datetime2", nullable: false),

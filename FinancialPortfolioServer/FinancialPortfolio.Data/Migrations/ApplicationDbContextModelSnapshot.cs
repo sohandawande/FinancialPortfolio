@@ -736,6 +736,9 @@ namespace FinancialPortfolio.Data.Migrations
                         .HasAnnotation("QueryEngine:Filterable", true)
                         .HasAnnotation("QueryEngine:Sortable", true);
 
+                    b.Property<decimal>("PriceChangePercentage")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<long>("StockId")
                         .HasColumnType("bigint");
 

@@ -1,12 +1,80 @@
+/* =============================================================================
+   Shared Bootstrap modal polish (used alongside custom .fp-modal-*)
+   ============================================================================= */
+
 .modal-content {
   border: 0;
-
   border-radius: var(--fp-radius-lg);
-
   box-shadow: var(--fp-shadow-lg);
+  background: var(--fp-card);
+  color: var(--fp-text);
+  overflow: hidden;
 }
 
-.modal-header,
+.modal-header {
+  border-bottom: 1px solid var(--fp-border-soft);
+  padding: 1rem 1.25rem;
+  background: linear-gradient(135deg, var(--fp-vue-soft) 0%, var(--fp-navy-soft) 100%);
+}
+
+.modal-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--fp-navy);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.modal-title i {
+  color: var(--fp-vue);
+}
+
+.modal-body {
+  padding: 1.15rem 1.25rem;
+}
+
 .modal-footer {
-  border-color: var(--fp-border-light);
+  border-top: 1px solid var(--fp-border-soft);
+  padding: 0.85rem 1.25rem 1.1rem;
+  background: var(--fp-navy-soft);
+  gap: 0.5rem;
+}
+
+.modal-footer .btn {
+  min-width: 5.5rem;
+}
+
+.modal-backdrop.show {
+  opacity: 0.48;
+  backdrop-filter: blur(4px);
+}
+
+.modal-body .fp-form,
+.modal-body .fp-form-modal,
+.fp-form-modal {
+  margin: 0;
+}
+
+.fp-form-modal .fp-field,
+.modal-body .fp-field {
+  margin-bottom: 1rem;
+}
+
+.fp-form-modal .fp-field:last-child,
+.modal-body .fp-field:last-child {
+  margin-bottom: 0;
+}
+
+html[data-theme="dark"] .modal-header {
+  background: linear-gradient(135deg, rgba(66, 184, 131, 0.12) 0%, var(--fp-navy-soft) 100%);
+}
+
+html[data-theme="dark"] .modal-title {
+  color: var(--fp-text);
+}
+
+html[data-theme="dark"] .modal-footer {
+  background: var(--fp-card);
+  border-top-color: var(--fp-border);
 }
