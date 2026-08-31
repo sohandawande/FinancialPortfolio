@@ -48,11 +48,12 @@ namespace FinancialPortfolio.Business.Services.Wealth
             var buckets = new List<WealthBucketResponse>
             {
                 equity,
-                etfs, // always present so Wealth UI shows an ETFs card
+                etfs,
                 Bucket("mf", "Mutual funds", funds.Sum(x => x.InvestedAmount), funds.Sum(x => x.CurrentValue), funds.Count),
                 Bucket("fd", "Fixed deposits", fds.Sum(x => x.Principal), fds.Sum(x => x.CurrentValue), fds.Count),
                 Bucket("rd", "Recurring deposits", rds.Sum(x => x.InvestedAmount), rds.Sum(x => x.CurrentValue), rds.Count)
             };
+
             var invested = buckets.Sum(b => b.Invested);
             var value = buckets.Sum(b => b.CurrentValue);
             foreach (var b in buckets)
@@ -158,6 +159,24 @@ namespace FinancialPortfolio.Business.Services.Wealth
             return ResponseFactory.Success(await MapRdsAsync(portfolio.Id, cancellationToken), "Recurring deposits fetched.");
         }
 
+        public async Task<ApiResponse<RecurringDepositResponse>> GetRecurringDepositDetailAsync(long id, CancellationToken cancellationToken)
+        {
+            var portfolio = await RequirePortfolioAsync(cancellationToken);
+            var entity = await _context.PortfolioRecurringDeposits
+                .AsNoTracking()
+                .Include(x => x.Installments)
+                .FirstOrDefaultAsync(x => x.Id == id && x.PortfolioId == portfolio.Id, cancellationToken)
+                ?? throw new NotFoundException("Recurring deposit not found.");
+
+            var response = MapRd(entity);
+            response.Installments = entity.Installments
+                .OrderBy(i => i.InstallmentNumber)
+                .Select(MapInstallment)
+                .ToList();
+
+            return ResponseFactory.Success(response, "RD detail fetched.");
+        }
+
         public async Task<ApiResponse<RecurringDepositResponse>> AddRecurringDepositAsync(UpsertRecurringDepositRequest request, CancellationToken cancellationToken)
         {
             Guard.AgainstNull(request, nameof(request));
@@ -189,6 +208,198 @@ namespace FinancialPortfolio.Business.Services.Wealth
             _context.PortfolioRecurringDeposits.Remove(entity);
             await _context.SaveChangesAsync(cancellationToken);
             return ResponseFactory.Success(true, "Recurring deposit deleted.");
+        }
+
+        public async Task<ApiResponse<List<RdInstallmentResponse>>> GetRdInstallmentsAsync(long rdId, CancellationToken cancellationToken)
+        {
+            var portfolio = await RequirePortfolioAsync(cancellationToken);
+            var exists = await _context.PortfolioRecurringDeposits
+                .AnyAsync(x => x.Id == rdId && x.PortfolioId == portfolio.Id, cancellationToken);
+            if (!exists)
+                throw new NotFoundException("Recurring deposit not found.");
+
+            var rows = await _context.PortfolioRecurringDepositInstallments
+                .AsNoTracking()
+                .Where(x => x.RecurringDepositId == rdId)
+                .OrderBy(x => x.InstallmentNumber)
+                .ToListAsync(cancellationToken);
+
+            return ResponseFactory.Success(rows.Select(MapInstallment).ToList(), "Installments fetched.");
+        }
+
+        public async Task<ApiResponse<RdInstallmentResponse>> PayRdInstallmentAsync(
+            long rdId,
+            PayRdInstallmentRequest request,
+            CancellationToken cancellationToken)
+        {
+            Guard.AgainstNull(request, nameof(request));
+            await _validation.ValidateAsync(request, cancellationToken);
+
+            var portfolio = await RequirePortfolioAsync(cancellationToken);
+            var rd = await _context.PortfolioRecurringDeposits
+                .Include(x => x.Installments)
+                .FirstOrDefaultAsync(x => x.Id == rdId && x.PortfolioId == portfolio.Id, cancellationToken)
+                ?? throw new NotFoundException("Recurring deposit not found.");
+
+            if (rd.Status != DepositStatus.Active)
+                throw new ValidationException("Only active RDs can accept installment payments.");
+
+            var nextNumber = request.InstallmentNumber
+                ?? (rd.Installments.Count > 0
+                    ? rd.Installments.Max(i => i.InstallmentNumber) + 1
+                    : rd.InstallmentsPaid + 1);
+
+            if (nextNumber < 1 || nextNumber > rd.TenureMonths)
+                throw new ValidationException($"Installment number must be between 1 and {rd.TenureMonths}.");
+
+            var dueDate = rd.StartDate.Date.AddMonths(nextNumber - 1);
+            var today = DateTime.UtcNow.Date;
+
+            // Block future installments (due date not yet reached)
+            if (dueDate > today)
+                throw new ValidationException(
+                    $"Cannot record installment #{nextNumber}. Its due date ({dueDate:dd MMM yyyy}) is in the future.");
+
+            var existing = rd.Installments.FirstOrDefault(i => i.InstallmentNumber == nextNumber);
+            if (existing is not null && existing.Status == RdInstallmentStatus.Paid)
+                throw new ValidationException($"Installment #{nextNumber} is already paid.");
+
+            var paidDate = (request.PaidDate ?? DateTime.UtcNow).Date;
+            if (paidDate > today)
+                throw new ValidationException("Paid date cannot be in the future.");
+
+            var amount = request.Amount is > 0 ? request.Amount.Value : rd.MonthlyAmount;
+
+            PortfolioRecurringDepositInstallmentEntity row;
+            if (existing is null)
+            {
+                row = new PortfolioRecurringDepositInstallmentEntity
+                {
+                    RecurringDepositId = rd.Id,
+                    InstallmentNumber = nextNumber,
+                    DueDate = dueDate,
+                    PaidDate = paidDate,
+                    Amount = amount,
+                    FromBankName = string.IsNullOrWhiteSpace(request.FromBankName) ? null : request.FromBankName.Trim(),
+                    FromAccountNumber = string.IsNullOrWhiteSpace(request.FromAccountNumber) ? null : request.FromAccountNumber.Trim(),
+                    FromIfsc = string.IsNullOrWhiteSpace(request.FromIfsc) ? null : request.FromIfsc.Trim().ToUpperInvariant(),
+                    TransactionReference = string.IsNullOrWhiteSpace(request.TransactionReference) ? null : request.TransactionReference.Trim(),
+                    PaymentMode = request.PaymentMode,
+                    Status = RdInstallmentStatus.Paid,
+                    PenaltyAmount = request.PenaltyAmount,
+                    Notes = request.Notes
+                };
+                await _context.PortfolioRecurringDepositInstallments.AddAsync(row, cancellationToken);
+            }
+            else
+            {
+                row = existing;
+                row.PaidDate = paidDate;
+                row.Amount = amount;
+                row.FromBankName = string.IsNullOrWhiteSpace(request.FromBankName) ? row.FromBankName : request.FromBankName.Trim();
+                row.FromAccountNumber = string.IsNullOrWhiteSpace(request.FromAccountNumber) ? row.FromAccountNumber : request.FromAccountNumber.Trim();
+                row.FromIfsc = string.IsNullOrWhiteSpace(request.FromIfsc) ? row.FromIfsc : request.FromIfsc.Trim().ToUpperInvariant();
+                row.TransactionReference = string.IsNullOrWhiteSpace(request.TransactionReference) ? row.TransactionReference : request.TransactionReference.Trim();
+                row.PaymentMode = request.PaymentMode;
+                row.Status = RdInstallmentStatus.Paid;
+                row.PenaltyAmount = request.PenaltyAmount ?? row.PenaltyAmount;
+                row.Notes = request.Notes ?? row.Notes;
+            }
+
+            await _context.SaveChangesAsync(cancellationToken);
+            await SyncRdPaidCountAsync(rd, cancellationToken);
+
+            return ResponseFactory.Success(MapInstallment(row), $"Installment #{nextNumber} recorded.");
+        }
+
+        public async Task<ApiResponse<RdInstallmentResponse>> UpsertRdInstallmentAsync(
+            long rdId,
+            UpsertRdInstallmentRequest request,
+            CancellationToken cancellationToken)
+        {
+            Guard.AgainstNull(request, nameof(request));
+            await _validation.ValidateAsync(request, cancellationToken);
+
+            var portfolio = await RequirePortfolioAsync(cancellationToken);
+            var rd = await _context.PortfolioRecurringDeposits
+                .Include(x => x.Installments)
+                .FirstOrDefaultAsync(x => x.Id == rdId && x.PortfolioId == portfolio.Id, cancellationToken)
+                ?? throw new NotFoundException("Recurring deposit not found.");
+
+            if (request.InstallmentNumber < 1 || request.InstallmentNumber > rd.TenureMonths)
+                throw new ValidationException($"Installment number must be between 1 and {rd.TenureMonths}.");
+
+            var today = DateTime.UtcNow.Date;
+            var dueDate = request.DueDate.Date;
+
+            // Block future installments
+            if (dueDate > today)
+                throw new ValidationException(
+                    $"Cannot save installment #{request.InstallmentNumber}. Due date ({dueDate:dd MMM yyyy}) is in the future.");
+
+            if (request.PaidDate is DateTime pd && pd.Date > today)
+                throw new ValidationException("Paid date cannot be in the future.");
+
+            var row = rd.Installments.FirstOrDefault(i => i.InstallmentNumber == request.InstallmentNumber);
+            if (row is null)
+            {
+                row = new PortfolioRecurringDepositInstallmentEntity
+                {
+                    RecurringDepositId = rd.Id,
+                    InstallmentNumber = request.InstallmentNumber
+                };
+                await _context.PortfolioRecurringDepositInstallments.AddAsync(row, cancellationToken);
+            }
+
+            row.DueDate = request.DueDate.Date;
+            row.PaidDate = request.PaidDate?.Date;
+            row.Amount = request.Amount;
+            row.FromBankName = string.IsNullOrWhiteSpace(request.FromBankName) ? null : request.FromBankName.Trim();
+            row.FromAccountNumber = string.IsNullOrWhiteSpace(request.FromAccountNumber) ? null : request.FromAccountNumber.Trim();
+            row.FromIfsc = string.IsNullOrWhiteSpace(request.FromIfsc) ? null : request.FromIfsc.Trim().ToUpperInvariant();
+            row.TransactionReference = string.IsNullOrWhiteSpace(request.TransactionReference) ? null : request.TransactionReference.Trim();
+            row.PaymentMode = request.PaymentMode;
+            row.Status = request.Status;
+            row.PenaltyAmount = request.PenaltyAmount;
+            row.Notes = request.Notes;
+
+            await _context.SaveChangesAsync(cancellationToken);
+            await SyncRdPaidCountAsync(rd, cancellationToken);
+
+            return ResponseFactory.Success(MapInstallment(row), "Installment saved.");
+        }
+
+        public async Task<ApiResponse<bool>> DeleteRdInstallmentAsync(long rdId, long installmentId, CancellationToken cancellationToken)
+        {
+            var portfolio = await RequirePortfolioAsync(cancellationToken);
+            var rd = await _context.PortfolioRecurringDeposits
+                .FirstOrDefaultAsync(x => x.Id == rdId && x.PortfolioId == portfolio.Id, cancellationToken)
+                ?? throw new NotFoundException("Recurring deposit not found.");
+
+            var row = await _context.PortfolioRecurringDepositInstallments
+                .FirstOrDefaultAsync(x => x.Id == installmentId && x.RecurringDepositId == rdId, cancellationToken)
+                ?? throw new NotFoundException("Installment not found.");
+
+            _context.PortfolioRecurringDepositInstallments.Remove(row);
+            await _context.SaveChangesAsync(cancellationToken);
+            await SyncRdPaidCountAsync(rd, cancellationToken);
+
+            return ResponseFactory.Success(true, "Installment deleted.");
+        }
+
+        private async Task SyncRdPaidCountAsync(PortfolioRecurringDepositEntity rd, CancellationToken cancellationToken)
+        {
+            var paidCount = await _context.PortfolioRecurringDepositInstallments
+                .CountAsync(i => i.RecurringDepositId == rd.Id && i.Status == RdInstallmentStatus.Paid, cancellationToken);
+
+            rd.InstallmentsPaid = Math.Clamp(paidCount, 0, rd.TenureMonths);
+
+            if (rd.InstallmentsPaid >= rd.TenureMonths)
+                rd.Status = DepositStatus.Matured;
+            else if (rd.Status == DepositStatus.Matured)
+                rd.Status = DepositStatus.Active;
+
+            await _context.SaveChangesAsync(cancellationToken);
         }
 
         private async Task<PortfolioEntity?> GetPortfolioOrNullAsync(CancellationToken cancellationToken)
@@ -317,7 +528,10 @@ namespace FinancialPortfolio.Business.Services.Wealth
         private static PortfolioRecurringDepositEntity ApplyRd(PortfolioRecurringDepositEntity entity, UpsertRecurringDepositRequest request)
         {
             entity.BankName = request.BankName.Trim();
+            entity.BankIfsc = string.IsNullOrWhiteSpace(request.BankIfsc) ? null : request.BankIfsc.Trim().ToUpperInvariant();
             entity.AccountRef = string.IsNullOrWhiteSpace(request.AccountRef) ? null : request.AccountRef.Trim();
+            entity.LinkedAccountNumber = string.IsNullOrWhiteSpace(request.LinkedAccountNumber) ? null : request.LinkedAccountNumber.Trim();
+            entity.LinkedIfsc = string.IsNullOrWhiteSpace(request.LinkedIfsc) ? null : request.LinkedIfsc.Trim().ToUpperInvariant();
             entity.MonthlyAmount = request.MonthlyAmount;
             entity.InterestRate = request.InterestRate;
             entity.TenureMonths = request.TenureMonths;
@@ -385,13 +599,18 @@ namespace FinancialPortfolio.Business.Services.Wealth
         private static RecurringDepositResponse MapRd(PortfolioRecurringDepositEntity x)
         {
             var now = DateTime.UtcNow.Date;
-            var paid = DepositMath.ElapsedInstallments(x.StartDate, x.TenureMonths, x.InstallmentsPaid, now);
+            // Use stored paid count only — never auto-infer from calendar months.
+            // Past RDs must be backfilled via Pay installment / Upsert installment.
+            var paid = Math.Clamp(x.InstallmentsPaid, 0, x.TenureMonths);
             var invested = DepositMath.Round(x.MonthlyAmount * paid);
             return new RecurringDepositResponse
             {
                 Id = x.Id,
                 BankName = x.BankName,
+                BankIfsc = x.BankIfsc,
                 AccountRef = x.AccountRef,
+                LinkedAccountNumber = x.LinkedAccountNumber,
+                LinkedIfsc = x.LinkedIfsc,
                 MonthlyAmount = x.MonthlyAmount,
                 InterestRate = x.InterestRate,
                 TenureMonths = x.TenureMonths,
@@ -402,8 +621,27 @@ namespace FinancialPortfolio.Business.Services.Wealth
                 CurrentValue = DepositMath.RdCurrent(x.MonthlyAmount, x.InterestRate, x.TenureMonths, paid, x.StartDate, now),
                 MaturityAmount = DepositMath.RdMaturity(x.MonthlyAmount, x.InterestRate, x.TenureMonths),
                 Status = x.Status == DepositStatus.Active && now >= x.MaturityDate ? DepositStatus.Matured : x.Status,
-                Notes = x.Notes
+                Notes = x.Notes,
+                Installments = []
             };
         }
+
+        private static RdInstallmentResponse MapInstallment(PortfolioRecurringDepositInstallmentEntity x) => new()
+        {
+            Id = x.Id,
+            RecurringDepositId = x.RecurringDepositId,
+            InstallmentNumber = x.InstallmentNumber,
+            DueDate = x.DueDate,
+            PaidDate = x.PaidDate,
+            Amount = x.Amount,
+            FromBankName = x.FromBankName,
+            FromAccountNumber = x.FromAccountNumber,
+            FromIfsc = x.FromIfsc,
+            TransactionReference = x.TransactionReference,
+            PaymentMode = x.PaymentMode,
+            Status = x.Status,
+            PenaltyAmount = x.PenaltyAmount,
+            Notes = x.Notes
+        };
     }
 }

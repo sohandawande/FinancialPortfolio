@@ -506,7 +506,10 @@ namespace FinancialPortfolio.Data.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     PortfolioId = table.Column<long>(type: "bigint", nullable: false),
                     BankName = table.Column<string>(type: "nvarchar(120)", maxLength: 120, nullable: false),
+                    BankIfsc = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: true),
                     AccountRef = table.Column<string>(type: "nvarchar(60)", maxLength: 60, nullable: true),
+                    LinkedAccountNumber = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: true),
+                    LinkedIfsc = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: true),
                     MonthlyAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     InterestRate = table.Column<decimal>(type: "decimal(8,4)", precision: 8, scale: 4, nullable: false),
                     TenureMonths = table.Column<int>(type: "int", nullable: false),
@@ -607,6 +610,41 @@ namespace FinancialPortfolio.Data.Migrations
                         principalTable: "Stocks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PortfolioRecurringDepositInstallments",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RecurringDepositId = table.Column<long>(type: "bigint", nullable: false),
+                    InstallmentNumber = table.Column<int>(type: "int", nullable: false),
+                    DueDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PaidDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    FromBankName = table.Column<string>(type: "nvarchar(120)", maxLength: 120, nullable: true),
+                    FromAccountNumber = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: true),
+                    FromIfsc = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: true),
+                    TransactionReference = table.Column<string>(type: "nvarchar(80)", maxLength: 80, nullable: true),
+                    PaymentMode = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    PenaltyAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
+                    Notes = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
+                    CreatedBy = table.Column<long>(type: "bigint", nullable: true),
+                    ModifiedBy = table.Column<long>(type: "bigint", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PortfolioRecurringDepositInstallments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PortfolioRecurringDepositInstallments_PortfolioRecurringDeposits_RecurringDepositId",
+                        column: x => x.RecurringDepositId,
+                        principalTable: "PortfolioRecurringDeposits",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -726,6 +764,17 @@ namespace FinancialPortfolio.Data.Migrations
                 name: "IX_PortfolioMutualFunds_PortfolioId",
                 table: "PortfolioMutualFunds",
                 column: "PortfolioId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PortfolioRecurringDepositInstallments_RecurringDepositId",
+                table: "PortfolioRecurringDepositInstallments",
+                column: "RecurringDepositId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PortfolioRecurringDepositInstallments_RecurringDepositId_InstallmentNumber",
+                table: "PortfolioRecurringDepositInstallments",
+                columns: new[] { "RecurringDepositId", "InstallmentNumber" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_PortfolioRecurringDeposits_PortfolioId",
@@ -876,7 +925,7 @@ namespace FinancialPortfolio.Data.Migrations
                 name: "PortfolioMutualFunds");
 
             migrationBuilder.DropTable(
-                name: "PortfolioRecurringDeposits");
+                name: "PortfolioRecurringDepositInstallments");
 
             migrationBuilder.DropTable(
                 name: "PortfolioStockDividends");
@@ -898,6 +947,9 @@ namespace FinancialPortfolio.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Etfs");
+
+            migrationBuilder.DropTable(
+                name: "PortfolioRecurringDeposits");
 
             migrationBuilder.DropTable(
                 name: "PortfolioStockHolds");

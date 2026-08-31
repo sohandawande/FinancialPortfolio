@@ -76,6 +76,10 @@ namespace FinancialPortfolio.Api.Controllers.Wealth
         public async Task<IActionResult> RecurringDeposits(CancellationToken cancellationToken)
             => Ok(await _wealth.GetRecurringDepositsAsync(cancellationToken));
 
+        [HttpGet("recurring-deposits/{id:long}")]
+        public async Task<IActionResult> GetRecurringDepositDetail(long id, CancellationToken cancellationToken)
+            => Ok(await _wealth.GetRecurringDepositDetailAsync(id, cancellationToken));
+
         [HttpPost("recurring-deposits")]
         public async Task<IActionResult> AddRecurringDeposit([FromBody] UpsertRecurringDepositRequest request, CancellationToken cancellationToken)
             => Ok(await _wealth.AddRecurringDepositAsync(request, cancellationToken));
@@ -87,5 +91,21 @@ namespace FinancialPortfolio.Api.Controllers.Wealth
         [HttpDelete("recurring-deposits/{id:long}")]
         public async Task<IActionResult> DeleteRecurringDeposit(long id, CancellationToken cancellationToken)
             => Ok(await _wealth.DeleteRecurringDepositAsync(id, cancellationToken));
+
+        [HttpGet("recurring-deposits/{id:long}/installments")]
+        public async Task<IActionResult> GetRdInstallments(long id, CancellationToken cancellationToken)
+            => Ok(await _wealth.GetRdInstallmentsAsync(id, cancellationToken));
+
+        [HttpPost("recurring-deposits/{id:long}/pay")]
+        public async Task<IActionResult> PayRdInstallment(long id, [FromBody] PayRdInstallmentRequest request, CancellationToken cancellationToken)
+            => Ok(await _wealth.PayRdInstallmentAsync(id, request, cancellationToken));
+
+        [HttpPost("recurring-deposits/{id:long}/installments")]
+        public async Task<IActionResult> UpsertRdInstallment(long id, [FromBody] UpsertRdInstallmentRequest request, CancellationToken cancellationToken)
+            => Ok(await _wealth.UpsertRdInstallmentAsync(id, request, cancellationToken));
+
+        [HttpDelete("recurring-deposits/{id:long}/installments/{installmentId:long}")]
+        public async Task<IActionResult> DeleteRdInstallment(long id, long installmentId, CancellationToken cancellationToken)
+            => Ok(await _wealth.DeleteRdInstallmentAsync(id, installmentId, cancellationToken));
     }
 }

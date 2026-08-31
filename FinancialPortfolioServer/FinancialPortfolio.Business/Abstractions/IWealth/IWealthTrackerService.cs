@@ -19,8 +19,14 @@ namespace FinancialPortfolio.Business.Abstractions.IWealth
         Task<ApiResponse<bool>> DeleteFixedDepositAsync(long id, CancellationToken cancellationToken);
 
         Task<ApiResponse<List<RecurringDepositResponse>>> GetRecurringDepositsAsync(CancellationToken cancellationToken);
+        Task<ApiResponse<RecurringDepositResponse>> GetRecurringDepositDetailAsync(long id, CancellationToken cancellationToken);
         Task<ApiResponse<RecurringDepositResponse>> AddRecurringDepositAsync(UpsertRecurringDepositRequest request, CancellationToken cancellationToken);
         Task<ApiResponse<RecurringDepositResponse>> UpdateRecurringDepositAsync(long id, UpsertRecurringDepositRequest request, CancellationToken cancellationToken);
         Task<ApiResponse<bool>> DeleteRecurringDepositAsync(long id, CancellationToken cancellationToken);
+
+        Task<ApiResponse<List<RdInstallmentResponse>>> GetRdInstallmentsAsync(long rdId, CancellationToken cancellationToken);
+        Task<ApiResponse<RdInstallmentResponse>> PayRdInstallmentAsync(long rdId, PayRdInstallmentRequest request, CancellationToken cancellationToken);
+        Task<ApiResponse<RdInstallmentResponse>> UpsertRdInstallmentAsync(long rdId, UpsertRdInstallmentRequest request, CancellationToken cancellationToken);
+        Task<ApiResponse<bool>> DeleteRdInstallmentAsync(long rdId, long installmentId, CancellationToken cancellationToken);
     }
 }

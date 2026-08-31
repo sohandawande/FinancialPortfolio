@@ -8,7 +8,10 @@ namespace FinancialPortfolio.Business.Validators.Wealth
         public UpsertRecurringDepositRequestValidator()
         {
             RuleFor(x => x.BankName).NotEmpty().MaximumLength(120);
+            RuleFor(x => x.BankIfsc).MaximumLength(15);
             RuleFor(x => x.AccountRef).MaximumLength(60);
+            RuleFor(x => x.LinkedAccountNumber).MaximumLength(40);
+            RuleFor(x => x.LinkedIfsc).MaximumLength(15);
             RuleFor(x => x.MonthlyAmount).GreaterThan(0);
             RuleFor(x => x.InterestRate).InclusiveBetween(0, 40);
             RuleFor(x => x.TenureMonths).InclusiveBetween(1, 360);

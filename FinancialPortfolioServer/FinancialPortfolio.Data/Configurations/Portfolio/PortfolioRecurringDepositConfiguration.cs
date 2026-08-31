@@ -13,7 +13,10 @@ namespace FinancialPortfolio.Data.Configurations.Portfolio
             builder.Property(x => x.Id).ValueGeneratedOnAdd();
             builder.Property(x => x.PortfolioId).IsRequired();
             builder.Property(x => x.BankName).HasMaxLength(120).IsRequired();
+            builder.Property(x => x.BankIfsc).HasMaxLength(15);
             builder.Property(x => x.AccountRef).HasMaxLength(60);
+            builder.Property(x => x.LinkedAccountNumber).HasMaxLength(40);
+            builder.Property(x => x.LinkedIfsc).HasMaxLength(15);
             builder.Property(x => x.MonthlyAmount).HasPrecision(18, 2).IsRequired();
             builder.Property(x => x.InterestRate).HasPrecision(8, 4).IsRequired();
             builder.Property(x => x.TenureMonths).IsRequired();

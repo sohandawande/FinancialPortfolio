@@ -530,6 +530,10 @@ namespace FinancialPortfolio.Data.Migrations
                         .HasMaxLength(60)
                         .HasColumnType("nvarchar(60)");
 
+                    b.Property<string>("BankIfsc")
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
                     b.Property<string>("BankName")
                         .IsRequired()
                         .HasMaxLength(120)
@@ -547,6 +551,14 @@ namespace FinancialPortfolio.Data.Migrations
                     b.Property<decimal>("InterestRate")
                         .HasPrecision(8, 4)
                         .HasColumnType("decimal(8,4)");
+
+                    b.Property<string>("LinkedAccountNumber")
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<string>("LinkedIfsc")
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
 
                     b.Property<DateTime>("MaturityDate")
                         .HasColumnType("datetime2");
@@ -584,6 +596,86 @@ namespace FinancialPortfolio.Data.Migrations
                     b.HasIndex("PortfolioId");
 
                     b.ToTable("PortfolioRecurringDeposits", (string)null);
+                });
+
+            modelBuilder.Entity("FinancialPortfolio.Data.Entities.Portfolio.PortfolioRecurringDepositInstallmentEntity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<long?>("CreatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FromAccountNumber")
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<string>("FromBankName")
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<string>("FromIfsc")
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
+                    b.Property<int>("InstallmentNumber")
+                        .HasColumnType("int");
+
+                    b.Property<long?>("ModifiedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime?>("PaidDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PaymentMode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<decimal?>("PenaltyAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<long>("RecurringDepositId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("TransactionReference")
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RecurringDepositId");
+
+                    b.HasIndex("RecurringDepositId", "InstallmentNumber")
+                        .IsUnique();
+
+                    b.ToTable("PortfolioRecurringDepositInstallments", (string)null);
                 });
 
             modelBuilder.Entity("FinancialPortfolio.Data.Entities.Portfolio.PortfolioStockDividendEntity", b =>
@@ -1451,6 +1543,17 @@ namespace FinancialPortfolio.Data.Migrations
                     b.Navigation("Portfolio");
                 });
 
+            modelBuilder.Entity("FinancialPortfolio.Data.Entities.Portfolio.PortfolioRecurringDepositInstallmentEntity", b =>
+                {
+                    b.HasOne("FinancialPortfolio.Data.Entities.Portfolio.PortfolioRecurringDepositEntity", "RecurringDeposit")
+                        .WithMany("Installments")
+                        .HasForeignKey("RecurringDepositId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("RecurringDeposit");
+                });
+
             modelBuilder.Entity("FinancialPortfolio.Data.Entities.Portfolio.PortfolioStockDividendEntity", b =>
                 {
                     b.HasOne("FinancialPortfolio.Data.Entities.Portfolio.PortfolioEntity", "Portfolio")
@@ -1608,6 +1711,11 @@ namespace FinancialPortfolio.Data.Migrations
                     b.Navigation("PortfolioStockDividends");
 
                     b.Navigation("PortfolioStockHolds");
+                });
+
+            modelBuilder.Entity("FinancialPortfolio.Data.Entities.Portfolio.PortfolioRecurringDepositEntity", b =>
+                {
+                    b.Navigation("Installments");
                 });
 
             modelBuilder.Entity("FinancialPortfolio.Data.Entities.Portfolio.PortfolioStockHoldEntity", b =>

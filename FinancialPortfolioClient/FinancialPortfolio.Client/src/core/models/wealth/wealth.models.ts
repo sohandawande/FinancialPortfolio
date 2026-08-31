@@ -1,6 +1,8 @@
 export type MutualFundSchemeType = 1 | 2 | 3 | 4 | 5;
 export type DepositInterestType = 1 | 2;
 export type DepositStatus = 1 | 2 | 3;
+export type RdInstallmentStatus = 1 | 2 | 3 | 4 | 5;
+export type RdPaymentMode = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
 export interface MutualFund {
   id: number;
@@ -40,10 +42,30 @@ export interface FixedDeposit {
   notes?: string | null;
 }
 
+export interface RdInstallment {
+  id: number;
+  recurringDepositId: number;
+  installmentNumber: number;
+  dueDate: string;
+  paidDate?: string | null;
+  amount: number;
+  fromBankName?: string | null;
+  fromAccountNumber?: string | null;
+  fromIfsc?: string | null;
+  transactionReference?: string | null;
+  paymentMode: RdPaymentMode;
+  status: RdInstallmentStatus;
+  penaltyAmount?: number | null;
+  notes?: string | null;
+}
+
 export interface RecurringDeposit {
   id: number;
   bankName: string;
+  bankIfsc?: string | null;
   accountRef?: string | null;
+  linkedAccountNumber?: string | null;
+  linkedIfsc?: string | null;
   monthlyAmount: number;
   interestRate: number;
   tenureMonths: number;
@@ -55,6 +77,7 @@ export interface RecurringDeposit {
   maturityAmount: number;
   status: DepositStatus;
   notes?: string | null;
+  installments?: RdInstallment[];
 }
 
 export interface WealthBucket {
@@ -122,7 +145,10 @@ export interface UpsertFixedDepositRequest {
 
 export interface UpsertRecurringDepositRequest {
   bankName: string;
+  bankIfsc?: string | null;
   accountRef?: string | null;
+  linkedAccountNumber?: string | null;
+  linkedIfsc?: string | null;
   monthlyAmount: number;
   interestRate: number;
   tenureMonths: number;
@@ -130,6 +156,41 @@ export interface UpsertRecurringDepositRequest {
   startDate: string;
   notes?: string | null;
   status: DepositStatus;
+}
+
+export interface PayRdInstallmentRequest {
+  installmentNumber?: number | null;
+  paidDate?: string | null;
+  amount?: number | null;
+  fromBankName?: string | null;
+  fromAccountNumber?: string | null;
+  fromIfsc?: string | null;
+  transactionReference?: string | null;
+  paymentMode?: RdPaymentMode;
+  penaltyAmount?: number | null;
+  notes?: string | null;
+}
+
+export interface BankIfscInfo {
+  ifsc: string;
+  bank: string;
+  bankCode?: string | null;
+  branch?: string | null;
+  address?: string | null;
+  city?: string | null;
+  district?: string | null;
+  state?: string | null;
+  contact?: string | null;
+  micr?: string | null;
+  rtgs?: boolean | null;
+  neft?: boolean | null;
+  imps?: boolean | null;
+  upi?: boolean | null;
+}
+
+export interface BankSuggestion {
+  name: string;
+  code?: string | null;
 }
 
 export const SCHEME_LABELS: Record<number, string> = {
@@ -144,4 +205,23 @@ export const STATUS_LABELS: Record<number, string> = {
   1: 'Active',
   2: 'Matured',
   3: 'Closed',
+};
+
+export const RD_INSTALLMENT_STATUS_LABELS: Record<number, string> = {
+  1: 'Pending',
+  2: 'Paid',
+  3: 'Missed',
+  4: 'Partial',
+  5: 'Waived',
+};
+
+export const RD_PAYMENT_MODE_LABELS: Record<number, string> = {
+  1: 'Auto debit',
+  2: 'NEFT',
+  3: 'RTGS',
+  4: 'IMPS',
+  5: 'UPI',
+  6: 'Cash',
+  7: 'Cheque',
+  8: 'Other',
 };

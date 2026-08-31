@@ -9,6 +9,8 @@ import {
   MutualFund,
   MutualFundNavSync,
   MutualFundSchemeLookup,
+  PayRdInstallmentRequest,
+  RdInstallment,
   RecurringDeposit,
   UpsertFixedDepositRequest,
   UpsertMutualFundRequest,
@@ -72,7 +74,15 @@ export class WealthService {
   }
 
   recurringDeposits(): Observable<RecurringDeposit[]> {
-    return this.http.get<ApiResponse<RecurringDeposit[]>>(`${this.apiUrl}/recurring-deposits`).pipe(map((r) => r.data ?? []));
+    return this.http
+      .get<ApiResponse<RecurringDeposit[]>>(`${this.apiUrl}/recurring-deposits`)
+      .pipe(map((r) => r.data ?? []));
+  }
+
+  getRecurringDepositDetail(id: number): Observable<RecurringDeposit> {
+    return this.http
+      .get<ApiResponse<RecurringDeposit>>(`${this.apiUrl}/recurring-deposits/${id}`)
+      .pipe(map((r) => r.data!));
   }
 
   addRecurringDeposit(body: UpsertRecurringDepositRequest): Observable<ApiResponse<RecurringDeposit>> {
@@ -85,5 +95,21 @@ export class WealthService {
 
   deleteRecurringDeposit(id: number): Observable<ApiResponse<boolean>> {
     return this.http.delete<ApiResponse<boolean>>(`${this.apiUrl}/recurring-deposits/${id}`);
+  }
+
+  getRdInstallments(rdId: number): Observable<RdInstallment[]> {
+    return this.http
+      .get<ApiResponse<RdInstallment[]>>(`${this.apiUrl}/recurring-deposits/${rdId}/installments`)
+      .pipe(map((r) => r.data ?? []));
+  }
+
+  payRdInstallment(rdId: number, body: PayRdInstallmentRequest): Observable<ApiResponse<RdInstallment>> {
+    return this.http.post<ApiResponse<RdInstallment>>(`${this.apiUrl}/recurring-deposits/${rdId}/pay`, body);
+  }
+
+  deleteRdInstallment(rdId: number, installmentId: number): Observable<ApiResponse<boolean>> {
+    return this.http.delete<ApiResponse<boolean>>(
+      `${this.apiUrl}/recurring-deposits/${rdId}/installments/${installmentId}`,
+    );
   }
 }

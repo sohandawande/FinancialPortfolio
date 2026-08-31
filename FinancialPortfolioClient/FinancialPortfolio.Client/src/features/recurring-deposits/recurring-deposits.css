@@ -243,3 +243,59 @@ html[data-theme="dark"] .rd-form-banner {
   border-color: rgba(16, 185, 129, 0.3);
   color: #6ee7b7;
 }
+
+/* Bank typeahead + installment history */
+
+.rd-bank-field {
+  position: relative;
+}
+
+.rd-bank-dropdown {
+  position: absolute;
+  z-index: 20;
+  left: 0;
+  right: 0;
+  top: 100%;
+  margin: 2px 0 0;
+  padding: 0.25rem 0;
+  list-style: none;
+  background: var(--fp-card, var(--bs-body-bg, #fff));
+  border: 1px solid var(--fp-border-soft, var(--bs-border-color, #dee2e6));
+  border-radius: var(--fp-radius-sm, 0.375rem);
+  max-height: 220px;
+  overflow-y: auto;
+  box-shadow: var(--fp-shadow, 0 0.5rem 1rem rgba(0, 0, 0, 0.1));
+}
+
+.rd-bank-dropdown li button {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.9rem;
+  color: inherit;
+  cursor: pointer;
+}
+
+.rd-bank-dropdown li button:hover {
+  background: var(--fp-navy-soft, var(--bs-tertiary-bg, #f8f9fa));
+}
+
+.rd-section-title {
+  font-size: 0.95rem;
+  font-weight: 650;
+  margin: 1rem 0 0.5rem;
+  color: var(--fp-navy, inherit);
+}
+
+.rd-inst-table {
+  font-size: 0.85rem;
+}
+
+.rd-inst-table th {
+  white-space: nowrap;
+}

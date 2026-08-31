@@ -1,7 +1,7 @@
 <div class="page-container rd-page">
   <app-page-header
     title="Recurring deposits"
-    subtitle="One RD account · pay installments over time. Rate and amount stay fixed after creation."
+    subtitle="One RD account · installment debit history (date, bank, account, UTR)."
     [actions]="headerActions"
     (actionClick)="onHeaderAction($event)"
   />
@@ -23,7 +23,12 @@
               </h3>
               <div class="rd-sub">
                 ₹{{ row.monthlyAmount | number: '1.0-0' }} / month · {{ row.interestRate }}%
-                @if (row.accountRef) { · {{ row.accountRef }} }
+                @if (row.accountRef) {
+                  · {{ row.accountRef }}
+                }
+                @if (row.bankIfsc) {
+                  · {{ row.bankIfsc }}
+                }
               </div>
             </div>
             <div class="rd-progress-block">
@@ -67,10 +72,10 @@
                     type="button"
                     class="btn btn-sm btn-primary"
                     [disabled]="payingId() === row.id"
-                    (click)="payInstallment(row, $event)"
+                    (click)="openPay(row, $event)"
                   >
                     <i class="bi bi-plus-circle"></i>
-                    {{ payingId() === row.id ? 'Recording…' : 'Pay installment #' + (row.installmentsPaid + 1) }}
+                    Pay installment #{{ row.installmentsPaid + 1 }}
                   </button>
                 } @else if (row.installmentsPaid >= row.tenureMonths) {
                   <button type="button" class="btn btn-sm btn-outline-secondary" disabled>
@@ -79,19 +84,77 @@
                 }
 
                 <button type="button" class="btn btn-sm btn-outline-primary" (click)="open(row); $event.stopPropagation()">
-                  <i class="bi bi-pencil"></i> Edit notes / status
+                  <i class="bi bi-pencil"></i> Edit
                 </button>
                 <button type="button" class="btn btn-sm btn-outline-danger" (click)="remove(row, $event)">
                   <i class="bi bi-trash"></i> Delete
                 </button>
               </div>
 
-              @if (canPay(row)) {
-                <p class="rd-pay-hint">
-                  Next payment adds ₹{{ row.monthlyAmount | number: '1.0-0' }} at {{ row.interestRate }}%.
-                  Bank, rate and tenure stay the same — no need to create a new RD.
-                </p>
-              }
+              <div class="rd-installments">
+                <h4 class="rd-section-title">Installment history</h4>
+                @if (loadingInstallments()) {
+                  <div class="text-muted small">Loading…</div>
+                } @else if (installments().length === 0) {
+                  <div class="text-muted small">
+                    No installment rows yet. Use <strong>Pay installment</strong> to record the first debit.
+                  </div>
+                } @else {
+                  <div class="table-responsive">
+                    <table class="table table-sm align-middle rd-inst-table">
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Due</th>
+                          <th>Paid on</th>
+                          <th>Amount</th>
+                          <th>From bank / A/c</th>
+                          <th>UTR / Ref</th>
+                          <th>Mode</th>
+                          <th>Status</th>
+                          <th></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (inst of installments(); track inst.id) {
+                          <tr>
+                            <td>{{ inst.installmentNumber }}</td>
+                            <td>{{ inst.dueDate | date: 'dd MMM yyyy' }}</td>
+                            <td>{{ inst.paidDate ? (inst.paidDate | date: 'dd MMM yyyy') : '—' }}</td>
+                            <td>{{ inst.amount | currency: 'INR' : 'symbol' : '1.0-0' }}</td>
+                            <td>
+                              <div>{{ inst.fromBankName || '—' }}</div>
+                              <div class="text-muted small">
+                                @if (inst.fromAccountNumber) {
+                                  {{ inst.fromAccountNumber }}
+                                }
+                                @if (inst.fromIfsc) {
+                                  · {{ inst.fromIfsc }}
+                                }
+                              </div>
+                            </td>
+                            <td class="small">{{ inst.transactionReference || '—' }}</td>
+                            <td>{{ paymentModeLabels[inst.paymentMode] || inst.paymentMode }}</td>
+                            <td>
+                              <span class="badge text-bg-light">{{ installmentStatusLabels[inst.status] }}</span>
+                            </td>
+                            <td>
+                              <button
+                                type="button"
+                                class="btn btn-link btn-sm text-danger p-0"
+                                title="Delete"
+                                (click)="removeInstallment(row, inst, $event)"
+                              >
+                                <i class="bi bi-trash"></i>
+                              </button>
+                            </td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                }
+              </div>
             </div>
           }
         </article>
@@ -115,20 +178,74 @@
         <div class="rd-form-banner">
           <i class="bi bi-info-circle"></i>
           <span>
-            Core terms are locked. To record a payment use <strong>Pay installment</strong> on the card —
-            do not create another RD for the same account.
+            Core terms are locked. To record a payment use <strong>Pay installment</strong> on the card.
           </span>
         </div>
       }
 
-      <label class="div-field">
+      <label class="div-field rd-bank-field">
         <span>Bank <span class="text-danger">*</span></span>
-        <input class="form-control" [(ngModel)]="form.bankName" [readonly]="!!editId()" />
+        <input
+          class="form-control"
+          [ngModel]="form.bankName"
+          (ngModelChange)="onBankNameInput($event)"
+          (focus)="onBankFocus()"
+          [readonly]="!!editId()"
+          autocomplete="off"
+          placeholder="Type to search (HDFC, SBI…)"
+        />
+        @if (showBankDrop() && !editId()) {
+          <ul class="rd-bank-dropdown">
+            @for (s of bankSuggestions(); track s.name) {
+              <li>
+                <button type="button" (mousedown)="selectBank(s)">
+                  <strong>{{ s.name }}</strong>
+                  @if (s.code) {
+                    <span class="text-muted">{{ s.code }}</span>
+                  }
+                </button>
+              </li>
+            }
+          </ul>
+        }
       </label>
-      <label class="div-field">
-        <span>Account / ref</span>
-        <input class="form-control" [(ngModel)]="form.accountRef" [readonly]="!!editId()" />
-      </label>
+
+      <div class="row g-2">
+        <div class="col-6">
+          <label class="div-field">
+            <span>Bank IFSC</span>
+            <input
+              class="form-control"
+              [(ngModel)]="form.bankIfsc"
+              (blur)="onIfscBlur()"
+              [readonly]="!!editId()"
+              maxlength="11"
+              placeholder="e.g. SBIN0001234"
+            />
+          </label>
+        </div>
+        <div class="col-6">
+          <label class="div-field">
+            <span>RD account / ref</span>
+            <input class="form-control" [(ngModel)]="form.accountRef" [readonly]="!!editId()" />
+          </label>
+        </div>
+      </div>
+
+      <div class="row g-2">
+        <div class="col-6">
+          <label class="div-field">
+            <span>Debit from A/c no.</span>
+            <input class="form-control" [(ngModel)]="form.linkedAccountNumber" [readonly]="!!editId()" />
+          </label>
+        </div>
+        <div class="col-6">
+          <label class="div-field">
+            <span>Debit IFSC</span>
+            <input class="form-control" [(ngModel)]="form.linkedIfsc" [readonly]="!!editId()" maxlength="11" />
+          </label>
+        </div>
+      </div>
 
       <div class="row g-2">
         <div class="col-4">
@@ -152,13 +269,8 @@
       </div>
 
       <label class="div-field">
-        <span>Installments paid</span>
-        <input
-          type="number"
-          class="form-control"
-          [(ngModel)]="form.installmentsPaid"
-          [readonly]="!!editId()"
-        />
+        <span>Installments already paid (at create)</span>
+        <input type="number" class="form-control" [(ngModel)]="form.installmentsPaid" [readonly]="!!editId()" />
         @if (editId()) {
           <small class="text-muted">Use “Pay installment” on the list to increase this safely.</small>
         }
@@ -187,6 +299,80 @@
       <label class="div-field">
         <span>Notes</span>
         <input class="form-control" [(ngModel)]="form.notes" />
+      </label>
+    </div>
+  </app-fp-modal>
+}
+
+@if (showPayModal() && payTarget(); as target) {
+  <app-fp-modal
+    [open]="true"
+    title="Record installment payment"
+    icon="bi-cash-coin"
+    [busy]="payingId() === target.id"
+    confirmText="Record payment"
+    (closed)="showPayModal.set(false)"
+    (confirmed)="confirmPay()"
+  >
+    <div class="div-form fp-form rd-form">
+      <p class="text-muted small mb-2">
+        {{ target.bankName }} · installment #{{ payForm.installmentNumber }} of {{ target.tenureMonths }}
+      </p>
+
+      <div class="row g-2">
+        <div class="col-6">
+          <label class="div-field">
+            <span>Paid date</span>
+            <app-fp-date name="payDate" [(ngModel)]="payForm.paidDate" />
+          </label>
+        </div>
+        <div class="col-6">
+          <label class="div-field">
+            <span>Amount</span>
+            <input type="number" class="form-control" [(ngModel)]="payForm.amount" />
+          </label>
+        </div>
+      </div>
+
+      <label class="div-field">
+        <span>From bank</span>
+        <input class="form-control" [(ngModel)]="payForm.fromBankName" />
+      </label>
+
+      <div class="row g-2">
+        <div class="col-6">
+          <label class="div-field">
+            <span>From account number</span>
+            <input class="form-control" [(ngModel)]="payForm.fromAccountNumber" />
+          </label>
+        </div>
+        <div class="col-6">
+          <label class="div-field">
+            <span>From IFSC</span>
+            <input class="form-control" [(ngModel)]="payForm.fromIfsc" maxlength="11" />
+          </label>
+        </div>
+      </div>
+
+      <label class="div-field">
+        <span>Transaction / UTR / ref no.</span>
+        <input class="form-control" [(ngModel)]="payForm.transactionReference" placeholder="UTR / cheque / UPI ref" />
+      </label>
+
+      <label class="div-field">
+        <span>Payment mode</span>
+        <app-fp-dropdown-select
+          icon="bi-credit-card"
+          ariaLabel="Payment mode"
+          [options]="paymentModeOptions"
+          [value]="payForm.paymentMode ?? 1"
+          (valueChange)="onPayModeChange($event)"
+        />
+      </label>
+
+      <label class="div-field">
+        <span>Notes</span>
+        <input class="form-control" [(ngModel)]="payForm.notes" />
       </label>
     </div>
   </app-fp-modal>
