@@ -87,8 +87,7 @@ export const routes: Routes = [
       },
       {
         path: 'etfs',
-        loadComponent: () =>
-          import('../features/etfs/etf-lists/etf-lists').then((c) => c.EtfLists),
+        loadComponent: () => import('../features/etfs/etf-lists/etf-lists').then((c) => c.EtfLists),
       },
       {
         path: 'etfs/:id',
@@ -140,8 +139,14 @@ export const routes: Routes = [
       },
       {
         path: 'dividends',
+        loadComponent: () => import('../features/dividends/dividends').then((c) => c.Dividends),
+      },
+      {
+        path: 'insurance-policies',
         loadComponent: () =>
-          import('../features/dividends/dividends').then((c) => c.Dividends),
+          import('../features/insurance-policies/insurance-policies').then(
+            (m) => m.InsurancePolicies,
+          ),
       },
       {
         path: 'transactions',

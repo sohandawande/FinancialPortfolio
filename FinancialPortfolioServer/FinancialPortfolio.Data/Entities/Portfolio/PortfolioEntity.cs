@@ -18,5 +18,6 @@ namespace FinancialPortfolio.Data.Entities.Portfolio
         public ICollection<PortfolioMutualFundEntity> PortfolioMutualFunds { get; set; } = [];
         public ICollection<PortfolioFixedDepositEntity> PortfolioFixedDeposits { get; set; } = [];
         public ICollection<PortfolioRecurringDepositEntity> PortfolioRecurringDeposits { get; set; } = [];
+        public ICollection<PortfolioInsurancePolicyEntity> PortfolioInsurancePolicies { get; set; } = [];
     }
 }

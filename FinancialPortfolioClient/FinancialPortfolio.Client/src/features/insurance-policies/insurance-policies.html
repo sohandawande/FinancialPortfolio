@@ -1,0 +1,118 @@
+<div class="page-container">
+  <app-page-header
+    title="Insurance policies"
+    subtitle="LIC, HDFC Life, SBI Life, Axis Max and others. Track premiums paid, term and expected maturity."
+    [actions]="headerActions"
+    (actionClick)="onHeaderAction($event)"
+  />
+
+  @if (loading()) {
+    <div class="wt-empty">Loading policies…</div>
+  } @else if (rows().length === 0) {
+    <div class="wt-empty">No insurance policies yet.</div>
+  } @else {
+    <div class="wt-buckets">
+      @for (row of rows(); track row.id) {
+        <article class="wt-bucket">
+          <div class="wt-bucket-top">
+            <span>{{ statusLabels[row.status] }}</span>
+            <span>{{ typeLabels[row.policyType] }} · {{ freqLabels[row.premiumFrequency] }}</span>
+          </div>
+          <div class="wt-bucket-value">{{ row.insurerName }}</div>
+          <div class="wt-bucket-meta">{{ row.planName }} · {{ row.policyNumber }}</div>
+          <div class="wt-bucket-meta">
+            SA {{ row.sumAssured | currency: 'INR' : 'symbol' : '1.0-0' }} · Premium
+            {{ row.premiumAmount | currency: 'INR' : 'symbol' : '1.0-0' }}
+          </div>
+          <div class="wt-bucket-meta">
+            Paid {{ row.premiumsPaid }}/{{ row.maxPremiumInstallments || '—' }} · Invested
+            {{ row.totalPremiumsPaid | currency: 'INR' : 'symbol' : '1.0-0' }} · Value
+            {{ row.currentValue | currency: 'INR' : 'symbol' : '1.0-0' }}
+          </div>
+          <div class="wt-bucket-meta">
+            Maturity {{ row.maturityDate | date: 'dd MMM yyyy' }}
+            @if (row.expectedMaturityAmount) {
+              · Expected {{ row.expectedMaturityAmount | currency: 'INR' : 'symbol' : '1.0-0' }}
+            }
+          </div>
+          <div class="d-flex gap-2 mt-2">
+            <button type="button" class="btn btn-sm btn-outline-primary" (click)="open(row)">Edit</button>
+            <button type="button" class="btn btn-sm btn-outline-danger" (click)="remove(row)">Delete</button>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</div>
+
+@if (showModal()) {
+  <app-fp-modal
+    [open]="true"
+    [title]="editId() ? 'Edit policy' : 'Add policy'"
+    icon="bi-shield-check"
+    [busy]="saving()"
+    confirmText="Save"
+    (closed)="showModal.set(false)"
+    (confirmed)="save()"
+  >
+    <div class="div-form">
+      <label class="div-field"><span>Insurer</span><input class="form-control" [(ngModel)]="form.insurerName" placeholder="LIC / HDFC Life / SBI Life…" /></label>
+      <div class="row g-2">
+        <div class="col-6"><label class="div-field"><span>Policy number</span><input class="form-control" [(ngModel)]="form.policyNumber" /></label></div>
+        <div class="col-6"><label class="div-field"><span>Plan name</span><input class="form-control" [(ngModel)]="form.planName" /></label></div>
+      </div>
+      <div class="row g-2">
+        <div class="col-6">
+          <label class="div-field">
+            <span>Type</span>
+            <select class="form-select" [(ngModel)]="form.policyType">
+              <option [ngValue]="1">Term</option>
+              <option [ngValue]="2">Endowment</option>
+              <option [ngValue]="3">ULIP</option>
+              <option [ngValue]="4">Money-back</option>
+              <option [ngValue]="5">Whole life</option>
+              <option [ngValue]="6">Pension</option>
+              <option [ngValue]="7">Child</option>
+              <option [ngValue]="8">Other</option>
+            </select>
+          </label>
+        </div>
+        <div class="col-6">
+          <label class="div-field">
+            <span>Premium frequency</span>
+            <select class="form-select" [(ngModel)]="form.premiumFrequency">
+              <option [ngValue]="1">Monthly</option>
+              <option [ngValue]="2">Quarterly</option>
+              <option [ngValue]="3">Half-yearly</option>
+              <option [ngValue]="4">Yearly</option>
+              <option [ngValue]="5">Single</option>
+              <option [ngValue]="6">Weekly</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      <div class="row g-2">
+        <div class="col-4"><label class="div-field"><span>Sum assured</span><input type="number" class="form-control" [(ngModel)]="form.sumAssured" /></label></div>
+        <div class="col-4"><label class="div-field"><span>Premium</span><input type="number" class="form-control" [(ngModel)]="form.premiumAmount" /></label></div>
+        <div class="col-4"><label class="div-field"><span>Premiums paid</span><input type="number" class="form-control" [(ngModel)]="form.premiumsPaid" /></label></div>
+      </div>
+      <div class="row g-2">
+        <div class="col-4"><label class="div-field"><span>PPT years</span><input type="number" class="form-control" [(ngModel)]="form.premiumPayingTermYears" /></label></div>
+        <div class="col-4"><label class="div-field"><span>Policy term years</span><input type="number" class="form-control" [(ngModel)]="form.policyTermYears" /></label></div>
+        <div class="col-4"><label class="div-field"><span>Expected maturity</span><input type="number" class="form-control" [(ngModel)]="form.expectedMaturityAmount" /></label></div>
+      </div>
+      <label class="div-field"><span>Start / commencement date</span><app-fp-date name="polStart" [(ngModel)]="form.startDate" /></label>
+      <label class="div-field">
+        <span>Status</span>
+        <select class="form-select" [(ngModel)]="form.status">
+          <option [ngValue]="1">Active</option>
+          <option [ngValue]="2">Lapsed</option>
+          <option [ngValue]="3">Matured</option>
+          <option [ngValue]="4">Surrendered</option>
+          <option [ngValue]="5">Closed</option>
+        </select>
+      </label>
+      <label class="div-field"><span>Notes</span><input class="form-control" [(ngModel)]="form.notes" /></label>
+    </div>
+  </app-fp-modal>
+}

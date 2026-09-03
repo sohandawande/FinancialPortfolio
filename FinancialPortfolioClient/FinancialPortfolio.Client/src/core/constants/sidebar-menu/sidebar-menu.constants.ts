@@ -13,4 +13,5 @@ export const SIDEBAR_MENU: SidebarMenu[] = [
   { id: 9, title: 'Dividends', icon: 'bi-cash-coin', route: '/dividends' },
   { id: 10, title: 'Users', icon: 'bi-people', route: '/users/manage' },
   { id: 11, title: 'System Logs', icon: 'bi-journal-text', route: '/system-logs' },
+  { id: 13, title: 'Insurance Policies', icon: 'bi-shield-check', route: '/insurance-policies' },
 ];

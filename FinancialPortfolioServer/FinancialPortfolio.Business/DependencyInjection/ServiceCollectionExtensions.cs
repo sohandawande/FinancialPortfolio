@@ -69,6 +69,11 @@ namespace FinancialPortfolio.Business.DependencyInjection
                 client.DefaultRequestHeaders.UserAgent.ParseAdd("FinancialPortfolio/1.0");
             });
             services.AddScoped<IMutualFundNavService>(sp => sp.GetRequiredService<MutualFundNavService>());
+            services.AddHttpClient<IBankLookupService, BankLookupService>(client =>
+            {
+                client.BaseAddress = new Uri("https://ifsc.razorpay.com/");
+                client.Timeout = TimeSpan.FromSeconds(8);
+            });
 
             return services;
         }

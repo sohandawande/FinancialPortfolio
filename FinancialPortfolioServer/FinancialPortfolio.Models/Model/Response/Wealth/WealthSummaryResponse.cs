@@ -21,5 +21,6 @@ namespace FinancialPortfolio.Models.Model.Response.Wealth
         public List<MutualFundResponse> MutualFunds { get; set; } = [];
         public List<FixedDepositResponse> FixedDeposits { get; set; } = [];
         public List<RecurringDepositResponse> RecurringDeposits { get; set; } = [];
+        public List<InsurancePolicyResponse> InsurancePolicies { get; set; } = [];
     }
 }

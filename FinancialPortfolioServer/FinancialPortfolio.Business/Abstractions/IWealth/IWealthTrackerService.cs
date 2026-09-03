@@ -28,5 +28,10 @@ namespace FinancialPortfolio.Business.Abstractions.IWealth
         Task<ApiResponse<RdInstallmentResponse>> PayRdInstallmentAsync(long rdId, PayRdInstallmentRequest request, CancellationToken cancellationToken);
         Task<ApiResponse<RdInstallmentResponse>> UpsertRdInstallmentAsync(long rdId, UpsertRdInstallmentRequest request, CancellationToken cancellationToken);
         Task<ApiResponse<bool>> DeleteRdInstallmentAsync(long rdId, long installmentId, CancellationToken cancellationToken);
+
+        Task<ApiResponse<List<InsurancePolicyResponse>>> GetInsurancePoliciesAsync(CancellationToken cancellationToken);
+        Task<ApiResponse<InsurancePolicyResponse>> AddInsurancePolicyAsync(UpsertInsurancePolicyRequest request, CancellationToken cancellationToken);
+        Task<ApiResponse<InsurancePolicyResponse>> UpdateInsurancePolicyAsync(long id, UpsertInsurancePolicyRequest request, CancellationToken cancellationToken);
+        Task<ApiResponse<bool>> DeleteInsurancePolicyAsync(long id, CancellationToken cancellationToken);
     }
 }

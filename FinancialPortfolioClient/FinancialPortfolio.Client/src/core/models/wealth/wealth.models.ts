@@ -3,6 +3,9 @@ export type DepositInterestType = 1 | 2;
 export type DepositStatus = 1 | 2 | 3;
 export type RdInstallmentStatus = 1 | 2 | 3 | 4 | 5;
 export type RdPaymentMode = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+export type InsurancePolicyType = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+export type PremiumFrequency = 1 | 2 | 3 | 4 | 5 | 6;
+export type InsurancePolicyStatus = 1 | 2 | 3 | 4 | 5;
 
 export interface MutualFund {
   id: number;
@@ -188,6 +191,46 @@ export interface BankIfscInfo {
   upi?: boolean | null;
 }
 
+export interface InsurancePolicy {
+  id: number;
+  insurerName: string;
+  policyNumber: string;
+  planName: string;
+  policyType: InsurancePolicyType;
+  sumAssured: number;
+  premiumAmount: number;
+  premiumFrequency: PremiumFrequency;
+  premiumPayingTermYears: number;
+  policyTermYears: number;
+  startDate: string;
+  maturityDate: string;
+  premiumsPaid: number;
+  maxPremiumInstallments: number;
+  totalPremiumsPaid: number;
+  expectedMaturityAmount?: number | null;
+  currentValue: number;
+  gainLoss: number;
+  status: InsurancePolicyStatus;
+  notes?: string | null;
+}
+
+export interface UpsertInsurancePolicyRequest {
+  insurerName: string;
+  policyNumber: string;
+  planName: string;
+  policyType: InsurancePolicyType;
+  sumAssured: number;
+  premiumAmount: number;
+  premiumFrequency: PremiumFrequency;
+  premiumPayingTermYears: number;
+  policyTermYears: number;
+  startDate: string;
+  premiumsPaid: number;
+  expectedMaturityAmount?: number | null;
+  status: InsurancePolicyStatus;
+  notes?: string | null;
+}
+
 export interface BankSuggestion {
   name: string;
   code?: string | null;
@@ -224,4 +267,32 @@ export const RD_PAYMENT_MODE_LABELS: Record<number, string> = {
   6: 'Cash',
   7: 'Cheque',
   8: 'Other',
+};
+
+export const POLICY_TYPE_LABELS: Record<number, string> = {
+  1: 'Term',
+  2: 'Endowment',
+  3: 'ULIP',
+  4: 'Money-back',
+  5: 'Whole life',
+  6: 'Pension',
+  7: 'Child',
+  8: 'Other',
+};
+
+export const PREMIUM_FREQUENCY_LABELS: Record<number, string> = {
+  1: 'Monthly',
+  2: 'Quarterly',
+  3: 'Half-yearly',
+  4: 'Yearly',
+  5: 'Single',
+  6: 'Weekly',
+};
+
+export const POLICY_STATUS_LABELS: Record<number, string> = {
+  1: 'Active',
+  2: 'Lapsed',
+  3: 'Matured',
+  4: 'Surrendered',
+  5: 'Closed',
 };

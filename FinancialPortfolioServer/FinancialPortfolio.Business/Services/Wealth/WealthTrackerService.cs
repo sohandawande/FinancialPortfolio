@@ -43,17 +43,17 @@ namespace FinancialPortfolio.Business.Services.Wealth
             var funds = await MapFundsAsync(portfolio.Id, cancellationToken);
             var fds = await MapFdsAsync(portfolio.Id, cancellationToken);
             var rds = await MapRdsAsync(portfolio.Id, cancellationToken);
-            var (equity, etfs) = await MapEquityBucketsAsync(portfolio.Id, cancellationToken);
+            var policies = await MapPoliciesAsync(portfolio.Id, cancellationToken);
+            var equity = await MapEquityAsync(portfolio.Id, cancellationToken);
 
             var buckets = new List<WealthBucketResponse>
             {
                 equity,
-                etfs,
                 Bucket("mf", "Mutual funds", funds.Sum(x => x.InvestedAmount), funds.Sum(x => x.CurrentValue), funds.Count),
                 Bucket("fd", "Fixed deposits", fds.Sum(x => x.Principal), fds.Sum(x => x.CurrentValue), fds.Count),
-                Bucket("rd", "Recurring deposits", rds.Sum(x => x.InvestedAmount), rds.Sum(x => x.CurrentValue), rds.Count)
+                Bucket("rd", "Recurring deposits", rds.Sum(x => x.InvestedAmount), rds.Sum(x => x.CurrentValue), rds.Count),
+                Bucket("insurance", "Insurance policies", policies.Sum(x => x.TotalPremiumsPaid), policies.Sum(x => x.CurrentValue), policies.Count)
             };
-
             var invested = buckets.Sum(b => b.Invested);
             var value = buckets.Sum(b => b.CurrentValue);
             foreach (var b in buckets)
@@ -68,7 +68,8 @@ namespace FinancialPortfolio.Business.Services.Wealth
                 Buckets = buckets,
                 MutualFunds = funds,
                 FixedDeposits = fds,
-                RecurringDeposits = rds
+                RecurringDeposits = rds,
+                InsurancePolicies = policies
             }, "Wealth summary fetched.");
         }
 
@@ -387,6 +388,46 @@ namespace FinancialPortfolio.Business.Services.Wealth
             return ResponseFactory.Success(true, "Installment deleted.");
         }
 
+        public async Task<ApiResponse<List<InsurancePolicyResponse>>> GetInsurancePoliciesAsync(CancellationToken cancellationToken)
+        {
+            var portfolio = await GetPortfolioOrNullAsync(cancellationToken);
+            if (portfolio is null) return ResponseFactory.Success(new List<InsurancePolicyResponse>(), "No portfolio created yet.");
+            return ResponseFactory.Success(await MapPoliciesAsync(portfolio.Id, cancellationToken), "Insurance policies fetched.");
+        }
+
+        public async Task<ApiResponse<InsurancePolicyResponse>> AddInsurancePolicyAsync(UpsertInsurancePolicyRequest request, CancellationToken cancellationToken)
+        {
+            Guard.AgainstNull(request, nameof(request));
+            await _validation.ValidateAsync(request, cancellationToken);
+            var portfolio = await RequirePortfolioAsync(cancellationToken);
+            var entity = ApplyPolicy(new PortfolioInsurancePolicyEntity { PortfolioId = portfolio.Id }, request);
+            await _context.PortfolioInsurancePolicies.AddAsync(entity, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+            return ResponseFactory.Success(MapPolicy(entity), "Insurance policy added.");
+        }
+
+        public async Task<ApiResponse<InsurancePolicyResponse>> UpdateInsurancePolicyAsync(long id, UpsertInsurancePolicyRequest request, CancellationToken cancellationToken)
+        {
+            Guard.AgainstNull(request, nameof(request));
+            await _validation.ValidateAsync(request, cancellationToken);
+            var portfolio = await RequirePortfolioAsync(cancellationToken);
+            var entity = await _context.PortfolioInsurancePolicies.FirstOrDefaultAsync(x => x.Id == id && x.PortfolioId == portfolio.Id, cancellationToken)
+                ?? throw new NotFoundException("Insurance policy not found.");
+            ApplyPolicy(entity, request);
+            await _context.SaveChangesAsync(cancellationToken);
+            return ResponseFactory.Success(MapPolicy(entity), "Insurance policy updated.");
+        }
+
+        public async Task<ApiResponse<bool>> DeleteInsurancePolicyAsync(long id, CancellationToken cancellationToken)
+        {
+            var portfolio = await RequirePortfolioAsync(cancellationToken);
+            var entity = await _context.PortfolioInsurancePolicies.FirstOrDefaultAsync(x => x.Id == id && x.PortfolioId == portfolio.Id, cancellationToken)
+                ?? throw new NotFoundException("Insurance policy not found.");
+            _context.PortfolioInsurancePolicies.Remove(entity);
+            await _context.SaveChangesAsync(cancellationToken);
+            return ResponseFactory.Success(true, "Insurance policy deleted.");
+        }
+
         private async Task SyncRdPaidCountAsync(PortfolioRecurringDepositEntity rd, CancellationToken cancellationToken)
         {
             var paidCount = await _context.PortfolioRecurringDepositInstallments
@@ -643,5 +684,71 @@ namespace FinancialPortfolio.Business.Services.Wealth
             PenaltyAmount = x.PenaltyAmount,
             Notes = x.Notes
         };
+
+        private async Task<List<InsurancePolicyResponse>> MapPoliciesAsync(long portfolioId, CancellationToken cancellationToken)
+        {
+            var rows = await _context.PortfolioInsurancePolicies.AsNoTracking()
+                .Where(x => x.PortfolioId == portfolioId)
+                .OrderByDescending(x => x.StartDate)
+                .ToListAsync(cancellationToken);
+            return rows.Select(MapPolicy).ToList();
+        }
+
+        private static PortfolioInsurancePolicyEntity ApplyPolicy(PortfolioInsurancePolicyEntity entity, UpsertInsurancePolicyRequest request)
+        {
+            entity.InsurerName = request.InsurerName.Trim();
+            entity.PolicyNumber = request.PolicyNumber.Trim();
+            entity.PlanName = request.PlanName.Trim();
+            entity.PolicyType = request.PolicyType;
+            entity.SumAssured = request.SumAssured;
+            entity.PremiumAmount = request.PremiumAmount;
+            entity.PremiumFrequency = request.PremiumFrequency;
+            entity.PremiumPayingTermYears = request.PremiumPayingTermYears;
+            entity.PolicyTermYears = request.PolicyTermYears;
+            entity.StartDate = request.StartDate.Date;
+            entity.MaturityDate = InsuranceMath.MaturityDate(request.StartDate, request.PolicyTermYears);
+            var max = InsuranceMath.MaxInstallments(request.PremiumFrequency, request.PremiumPayingTermYears);
+            entity.PremiumsPaid = Math.Clamp(request.PremiumsPaid, 0, max > 0 ? max : request.PremiumsPaid);
+            entity.ExpectedMaturityAmount = request.ExpectedMaturityAmount;
+            entity.Status = request.Status == 0 ? InsurancePolicyStatus.Active : request.Status;
+            entity.Notes = request.Notes;
+            if (entity.Status == InsurancePolicyStatus.Active && DateTime.UtcNow.Date >= entity.MaturityDate)
+                entity.Status = InsurancePolicyStatus.Matured;
+            return entity;
+        }
+
+        private static InsurancePolicyResponse MapPolicy(PortfolioInsurancePolicyEntity x)
+        {
+            var now = DateTime.UtcNow.Date;
+            var max = InsuranceMath.MaxInstallments(x.PremiumFrequency, x.PremiumPayingTermYears);
+            var totalPaid = InsuranceMath.TotalPremiumsPaid(x.PremiumAmount, x.PremiumsPaid);
+            var current = InsuranceMath.CurrentValue(x.PolicyType, totalPaid, x.ExpectedMaturityAmount, x.Status, x.MaturityDate, now);
+            var status = x.Status == InsurancePolicyStatus.Active && now >= x.MaturityDate
+                ? InsurancePolicyStatus.Matured
+                : x.Status;
+            return new InsurancePolicyResponse
+            {
+                Id = x.Id,
+                InsurerName = x.InsurerName,
+                PolicyNumber = x.PolicyNumber,
+                PlanName = x.PlanName,
+                PolicyType = x.PolicyType,
+                SumAssured = x.SumAssured,
+                PremiumAmount = x.PremiumAmount,
+                PremiumFrequency = x.PremiumFrequency,
+                PremiumPayingTermYears = x.PremiumPayingTermYears,
+                PolicyTermYears = x.PolicyTermYears,
+                StartDate = x.StartDate,
+                MaturityDate = x.MaturityDate,
+                PremiumsPaid = x.PremiumsPaid,
+                MaxPremiumInstallments = max,
+                TotalPremiumsPaid = totalPaid,
+                ExpectedMaturityAmount = x.ExpectedMaturityAmount,
+                CurrentValue = current,
+                GainLoss = InsuranceMath.Round(current - totalPaid),
+                Status = status,
+                Notes = x.Notes
+            };
+        }
     }
 }

@@ -34,6 +34,7 @@ export class Wealth implements OnInit {
     { id: 'mf', label: 'Mutual funds', icon: 'bi-pie-chart', color: 'outline-secondary' },
     { id: 'fd', label: 'FD', icon: 'bi-bank', color: 'outline-secondary' },
     { id: 'rd', label: 'RD', icon: 'bi-calendar-check', color: 'outline-secondary' },
+  { id: 'insurance', label: 'Insurance', icon: 'bi-shield-check', color: 'outline-secondary' },
   ];
 
   ngOnInit(): void {
@@ -48,6 +49,7 @@ export class Wealth implements OnInit {
     if (id === 'mf') void this.router.navigate(['/mutual-funds']);
     if (id === 'fd') void this.router.navigate(['/fixed-deposits']);
     if (id === 'rd') void this.router.navigate(['/recurring-deposits']);
+    if (id === 'insurance') void this.router.navigate(['/insurance-policies']);
   }
 
   openBucket(key: string): void {
@@ -56,6 +58,7 @@ export class Wealth implements OnInit {
     if (key === 'mf') void this.router.navigate(['/mutual-funds']);
     if (key === 'fd') void this.router.navigate(['/fixed-deposits']);
     if (key === 'rd') void this.router.navigate(['/recurring-deposits']);
+    if (key === 'insurance') void this.router.navigate(['/insurance-policies']);
   }
 
   load(): void {

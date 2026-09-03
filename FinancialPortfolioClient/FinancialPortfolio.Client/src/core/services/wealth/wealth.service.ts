@@ -112,4 +112,20 @@ export class WealthService {
       `${this.apiUrl}/recurring-deposits/${rdId}/installments/${installmentId}`,
     );
   }
+
+  insurancePolicies(): Observable<InsurancePolicy[]> {
+    return this.http.get<ApiResponse<InsurancePolicy[]>>(`${this.apiUrl}/insurance-policies`).pipe(map((r) => r.data ?? []));
+  }
+
+  addInsurancePolicy(body: UpsertInsurancePolicyRequest): Observable<ApiResponse<InsurancePolicy>> {
+    return this.http.post<ApiResponse<InsurancePolicy>>(`${this.apiUrl}/insurance-policies`, body);
+  }
+
+  updateInsurancePolicy(id: number, body: UpsertInsurancePolicyRequest): Observable<ApiResponse<InsurancePolicy>> {
+    return this.http.put<ApiResponse<InsurancePolicy>>(`${this.apiUrl}/insurance-policies/${id}`, body);
+  }
+
+  deleteInsurancePolicy(id: number): Observable<ApiResponse<boolean>> {
+    return this.http.delete<ApiResponse<boolean>>(`${this.apiUrl}/insurance-policies/${id}`);
+  }
 }

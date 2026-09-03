@@ -107,5 +107,21 @@ namespace FinancialPortfolio.Api.Controllers.Wealth
         [HttpDelete("recurring-deposits/{id:long}/installments/{installmentId:long}")]
         public async Task<IActionResult> DeleteRdInstallment(long id, long installmentId, CancellationToken cancellationToken)
             => Ok(await _wealth.DeleteRdInstallmentAsync(id, installmentId, cancellationToken));
+
+        [HttpGet("insurance-policies")]
+        public async Task<IActionResult> InsurancePolicies(CancellationToken cancellationToken)
+            => Ok(await _wealth.GetInsurancePoliciesAsync(cancellationToken));
+
+        [HttpPost("insurance-policies")]
+        public async Task<IActionResult> AddInsurancePolicy([FromBody] UpsertInsurancePolicyRequest request, CancellationToken cancellationToken)
+            => Ok(await _wealth.AddInsurancePolicyAsync(request, cancellationToken));
+
+        [HttpPut("insurance-policies/{id:long}")]
+        public async Task<IActionResult> UpdateInsurancePolicy(long id, [FromBody] UpsertInsurancePolicyRequest request, CancellationToken cancellationToken)
+            => Ok(await _wealth.UpdateInsurancePolicyAsync(id, request, cancellationToken));
+
+        [HttpDelete("insurance-policies/{id:long}")]
+        public async Task<IActionResult> DeleteInsurancePolicy(long id, CancellationToken cancellationToken)
+            => Ok(await _wealth.DeleteInsurancePolicyAsync(id, cancellationToken));
     }
 }

@@ -36,6 +36,7 @@ namespace FinancialPortfolio.Data.Context
         public DbSet<PortfolioFixedDepositEntity> PortfolioFixedDeposits => Set<PortfolioFixedDepositEntity>();
         public DbSet<PortfolioRecurringDepositEntity> PortfolioRecurringDeposits => Set<PortfolioRecurringDepositEntity>();
         public DbSet<PortfolioRecurringDepositInstallmentEntity> PortfolioRecurringDepositInstallments => Set<PortfolioRecurringDepositInstallmentEntity>();
+        public DbSet<PortfolioInsurancePolicyEntity> PortfolioInsurancePolicies => Set<PortfolioInsurancePolicyEntity>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
