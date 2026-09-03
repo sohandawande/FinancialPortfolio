@@ -6,6 +6,7 @@ import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../../models/common/api-response';
 import {
   FixedDeposit,
+  InsurancePolicy,
   MutualFund,
   MutualFundNavSync,
   MutualFundSchemeLookup,
@@ -13,6 +14,7 @@ import {
   RdInstallment,
   RecurringDeposit,
   UpsertFixedDepositRequest,
+  UpsertInsurancePolicyRequest,
   UpsertMutualFundRequest,
   UpsertRecurringDepositRequest,
   WealthSummary,

@@ -44,11 +44,12 @@ namespace FinancialPortfolio.Business.Services.Wealth
             var fds = await MapFdsAsync(portfolio.Id, cancellationToken);
             var rds = await MapRdsAsync(portfolio.Id, cancellationToken);
             var policies = await MapPoliciesAsync(portfolio.Id, cancellationToken);
-            var equity = await MapEquityAsync(portfolio.Id, cancellationToken);
+            var (equity, etfs) = await MapEquityBucketsAsync(portfolio.Id, cancellationToken);
 
             var buckets = new List<WealthBucketResponse>
             {
                 equity,
+                etfs,
                 Bucket("mf", "Mutual funds", funds.Sum(x => x.InvestedAmount), funds.Sum(x => x.CurrentValue), funds.Count),
                 Bucket("fd", "Fixed deposits", fds.Sum(x => x.Principal), fds.Sum(x => x.CurrentValue), fds.Count),
                 Bucket("rd", "Recurring deposits", rds.Sum(x => x.InvestedAmount), rds.Sum(x => x.CurrentValue), rds.Count),
@@ -400,6 +401,11 @@ namespace FinancialPortfolio.Business.Services.Wealth
             Guard.AgainstNull(request, nameof(request));
             await _validation.ValidateAsync(request, cancellationToken);
             var portfolio = await RequirePortfolioAsync(cancellationToken);
+            var policyNumber = request.PolicyNumber.Trim();
+            var duplicate = await _context.PortfolioInsurancePolicies.AsNoTracking()
+                .AnyAsync(x => x.PortfolioId == portfolio.Id && x.PolicyNumber == policyNumber, cancellationToken);
+            if (duplicate)
+                throw new ConflictException($"A policy with number '{policyNumber}' already exists in this portfolio.");
             var entity = ApplyPolicy(new PortfolioInsurancePolicyEntity { PortfolioId = portfolio.Id }, request);
             await _context.PortfolioInsurancePolicies.AddAsync(entity, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
@@ -413,6 +419,11 @@ namespace FinancialPortfolio.Business.Services.Wealth
             var portfolio = await RequirePortfolioAsync(cancellationToken);
             var entity = await _context.PortfolioInsurancePolicies.FirstOrDefaultAsync(x => x.Id == id && x.PortfolioId == portfolio.Id, cancellationToken)
                 ?? throw new NotFoundException("Insurance policy not found.");
+            var policyNumber = request.PolicyNumber.Trim();
+            var duplicate = await _context.PortfolioInsurancePolicies.AsNoTracking()
+                .AnyAsync(x => x.PortfolioId == portfolio.Id && x.PolicyNumber == policyNumber && x.Id != id, cancellationToken);
+            if (duplicate)
+                throw new ConflictException($"A policy with number '{policyNumber}' already exists in this portfolio.");
             ApplyPolicy(entity, request);
             await _context.SaveChangesAsync(cancellationToken);
             return ResponseFactory.Success(MapPolicy(entity), "Insurance policy updated.");
